@@ -2,6 +2,10 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+-- This module is a simple kind of RAM test.
+-- It fills the HyperRAM with pseudo-random data,
+-- and verifies the data can be read back again.
+
 entity trafic_gen is
    port (
       clk_i               : in  std_logic;
@@ -70,7 +74,11 @@ begin
                avm_burstcount_o <= X"01";
 
                if avm_write_o = '1' and avm_waitrequest_i = '0' then
+                  -- Increment address linearly
                   address <= std_logic_vector(unsigned(address) + 2);
+
+                  -- The pseudo-random data is generated using a 16-bit maximal-period Galois LFSR,
+                  -- see https://en.wikipedia.org/wiki/Linear-feedback_shift_register
                   if data(15) = '1' then
                      data <= (data(14 downto 0) & "0") xor X"002D";
                   else
