@@ -32,16 +32,6 @@ architecture synthesis of system is
    signal avm_readdatavalid : std_logic;
    signal avm_waitrequest   : std_logic;
 
-   signal ctrl_rstn         : std_logic;
-   signal ctrl_ck_ddr       : std_logic_vector(1 downto 0);
-   signal ctrl_csn          : std_logic;
-   signal ctrl_dq_ddr_in    : std_logic_vector(15 downto 0);
-   signal ctrl_dq_ddr_out   : std_logic_vector(15 downto 0);
-   signal ctrl_dq_oe        : std_logic;
-   signal ctrl_rwds_ddr_in  : std_logic_vector(1 downto 0);
-   signal ctrl_rwds_ddr_out : std_logic_vector(1 downto 0);
-   signal ctrl_rwds_oe      : std_logic;
-
 begin
 
    --------------------------------------------------------
@@ -66,59 +56,30 @@ begin
 
 
    --------------------------------------------------------
-   -- Instantiate HyperRAM controller
+   -- Instantiate HyperRAM interface
    --------------------------------------------------------
 
    i_hyperram : entity work.hyperram
-      port map (
-         clk_i                => clk_i,
-         rst_i                => rst_i,
-         avm_write_i          => avm_write,
-         avm_read_i           => avm_read,
-         avm_address_i        => avm_address,
-         avm_writedata_i      => avm_writedata,
-         avm_byteenable_i     => avm_byteenable,
-         avm_burstcount_i     => avm_burstcount,
-         avm_readdata_o       => avm_readdata,
-         avm_readdatavalid_o  => avm_readdatavalid,
-         avm_waitrequest_o    => avm_waitrequest,
-         hb_rstn_o            => ctrl_rstn,
-         hb_ck_ddr_o          => ctrl_ck_ddr,
-         hb_csn_o             => ctrl_csn,
-         hb_dq_ddr_in_i       => ctrl_dq_ddr_in,
-         hb_dq_ddr_out_o      => ctrl_dq_ddr_out,
-         hb_dq_oe_o           => ctrl_dq_oe,
-         hb_rwds_ddr_in_i     => ctrl_rwds_ddr_in,
-         hb_rwds_ddr_out_o    => ctrl_rwds_ddr_out,
-         hb_rwds_oe_o         => ctrl_rwds_oe
-      ); -- i_hyperram
-
-
-   --------------------------------------------------------
-   -- Instantiate HyperRAM I/O
-   --------------------------------------------------------
-
-   i_hyperram_io : entity work.hyperram_io
       port map (
          clk_i               => clk_i,
          clk_90_i            => clk_90_i,
          clk_x4_i            => clk_x4_i,
          rst_i               => rst_i,
-         ctrl_rstn_i         => ctrl_rstn,
-         ctrl_ck_ddr_i       => ctrl_ck_ddr,
-         ctrl_csn_i          => ctrl_csn,
-         ctrl_dq_ddr_in_o    => ctrl_dq_ddr_in,
-         ctrl_dq_ddr_out_i   => ctrl_dq_ddr_out,
-         ctrl_dq_oe_i        => ctrl_dq_oe,
-         ctrl_rwds_ddr_in_o  => ctrl_rwds_ddr_in,
-         ctrl_rwds_ddr_out_i => ctrl_rwds_ddr_out,
-         ctrl_rwds_oe_i      => ctrl_rwds_oe,
+         avm_write_i         => avm_write,
+         avm_read_i          => avm_read,
+         avm_address_i       => avm_address,
+         avm_writedata_i     => avm_writedata,
+         avm_byteenable_i    => avm_byteenable,
+         avm_burstcount_i    => avm_burstcount,
+         avm_readdata_o      => avm_readdata,
+         avm_readdatavalid_o => avm_readdatavalid,
+         avm_waitrequest_o   => avm_waitrequest,
          hr_resetn_o         => hr_resetn_o,
          hr_csn_o            => hr_csn_o,
          hr_ck_o             => hr_ck_o,
          hr_rwds_io          => hr_rwds_io,
          hr_dq_io            => hr_dq_io
-      ); -- i_hyperram_io
+      ); -- i_hyperram
 
 end architecture synthesis;
 
