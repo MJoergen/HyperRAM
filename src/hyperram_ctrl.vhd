@@ -9,6 +9,8 @@ use ieee.numeric_std.all;
 
 -- Bit 31 of avm_address_i is used to indicate register space
 
+-- The datawidth is fixed at 16 bits.
+
 entity hyperram_ctrl is
    port (
       clk_i               : in  std_logic;

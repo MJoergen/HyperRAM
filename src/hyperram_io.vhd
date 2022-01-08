@@ -5,7 +5,7 @@ use ieee.numeric_std.all;
 library unisim;
 use unisim.vcomponents.all;
 
--- This is a HyperRAM I/O
+-- This is the HyperRAM I/O connections
 
 entity hyperram_io is
    port (

@@ -29,4 +29,19 @@ chip](doc/66-67WVH8M8ALL-BLL-938852.pdf) from ISSI (Integrated Silicon Solution
 Inc.).  Specifically, the part number is `IS66WVH8M8BLL-100B1LI`, which
 indicates a 3.0 V 100 MHz version.
 
+Note that this device is different from the simulation model. So I need to
+update the simulation with the timing characteristice of this particular
+device.
+
+## Design notes
+
+I've split the controller implementation into two parts:
+
+* The state machine, running in a single clock domain.
+* The I/O ports, using multiple additional clocks for correct timing.
+
+The most complicated part is when to sample the DQ signal upon read.  Since
+RWDS and DQ change synchronously, the solution I've decided on is to delay the
+RWDS signal by a quarter clock cycle, and then use that as a clock to sample
+the DQ signal. It remains to be seed, whether this is a stable solution.
 
