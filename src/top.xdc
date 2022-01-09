@@ -9,6 +9,7 @@ create_clock -period 10.000 -name clk [get_ports clk]
 ## otherwise Vivado does not find the pins)
 create_generated_clock -name clk_x4  [get_pins i_clk/i_clk_x4_90/CLKOUT0]
 create_generated_clock -name clk_90  [get_pins i_clk/i_clk_x4_90/CLKOUT1]
+create_generated_clock -name rwds_x4 -source [get_pins i_clk/i_clk_x4_90/CLKOUT0] -divide_by 1 [get_pins i_system/i_hyperram/i_hyperram_io/rwds_x4_reg/Q]
 
 ## Reset button
 set_property -dict {PACKAGE_PIN M13  IOSTANDARD LVCMOS33} [get_ports {reset_n}]
