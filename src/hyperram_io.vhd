@@ -49,6 +49,10 @@ architecture synthesis of hyperram_io is
 
 begin
 
+   ------------------------------------------------
+   -- Output buffers
+   ------------------------------------------------
+
    i_oddr_clk : ODDR
       generic map (
          DDR_CLK_EDGE => "SAME_EDGE"
@@ -60,7 +64,6 @@ begin
          Q  => hr_ck_o,
          C  => clk_90_i
       ); -- i_oddr_clk
-
 
    i_oddr_rwds : ODDR
       generic map (
@@ -88,18 +91,10 @@ begin
          ); -- i_oddr_dq
    end generate gen_oddr_dq;
 
-   p_delay : process (clk_i)
-   begin
-      if rising_edge(clk_i) then
-         dq_oe_d   <= ctrl_dq_oe_i;
-         rwds_oe_d <= ctrl_rwds_oe_i;
-      end if;
-   end process p_delay;
 
-   -- Drive tristate output buffers
-   hr_rwds_io <= rwds_out when rwds_oe_d = '1' else 'Z';
-   hr_dq_io   <= dq_out   when dq_oe_d   = '1' else (others => 'Z');
-
+   ------------------------------------------------
+   -- Input buffers
+   ------------------------------------------------
 
    p_input : process (clk_x4_i)
    begin
@@ -108,7 +103,6 @@ begin
          rwds_x4 <= hr_rwds_io;
       end if;
    end process p_input;
-
 
    gen_iddr_dq : for i in 0 to 7 generate
       i_iddr_dq : IDDR
@@ -135,6 +129,22 @@ begin
          CE => '1',
          C  => clk_i
       ); -- i_oddr_rwds
+
+
+   ------------------------------------------------
+   -- Tri-state buffers
+   ------------------------------------------------
+
+   p_delay : process (clk_i)
+   begin
+      if rising_edge(clk_i) then
+         dq_oe_d   <= ctrl_dq_oe_i;
+         rwds_oe_d <= ctrl_rwds_oe_i;
+      end if;
+   end process p_delay;
+
+   hr_rwds_io <= rwds_out when rwds_oe_d = '1' else 'Z';
+   hr_dq_io   <= dq_out   when dq_oe_d   = '1' else (others => 'Z');
 
    hr_csn_o    <= ctrl_csn_i;
    hr_resetn_o <= ctrl_rstn_i;

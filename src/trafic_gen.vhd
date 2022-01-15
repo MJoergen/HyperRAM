@@ -59,6 +59,7 @@ begin
                address <= (others => '0');
                data    <= (others => '1');
                if init_counter = 0 then
+                  report "Init completed";
                   state   <= WRITING_ST;
                end if;
                init_counter <= init_counter - 1;
@@ -106,6 +107,7 @@ begin
             when VERIFYING_ST =>
                if avm_readdatavalid_i = '1' then
                   if avm_readdata_i /= data then
+                     report "ERROR: Expected " & to_hstring(data) & ", read " & to_hstring(avm_readdata_i);
                      uled_o <= '1';
                   end if;
 
@@ -118,6 +120,7 @@ begin
 
                   if signed(address) = -2 then
                      data  <= (others => '1');
+                     report "Test stopped";
                      state <= STOPPED_ST;
                   else
                      state <= READING_ST;
