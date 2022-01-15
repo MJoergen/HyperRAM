@@ -45,7 +45,7 @@ architecture synthesis of hyperram_io is
    signal dq_oe_d   : std_logic;
 
    -- Over-sampled RWDS signal
-   signal rwds_x4   : std_logic;
+   signal rwds_x4_n : std_logic;
 
 begin
 
@@ -100,7 +100,7 @@ begin
    begin
       if rising_edge(clk_x4_i) then
          -- Delay RWDS input
-         rwds_x4 <= hr_rwds_io;
+         rwds_x4_n <= not hr_rwds_io;
       end if;
    end process p_input;
 
@@ -114,7 +114,7 @@ begin
             Q1 => ctrl_dq_ddr_in_o(i),
             Q2 => ctrl_dq_ddr_in_o(i+8),
             CE => '1',
-            C  => not rwds_x4
+            C  => rwds_x4_n
          ); -- i_iddr_dq
    end generate gen_iddr_dq;
 

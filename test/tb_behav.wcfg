@@ -11,13 +11,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="45082284fs"></ZoomEndTime>
-      <Cursor1Time time="161549000fs"></Cursor1Time>
+      <ZoomStartTime time="161593750fs"></ZoomStartTime>
+      <ZoomEndTime time="161646351fs"></ZoomEndTime>
+      <Cursor1Time time="161644500fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="290"></NameColumnWidth>
-      <ValueColumnWidth column_width="175"></ValueColumnWidth>
+      <ValueColumnWidth column_width="170"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="7" />
    <wvobject type="logic" fp_name="/tb/stop_test">
@@ -48,41 +48,45 @@
       <obj_property name="label">HyperRAM interface</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/avm_write_i">
-         <obj_property name="ElementShortName">avm_write_i</obj_property>
-         <obj_property name="ObjectShortName">avm_write_i</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/avm_read_i">
-         <obj_property name="ElementShortName">avm_read_i</obj_property>
-         <obj_property name="ObjectShortName">avm_read_i</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_system/i_hyperram/avm_address_i">
-         <obj_property name="ElementShortName">avm_address_i[31:0]</obj_property>
-         <obj_property name="ObjectShortName">avm_address_i[31:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_system/i_hyperram/avm_writedata_i">
-         <obj_property name="ElementShortName">avm_writedata_i[15:0]</obj_property>
-         <obj_property name="ObjectShortName">avm_writedata_i[15:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_system/i_hyperram/avm_byteenable_i">
-         <obj_property name="ElementShortName">avm_byteenable_i[1:0]</obj_property>
-         <obj_property name="ObjectShortName">avm_byteenable_i[1:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_system/i_hyperram/avm_burstcount_i">
-         <obj_property name="ElementShortName">avm_burstcount_i[7:0]</obj_property>
-         <obj_property name="ObjectShortName">avm_burstcount_i[7:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_system/i_hyperram/avm_readdata_o">
-         <obj_property name="ElementShortName">avm_readdata_o[15:0]</obj_property>
-         <obj_property name="ObjectShortName">avm_readdata_o[15:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/avm_readdatavalid_o">
-         <obj_property name="ElementShortName">avm_readdatavalid_o</obj_property>
-         <obj_property name="ObjectShortName">avm_readdatavalid_o</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/avm_waitrequest_o">
-         <obj_property name="ElementShortName">avm_waitrequest_o</obj_property>
-         <obj_property name="ObjectShortName">avm_waitrequest_o</obj_property>
+      <wvobject type="group" fp_name="group225">
+         <obj_property name="label">AVM</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/avm_write_i">
+            <obj_property name="ElementShortName">avm_write_i</obj_property>
+            <obj_property name="ObjectShortName">avm_write_i</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/avm_read_i">
+            <obj_property name="ElementShortName">avm_read_i</obj_property>
+            <obj_property name="ObjectShortName">avm_read_i</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/tb/i_system/i_hyperram/avm_address_i">
+            <obj_property name="ElementShortName">avm_address_i[31:0]</obj_property>
+            <obj_property name="ObjectShortName">avm_address_i[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/tb/i_system/i_hyperram/avm_writedata_i">
+            <obj_property name="ElementShortName">avm_writedata_i[15:0]</obj_property>
+            <obj_property name="ObjectShortName">avm_writedata_i[15:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/tb/i_system/i_hyperram/avm_byteenable_i">
+            <obj_property name="ElementShortName">avm_byteenable_i[1:0]</obj_property>
+            <obj_property name="ObjectShortName">avm_byteenable_i[1:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/tb/i_system/i_hyperram/avm_burstcount_i">
+            <obj_property name="ElementShortName">avm_burstcount_i[7:0]</obj_property>
+            <obj_property name="ObjectShortName">avm_burstcount_i[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/tb/i_system/i_hyperram/avm_readdata_o">
+            <obj_property name="ElementShortName">avm_readdata_o[15:0]</obj_property>
+            <obj_property name="ObjectShortName">avm_readdata_o[15:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/avm_readdatavalid_o">
+            <obj_property name="ElementShortName">avm_readdatavalid_o</obj_property>
+            <obj_property name="ObjectShortName">avm_readdatavalid_o</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/avm_waitrequest_o">
+            <obj_property name="ElementShortName">avm_waitrequest_o</obj_property>
+            <obj_property name="ObjectShortName">avm_waitrequest_o</obj_property>
+         </wvobject>
       </wvobject>
       <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/ctrl_rstn">
          <obj_property name="ElementShortName">ctrl_rstn</obj_property>

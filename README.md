@@ -43,5 +43,40 @@ I've split the controller implementation into two parts:
 The most complicated part is when to sample the DQ signal upon read.  Since
 RWDS and DQ change synchronously, the solution I've decided on is to delay the
 RWDS signal by a quarter clock cycle, and then use that as a clock to sample
-the DQ signal. It remains to be seed, whether this is a stable solution.
+the DQ signal. It remains to be seen, whether this is a stable solution.
+
+## Timing diagram
+
+In simulation I've generated the following waveform
+![waveform](Waveform.png)
+
+## Timing constraints
+
+The timing parameters are given in the table below:
+
+```
+Parameter                                | Symbol | Min  | Max  | Unit
+Chip Select High Between Transactions    | t_CSHI | 10.0 |  -   | ns
+HyperRAM Read-Write Recovery Time        | t_RWR  | 40   |  -   | ns
+Chip Select Setup to next CK Rising Edge | t_CSS  |  3   |  -   | ns
+Data Strobe Valid                        | t_DSV  |  -   | 12   | ns
+Input Setup                              | t_IS   |  1.0 |  -   | ns
+Input Hold                               | t_IH   |  1.0 |  -   | ns
+HyperRAM Read Initial Access Time        | t_ACC  | 40   |  -   | ns
+Clock to DQs Low Z                       | t_DQLZ |  0   |  -   | ns
+HyperRAM CK transition to DQ Valid       | t_CKD  |  1   |  7   | ns
+HyperRAM CK transition to DQ Invalid     | t_CKDI |  0.5 |  5.2 | ns
+Data Valid                               | t_DV   |  2.7 |  -   | ns
+CK transition to RWDS valid              | t_CKDS |  1   |  7   | ns
+RWDS transition to DQ Valid              | t_DSS  | -0.8 |  0.8 | ns
+RWDS transition to DQ Invalid            | t_DSH  | -0.8 |  0.8 | ns
+Chip Select Hold After CK Falling Edge   | t_CSH  | 0    |  -   | ns
+Chip Select Inactive to RWDS High-Z      | t_DSZ  | -    |  7   | ns
+Chip Select Inactive to DQ High-Z        | t_OZ   | -    |  7   | ns
+HyperRAM Chip Select Maximum Low Time    | t_CSM  | -    |  4.0 | us
+Refresh Time                             | t_RFH  | 40   |  -   | ns
+```
+
+The symbol names refer to the following figure:
+![timing diagram](Timing_Diagram.png)
 

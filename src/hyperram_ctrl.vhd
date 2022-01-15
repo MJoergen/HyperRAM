@@ -65,6 +65,18 @@ architecture synthesis of hyperram_ctrl is
    signal write_clk_count   : integer range 0 to 255;
    signal recovery_count    : integer range 0 to 255;
 
+   constant C_DEBUG_MODE                     : boolean := false;
+   attribute mark_debug                      : boolean;
+   attribute mark_debug of hb_rstn_o         : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_ck_ddr_o       : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_csn_o          : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_dq_ddr_in_i    : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_dq_ddr_out_o   : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_dq_oe_o        : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_rwds_ddr_in_i  : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_rwds_ddr_out_o : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_rwds_oe_o      : signal is C_DEBUG_MODE;
+
 begin
 
    p_fsm : process (clk_i)
