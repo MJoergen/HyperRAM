@@ -20,15 +20,16 @@ entity trafic_gen is
       avm_readdata_i      : in  std_logic_vector(15 downto 0);
       avm_readdatavalid_i : in  std_logic;
       avm_waitrequest_i   : in  std_logic;
-      uled_o              : out std_logic
+      active_o            : out std_logic;
+      error_o             : out std_logic
    );
 end entity trafic_gen;
 
 architecture synthesis of trafic_gen is
 
-   constant C_ADDRESS_SIZE : integer := 23; -- 8 MB
+   constant C_ADDRESS_SIZE : integer := 22; -- 8 MB
    -- constant C_ADDRESS_SIZE : integer := 3; -- 8 B
-   constant C_INIT_DELAY   : integer := 161*200; -- Wait for 161 us for device to initialize
+   constant C_INIT_DELAY   : integer := 151*100; -- Wait for 151 us for device to initialize
    constant C_DATA_INIT    : std_logic_vector(15 downto 0) := X"1357";
 
    signal address : std_logic_vector(C_ADDRESS_SIZE-1 downto 0);
@@ -58,7 +59,8 @@ architecture synthesis of trafic_gen is
    attribute mark_debug of avm_readdatavalid_i : signal is C_DEBUG_MODE;
    attribute mark_debug of avm_waitrequest_i   : signal is C_DEBUG_MODE;
    attribute mark_debug of start_i             : signal is C_DEBUG_MODE;
-   attribute mark_debug of uled_o              : signal is C_DEBUG_MODE;
+   attribute mark_debug of active_o            : signal is C_DEBUG_MODE;
+   attribute mark_debug of error_o             : signal is C_DEBUG_MODE;
    attribute mark_debug of state               : signal is C_DEBUG_MODE;
 
 begin
@@ -73,14 +75,16 @@ begin
 
          case state is 
             when INIT_ST =>
-               address <= (others => '0');
-               data    <= C_DATA_INIT;
+               address  <= (others => '0');
+               data     <= C_DATA_INIT;
+               active_o <= '0';
                if init_counter > 0 then
                   init_counter <= init_counter - 1;
                else
                   report "Init completed";
                   if start_i = '1' then
-                     state   <= WRITING_ST;
+                     active_o <= '1';
+                     state    <= WRITING_ST;
                   end if;
                end if;
 
@@ -96,7 +100,7 @@ begin
 
                if avm_write_o = '1' and avm_waitrequest_i = '0' then
                   -- Increment address linearly
-                  address <= std_logic_vector(unsigned(address) + 2);
+                  address <= std_logic_vector(unsigned(address) + 1);
 
                   -- The pseudo-random data is generated using a 16-bit maximal-period Galois LFSR,
                   -- see https://en.wikipedia.org/wiki/Linear-feedback_shift_register
@@ -106,7 +110,7 @@ begin
                      data <= (data(14 downto 0) & "0");
                   end if;
 
-                  if signed(address) = -2 then
+                  if signed(address) = -1 then
                      data  <= C_DATA_INIT;
                      state <= READING_ST;
                   end if;
@@ -128,20 +132,21 @@ begin
                if avm_readdatavalid_i = '1' then
                   if avm_readdata_i /= data then
                      report "ERROR: Expected " & to_hstring(data) & ", read " & to_hstring(avm_readdata_i);
-                     uled_o <= '1';
+                     error_o <= '1';
                   end if;
 
-                  address <= std_logic_vector(unsigned(address) + 2);
+                  address <= std_logic_vector(unsigned(address) + 1);
                   if data(15) = '1' then
                      data <= (data(14 downto 0) & "0") xor X"002D";
                   else
                      data <= (data(14 downto 0) & "0");
                   end if;
 
-                  if signed(address) = -2 then
-                     data  <= C_DATA_INIT;
+                  if signed(address) = -1 then
                      report "Test stopped";
-                     state <= STOPPED_ST;
+                     data     <= C_DATA_INIT;
+                     active_o <= '0';
+                     state    <= STOPPED_ST;
                   else
                      state <= READING_ST;
                   end if;
@@ -156,7 +161,8 @@ begin
             init_counter <= C_INIT_DELAY;
             avm_write_o  <= '0';
             avm_read_o   <= '0';
-            uled_o       <= '0';
+            active_o     <= '0';
+            error_o      <= '0';
             state        <= INIT_ST;
          end if;
       end if;

@@ -45,6 +45,7 @@ architecture synthesis of hyperram_io is
    signal dq_oe_d   : std_logic;
 
    -- Over-sampled RWDS signal
+   signal csn_in_x2    : std_logic;
    signal rwds_in_x2   : std_logic;
    signal dq_in_x2     : std_logic_vector(7 downto 0);
    signal rwds_in_x2_d : std_logic;
@@ -54,7 +55,7 @@ architecture synthesis of hyperram_io is
    attribute mark_debug               : boolean;
    attribute mark_debug of rwds_in_x2 : signal is C_DEBUG_MODE;
    attribute mark_debug of dq_in_x2   : signal is C_DEBUG_MODE;
-   attribute mark_debug of hr_csn_o   : signal is C_DEBUG_MODE;
+   attribute mark_debug of csn_in_x2  : signal is C_DEBUG_MODE;
 
 begin
 
@@ -108,8 +109,10 @@ begin
    p_pipeline : process (clk_x2_i)
    begin
       if rising_edge(clk_x2_i) then
+         csn_in_x2    <= hr_csn_o;
          rwds_in_x2   <= hr_rwds_io;
          dq_in_x2     <= hr_dq_io;
+
          rwds_in_x2_d <= rwds_in_x2;
          dq_in_x2_d   <= dq_in_x2;
       end if;

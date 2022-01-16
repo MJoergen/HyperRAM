@@ -17,26 +17,25 @@ entity top is
       -- Interface for physical keyboard
       kb_io0    : out   std_logic;
       kb_io1    : out   std_logic;
-      kb_io2    : in    std_logic;
-
-      -- LED output
-      uled      : out   std_logic
+      kb_io2    : in    std_logic
    );
 end entity top;
 
 architecture synthesis of top is
 
    -- clocks
-   signal clk_90 : std_logic;
-   signal clk_40 : std_logic;
-   signal clk_x2 : std_logic;
+   signal clk_90 : std_logic; -- 90 degrees phase shift
+   signal clk_x2 : std_logic; -- Double speed clock
+   signal clk_40 : std_logic; -- Keyboard clock
 
    -- resets
    signal rst    : std_logic;
 
    signal return_out  : std_logic;
    signal start       : std_logic;
-   signal led_counter : std_logic_vector(25 downto 0);
+
+   signal led_active  : std_logic;
+   signal led_error   : std_logic;
 
 begin
 
@@ -63,15 +62,16 @@ begin
          hr_ck_o      => hr_ck,
          hr_rwds_io   => hr_rwds,
          hr_dq_io     => hr_dq,
-         uled_o       => uled
+         active_o     => led_active,
+         error_o      => led_error
       ); -- i_system
 
    i_mega65kbd_to_matrix : entity work.mega65kbd_to_matrix
       port map (
          cpuclock       => clk_40,
          flopmotor      => '0',
-         flopled        => uled,
-         powerled       => led_counter(23),
+         flopled        => led_error,
+         powerled       => led_active,
          kbd_datestamp  => open,
          kbd_commit     => open,
          disco_led_id   => X"00",
@@ -90,13 +90,6 @@ begin
          leftkey        => open,
          upkey          => open
       ); -- i_mega65kbd_to_matrix
-
-   p_led_counter : process (clk_40)
-   begin
-      if rising_edge(clk_40) then
-         led_counter <= std_logic_vector(unsigned(led_counter) + 1);
-      end if;
-   end process p_led_counter;
 
    p_start : process (clk)
    begin

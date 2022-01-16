@@ -17,7 +17,8 @@ entity system is
       hr_rwds_io  : inout std_logic;
       hr_dq_io    : inout std_logic_vector(7 downto 0);
 
-      uled_o      : out   std_logic
+      active_o    : out   std_logic;
+      error_o     : out   std_logic
    );
 end entity system;
 
@@ -53,7 +54,8 @@ begin
          avm_readdata_i      => avm_readdata,
          avm_readdatavalid_i => avm_readdatavalid,
          avm_waitrequest_i   => avm_waitrequest,
-         uled_o              => uled_o
+         active_o            => active_o,
+         error_o             => error_o
       ); -- i_trafic_gen
 
 
