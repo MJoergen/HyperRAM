@@ -70,7 +70,7 @@ begin
       port map (
          cpuclock       => clk_40,
          flopmotor      => '0',
-         flopled        => '0',
+         flopled        => uled,
          powerled       => led_counter(23),
          kbd_datestamp  => open,
          kbd_commit     => open,

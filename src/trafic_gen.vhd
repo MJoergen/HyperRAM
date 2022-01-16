@@ -26,8 +26,8 @@ end entity trafic_gen;
 
 architecture synthesis of trafic_gen is
 
-   -- constant C_ADDRESS_SIZE : integer := 23; -- 8 MB
-   constant C_ADDRESS_SIZE : integer := 3; -- 8 B
+   constant C_ADDRESS_SIZE : integer := 23; -- 8 MB
+   -- constant C_ADDRESS_SIZE : integer := 3; -- 8 B
    constant C_INIT_DELAY   : integer := 161*200; -- Wait for 161 us for device to initialize
    constant C_DATA_INIT    : std_logic_vector(15 downto 0) := X"1357";
 
