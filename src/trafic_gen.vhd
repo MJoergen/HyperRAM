@@ -28,6 +28,7 @@ architecture synthesis of trafic_gen is
    -- constant C_ADDRESS_SIZE : integer := 23; -- 8 MB
    constant C_ADDRESS_SIZE : integer := 3; -- 8 B
    constant C_INIT_DELAY   : integer := 161*200; -- Wait for 161 us for device to initialize
+   constant C_DATA_INIT    : std_logic_vector(15 downto 0) := X"1357";
 
    signal address : std_logic_vector(C_ADDRESS_SIZE-1 downto 0);
    signal data    : std_logic_vector(15 downto 0);
@@ -57,7 +58,7 @@ begin
          case state is 
             when INIT_ST =>
                address <= (others => '0');
-               data    <= (others => '1');
+               data    <= C_DATA_INIT;
                if init_counter = 0 then
                   report "Init completed";
                   state   <= WRITING_ST;
@@ -87,7 +88,7 @@ begin
                   end if;
 
                   if signed(address) = -2 then
-                     data  <= (others => '1');
+                     data  <= C_DATA_INIT;
                      state <= READING_ST;
                   end if;
                end if;
@@ -119,7 +120,7 @@ begin
                   end if;
 
                   if signed(address) = -2 then
-                     data  <= (others => '1');
+                     data  <= C_DATA_INIT;
                      report "Test stopped";
                      state <= STOPPED_ST;
                   else
