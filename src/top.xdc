@@ -27,6 +27,11 @@ set_property -dict {PACKAGE_PIN A19  IOSTANDARD LVCMOS33  PULLUP FALSE  SLEW FAS
 set_property -dict {PACKAGE_PIN E21  IOSTANDARD LVCMOS33  PULLUP FALSE  SLEW FAST  DRIVE 16} [get_ports {hr_dq[6]}]
 set_property -dict {PACKAGE_PIN E22  IOSTANDARD LVCMOS33  PULLUP FALSE  SLEW FAST  DRIVE 16} [get_ports {hr_dq[7]}]
 
+## Keyboard interface (connected to MAX10)
+set_property -dict {PACKAGE_PIN A14  IOSTANDARD LVCMOS33}                                    [get_ports {kb_io0}]
+set_property -dict {PACKAGE_PIN A13  IOSTANDARD LVCMOS33}                                    [get_ports {kb_io1}]
+set_property -dict {PACKAGE_PIN C13  IOSTANDARD LVCMOS33}                                    [get_ports {kb_io2}]
+
 
 ############################################################################################################
 # Clocks and timing
@@ -39,6 +44,7 @@ create_clock -period 10.000 -name clk [get_ports clk]
 ## otherwise Vivado does not find the pins)
 create_generated_clock -name clk_x2 [get_pins i_clk/i_clk_x2_90/CLKOUT0]
 create_generated_clock -name clk_90 [get_pins i_clk/i_clk_x2_90/CLKOUT1]
+create_generated_clock -name clk_40 [get_pins i_clk/i_clk_x2_90/CLKOUT2]
 
 
 #############################################################################################################

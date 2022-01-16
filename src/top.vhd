@@ -14,6 +14,11 @@ entity top is
       hr_rwds   : inout std_logic;
       hr_dq     : inout std_logic_vector(7 downto 0);
 
+      -- Interface for physical keyboard
+      kb_io0    : out   std_logic;
+      kb_io1    : out   std_logic;
+      kb_io2    : in    std_logic;
+
       -- LED output
       uled      : out   std_logic
    );
@@ -23,10 +28,15 @@ architecture synthesis of top is
 
    -- clocks
    signal clk_90 : std_logic;
+   signal clk_40 : std_logic;
    signal clk_x2 : std_logic;
 
    -- resets
    signal rst    : std_logic;
+
+   signal return_out  : std_logic;
+   signal start       : std_logic;
+   signal led_counter : std_logic_vector(25 downto 0);
 
 begin
 
@@ -37,6 +47,7 @@ begin
          sys_rstn_i => reset_n,
          clk_x2_o   => clk_x2,
          clk_90_o   => clk_90,
+         clk_40_o   => clk_40,
          rst_o      => rst
       ); -- i_clk
 
@@ -46,6 +57,7 @@ begin
          clk_90_i     => clk_90,
          clk_x2_i     => clk_x2,
          rst_i        => rst,
+         start_i      => start,
          hr_resetn_o  => hr_resetn,
          hr_csn_o     => hr_csn,
          hr_ck_o      => hr_ck,
@@ -53,6 +65,45 @@ begin
          hr_dq_io     => hr_dq,
          uled_o       => uled
       ); -- i_system
+
+   i_mega65kbd_to_matrix : entity work.mega65kbd_to_matrix
+      port map (
+         cpuclock       => clk_40,
+         flopmotor      => '0',
+         flopled        => '0',
+         powerled       => led_counter(23),
+         kbd_datestamp  => open,
+         kbd_commit     => open,
+         disco_led_id   => X"00",
+         disco_led_val  => X"00",
+         disco_led_en   => '0',
+         kio8           => kb_io0,
+         kio9           => kb_io1,
+         kio10          => kb_io2,
+         matrix_col     => open,
+         matrix_col_idx => 0,
+         delete_out     => open,
+         return_out     => return_out, -- Active low
+         fastkey_out    => open,
+         restore        => open,
+         capslock_out   => open,
+         leftkey        => open,
+         upkey          => open
+      ); -- i_mega65kbd_to_matrix
+
+   p_led_counter : process (clk_40)
+   begin
+      if rising_edge(clk_40) then
+         led_counter <= std_logic_vector(unsigned(led_counter) + 1);
+      end if;
+   end process p_led_counter;
+
+   p_start : process (clk)
+   begin
+      if rising_edge(clk) then
+         start <= not return_out;
+      end if;
+   end process p_start;
 
 end architecture synthesis;
 

@@ -45,10 +45,16 @@ architecture synthesis of hyperram_io is
    signal dq_oe_d   : std_logic;
 
    -- Over-sampled RWDS signal
-   signal rwds_x2   : std_logic;
-   signal dq_x2     : std_logic_vector(7 downto 0);
-   signal rwds_x2_d : std_logic;
-   signal dq_x2_d   : std_logic_vector(7 downto 0);
+   signal rwds_in_x2   : std_logic;
+   signal dq_in_x2     : std_logic_vector(7 downto 0);
+   signal rwds_in_x2_d : std_logic;
+   signal dq_in_x2_d   : std_logic_vector(7 downto 0);
+
+   constant C_DEBUG_MODE              : boolean := false;
+   attribute mark_debug               : boolean;
+   attribute mark_debug of rwds_in_x2 : signal is C_DEBUG_MODE;
+   attribute mark_debug of dq_in_x2   : signal is C_DEBUG_MODE;
+   attribute mark_debug of hr_csn_o   : signal is C_DEBUG_MODE;
 
 begin
 
@@ -102,10 +108,10 @@ begin
    p_pipeline : process (clk_x2_i)
    begin
       if rising_edge(clk_x2_i) then
-         rwds_x2   <= hr_rwds_io;
-         dq_x2     <= hr_dq_io;
-         rwds_x2_d <= rwds_x2;
-         dq_x2_d   <= dq_x2;
+         rwds_in_x2   <= hr_rwds_io;
+         dq_in_x2     <= hr_dq_io;
+         rwds_in_x2_d <= rwds_in_x2;
+         dq_in_x2_d   <= dq_in_x2;
       end if;
    end process p_pipeline;
 
@@ -113,12 +119,12 @@ begin
    begin
       if rising_edge(clk_i) then
          ctrl_dq_ie_o <= '0';
-         if rwds_x2_d = '1' and rwds_x2 = '0' then
-            ctrl_dq_ddr_in_o <= dq_x2_d & dq_x2;
+         if rwds_in_x2_d = '1' and rwds_in_x2 = '0' then
+            ctrl_dq_ddr_in_o <= dq_in_x2_d & dq_in_x2;
             ctrl_dq_ie_o     <= '1';
          end if;
-         if rwds_x2_d = '0' and rwds_x2 = '1' then
-            ctrl_dq_ddr_in_o <= dq_x2 & hr_dq_io;
+         if rwds_in_x2_d = '0' and rwds_in_x2 = '1' then
+            ctrl_dq_ddr_in_o <= dq_in_x2 & hr_dq_io;
             ctrl_dq_ie_o     <= '1';
          end if;
       end if;

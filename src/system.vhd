@@ -8,6 +8,7 @@ entity system is
       clk_90_i    : in    std_logic;
       clk_x2_i    : in    std_logic;
       rst_i       : in    std_logic;
+      start_i     : in    std_logic;
 
       -- HyperRAM device interface
       hr_resetn_o : out   std_logic;
@@ -42,6 +43,7 @@ begin
       port map (
          clk_i               => clk_i,
          rst_i               => rst_i,
+         start_i             => start_i,
          avm_write_o         => avm_write,
          avm_read_o          => avm_read,
          avm_address_o       => avm_address,

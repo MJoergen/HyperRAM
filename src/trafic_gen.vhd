@@ -10,6 +10,7 @@ entity trafic_gen is
    port (
       clk_i               : in  std_logic;
       rst_i               : in  std_logic;
+      start_i             : in  std_logic;
       avm_write_o         : out std_logic;
       avm_read_o          : out std_logic;
       avm_address_o       : out std_logic_vector(31 downto 0);
@@ -56,6 +57,7 @@ architecture synthesis of trafic_gen is
    attribute mark_debug of avm_readdata_i      : signal is C_DEBUG_MODE;
    attribute mark_debug of avm_readdatavalid_i : signal is C_DEBUG_MODE;
    attribute mark_debug of avm_waitrequest_i   : signal is C_DEBUG_MODE;
+   attribute mark_debug of start_i             : signal is C_DEBUG_MODE;
    attribute mark_debug of uled_o              : signal is C_DEBUG_MODE;
    attribute mark_debug of state               : signal is C_DEBUG_MODE;
 
@@ -73,11 +75,14 @@ begin
             when INIT_ST =>
                address <= (others => '0');
                data    <= C_DATA_INIT;
-               if init_counter = 0 then
+               if init_counter > 0 then
+                  init_counter <= init_counter - 1;
+               else
                   report "Init completed";
-                  state   <= WRITING_ST;
+                  if start_i = '1' then
+                     state   <= WRITING_ST;
+                  end if;
                end if;
-               init_counter <= init_counter - 1;
 
             when WRITING_ST =>
 

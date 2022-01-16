@@ -121,7 +121,7 @@ begin
                   hb_ck_ddr_o <= "10";
                   ca_count    <= ca_count - 1;
                else
-                  latency_count <= 12;
+                  latency_count <= 10;
                   state         <= LATENCY_ST;
                end if;
 

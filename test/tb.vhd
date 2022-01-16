@@ -106,6 +106,7 @@ begin
          clk_90_i    => clk_90,
          clk_x2_i    => clk_x2,
          rst_i       => rst,
+         start_i     => '1',
          hr_resetn_o => hr_resetn,
          hr_csn_o    => hr_csn,
          hr_ck_o     => hr_ck,

@@ -13,6 +13,7 @@ entity clk is
       sys_rstn_i   : in  std_logic;   -- Asynchronous, asserted low
       clk_x2_o     : out std_logic;   -- 200 MHz
       clk_90_o     : out std_logic;   -- 100 MHz delayed 90 degrees
+      clk_40_o     : out std_logic;   -- 40 MHz
       rst_o        : out std_logic
    );
 end entity clk;
@@ -22,6 +23,7 @@ architecture synthesis of clk is
    signal clkfb       : std_logic;
    signal clkfb_mmcm  : std_logic;
    signal clk_90_mmcm : std_logic;
+   signal clk_40_mmcm : std_logic;
    signal clk_x2_mmcm : std_logic;
    signal locked      : std_logic;
 
@@ -49,13 +51,18 @@ begin
          CLKOUT1_DIVIDE       => 8,          -- 100 MHz
          CLKOUT1_PHASE        => 90.000,     -- 90 degrees delayed
          CLKOUT1_DUTY_CYCLE   => 0.500,
-         CLKOUT1_USE_FINE_PS  => FALSE
+         CLKOUT1_USE_FINE_PS  => FALSE,
+         CLKOUT2_DIVIDE       => 20,         -- 40 MHz
+         CLKOUT2_PHASE        => 0.000,
+         CLKOUT2_DUTY_CYCLE   => 0.500,
+         CLKOUT2_USE_FINE_PS  => FALSE
       )
       port map (
          -- Output clocks
          CLKFBOUT            => clkfb_mmcm,
          CLKOUT0             => clk_x2_mmcm,
          CLKOUT1             => clk_90_mmcm,
+         CLKOUT2             => clk_40_mmcm,
          -- Input clock control
          CLKFBIN             => clkfb,
          CLKIN1              => sys_clk_i,
@@ -105,6 +112,12 @@ begin
          I => clk_90_mmcm,
          O => clk_90_o
       ); -- i_bufg_clk_90
+
+   i_bufg_clk_40 : BUFG
+      port map (
+         I => clk_40_mmcm,
+         O => clk_40_o
+      ); -- i_bufg_clk_40
 
 
    -------------------------------------
