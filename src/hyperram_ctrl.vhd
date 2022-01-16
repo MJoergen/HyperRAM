@@ -148,7 +148,7 @@ begin
                   hb_ck_ddr_o <= "00";
                end if;
 
-               if hb_rwds_ddr_in_i = "10" then
+               if hb_rwds_ddr_in_i = "10" or hb_rwds_ddr_in_i = "01" then
                   avm_readdata_o      <= hb_dq_ddr_in_i;
                   avm_readdatavalid_o <= '1';
                   read_return_count <= read_return_count - 1;
