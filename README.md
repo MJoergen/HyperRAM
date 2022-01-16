@@ -27,28 +27,11 @@ I'm testing my HyperRAM controller on the [MEGA65](https://mega65.org/)
 hardware platform.  It contains the [8 MB HyperRAM
 chip](doc/66-67WVH8M8ALL-BLL-938852.pdf) from ISSI (Integrated Silicon Solution
 Inc.).  Specifically, the part number is `IS66WVH8M8BLL-100B1LI`, which
-indicates a 3.0 V 100 MHz version.
+indicates a 64 Mbit, 100 MHz, 3.0 V, single-ended clock version.
 
 Note that this device is different from the simulation model. So I need to
 update the simulation with the timing characteristice of this particular
 device.
-
-## Design notes
-
-I've split the controller implementation into two parts:
-
-* The state machine, running in a single clock domain.
-* The I/O ports, using multiple additional clocks for correct timing.
-
-The most complicated part is when to sample the DQ signal upon read.  Since
-RWDS and DQ change synchronously, the solution I've decided on is to delay the
-RWDS signal by a quarter clock cycle, and then use that as a clock to sample
-the DQ signal. It remains to be seen, whether this is a stable solution.
-
-## Timing diagram
-
-In simulation I've generated the following waveform
-![waveform](Waveform.png)
 
 ## Timing constraints
 
@@ -79,4 +62,26 @@ Refresh Time                             | t_RFH  | 40   |  -   | ns
 
 The symbol names refer to the following figure:
 ![timing diagram](Timing_Diagram.png)
+
+## Design notes
+
+I've split the controller implementation into two parts:
+
+* The state machine, running in a single clock domain, same as HyperRAM device,
+  i.e. 100 MHz.
+* The I/O ports, using two additional clocks for correct timing: A 100 MHz
+  clock phase shifted 90 degrees. and a double-speed clock at 200 MHz.
+
+The phase shifted clock is used to delay the HyperRAM clock signal `CK`
+relative to the transitions on the `DQ` signal. This ensures correct timing
+when sending data to the HyperRAM device, specifically the `t_IS` and `t_IH`
+times.
+
+The double-speed clock is used to manually sample the `DQ` signal when reading
+from HyperRAM.
+
+## Timing diagram
+
+In simulation I've generated the following waveform
+![waveform](Waveform.png)
 

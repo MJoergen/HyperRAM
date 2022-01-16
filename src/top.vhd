@@ -23,7 +23,7 @@ architecture synthesis of top is
 
    -- clocks
    signal clk_90 : std_logic;
-   signal clk_x4 : std_logic;
+   signal clk_x2 : std_logic;
 
    -- resets
    signal rst    : std_logic;
@@ -35,7 +35,7 @@ begin
       (
          sys_clk_i  => clk,
          sys_rstn_i => reset_n,
-         clk_x4_o   => clk_x4,
+         clk_x2_o   => clk_x2,
          clk_90_o   => clk_90,
          rst_o      => rst
       ); -- i_clk
@@ -44,7 +44,7 @@ begin
       port map (
          clk_i        => clk,
          clk_90_i     => clk_90,
-         clk_x4_i     => clk_x4,
+         clk_x2_i     => clk_x2,
          rst_i        => rst,
          hr_resetn_o  => hr_resetn,
          hr_csn_o     => hr_csn,

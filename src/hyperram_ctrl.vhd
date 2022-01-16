@@ -34,7 +34,7 @@ entity hyperram_ctrl is
       hb_dq_ddr_in_i      : in  std_logic_vector(15 downto 0);
       hb_dq_ddr_out_o     : out std_logic_vector(15 downto 0);
       hb_dq_oe_o          : out std_logic;
-      hb_rwds_ddr_in_i    : in  std_logic_vector(1 downto 0);
+      hb_dq_ie_i          : in  std_logic;
       hb_rwds_ddr_out_o   : out std_logic_vector(1 downto 0);
       hb_rwds_oe_o        : out std_logic
    );
@@ -73,7 +73,7 @@ architecture synthesis of hyperram_ctrl is
    attribute mark_debug of hb_dq_ddr_in_i    : signal is C_DEBUG_MODE;
    attribute mark_debug of hb_dq_ddr_out_o   : signal is C_DEBUG_MODE;
    attribute mark_debug of hb_dq_oe_o        : signal is C_DEBUG_MODE;
-   attribute mark_debug of hb_rwds_ddr_in_i  : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_dq_ie_i        : signal is C_DEBUG_MODE;
    attribute mark_debug of hb_rwds_ddr_out_o : signal is C_DEBUG_MODE;
    attribute mark_debug of hb_rwds_oe_o      : signal is C_DEBUG_MODE;
 
@@ -148,7 +148,7 @@ begin
                   hb_ck_ddr_o <= "00";
                end if;
 
-               if hb_rwds_ddr_in_i = "10" or hb_rwds_ddr_in_i = "01" then
+               if hb_dq_ie_i = '1' then
                   avm_readdata_o      <= hb_dq_ddr_in_i;
                   avm_readdatavalid_o <= '1';
                   read_return_count <= read_return_count - 1;

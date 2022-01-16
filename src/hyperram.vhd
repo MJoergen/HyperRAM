@@ -6,7 +6,7 @@ entity hyperram is
    port (
       clk_i               : in    std_logic;
       clk_90_i            : in    std_logic;
-      clk_x4_i            : in    std_logic;
+      clk_x2_i            : in    std_logic;
       rst_i               : in    std_logic;
 
       -- Avalon Memory Map
@@ -37,7 +37,7 @@ architecture synthesis of hyperram is
    signal ctrl_dq_ddr_in    : std_logic_vector(15 downto 0);
    signal ctrl_dq_ddr_out   : std_logic_vector(15 downto 0);
    signal ctrl_dq_oe        : std_logic;
-   signal ctrl_rwds_ddr_in  : std_logic_vector(1 downto 0);
+   signal ctrl_dq_ie        : std_logic;
    signal ctrl_rwds_ddr_out : std_logic_vector(1 downto 0);
    signal ctrl_rwds_oe      : std_logic;
 
@@ -66,7 +66,7 @@ begin
          hb_dq_ddr_in_i       => ctrl_dq_ddr_in,
          hb_dq_ddr_out_o      => ctrl_dq_ddr_out,
          hb_dq_oe_o           => ctrl_dq_oe,
-         hb_rwds_ddr_in_i     => ctrl_rwds_ddr_in,
+         hb_dq_ie_i           => ctrl_dq_ie,
          hb_rwds_ddr_out_o    => ctrl_rwds_ddr_out,
          hb_rwds_oe_o         => ctrl_rwds_oe
       ); -- i_hyperram_ctrl
@@ -80,7 +80,7 @@ begin
       port map (
          clk_i               => clk_i,
          clk_90_i            => clk_90_i,
-         clk_x4_i            => clk_x4_i,
+         clk_x2_i            => clk_x2_i,
          rst_i               => rst_i,
          ctrl_rstn_i         => ctrl_rstn,
          ctrl_ck_ddr_i       => ctrl_ck_ddr,
@@ -88,7 +88,7 @@ begin
          ctrl_dq_ddr_in_o    => ctrl_dq_ddr_in,
          ctrl_dq_ddr_out_i   => ctrl_dq_ddr_out,
          ctrl_dq_oe_i        => ctrl_dq_oe,
-         ctrl_rwds_ddr_in_o  => ctrl_rwds_ddr_in,
+         ctrl_dq_ie_o        => ctrl_dq_ie,
          ctrl_rwds_ddr_out_i => ctrl_rwds_ddr_out,
          ctrl_rwds_oe_i      => ctrl_rwds_oe,
          hr_resetn_o         => hr_resetn_o,

@@ -6,7 +6,7 @@ entity system is
    port (
       clk_i       : in    std_logic;
       clk_90_i    : in    std_logic;
-      clk_x4_i    : in    std_logic;
+      clk_x2_i    : in    std_logic;
       rst_i       : in    std_logic;
 
       -- HyperRAM device interface
@@ -63,7 +63,7 @@ begin
       port map (
          clk_i               => clk_i,
          clk_90_i            => clk_90_i,
-         clk_x4_i            => clk_x4_i,
+         clk_x2_i            => clk_x2_i,
          rst_i               => rst_i,
          avm_write_i         => avm_write,
          avm_read_i          => avm_read,

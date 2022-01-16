@@ -11,15 +11,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="161593750fs"></ZoomStartTime>
-      <ZoomEndTime time="161646351fs"></ZoomEndTime>
-      <Cursor1Time time="161644500fs"></Cursor1Time>
+      <ZoomStartTime time="161610605fs"></ZoomStartTime>
+      <ZoomEndTime time="161631746fs"></ZoomEndTime>
+      <Cursor1Time time="161619545fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="290"></NameColumnWidth>
-      <ValueColumnWidth column_width="170"></ValueColumnWidth>
+      <ValueColumnWidth column_width="165"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="7" />
+   <WVObjectSize size="11" />
    <wvobject type="logic" fp_name="/tb/stop_test">
       <obj_property name="ElementShortName">stop_test</obj_property>
       <obj_property name="ObjectShortName">stop_test</obj_property>
@@ -32,9 +32,9 @@
       <obj_property name="ElementShortName">clk_90</obj_property>
       <obj_property name="ObjectShortName">clk_90</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb/clk_x4">
-      <obj_property name="ElementShortName">clk_x4</obj_property>
-      <obj_property name="ObjectShortName">clk_x4</obj_property>
+   <wvobject type="logic" fp_name="/tb/clk_x2">
+      <obj_property name="ElementShortName">clk_x2</obj_property>
+      <obj_property name="ObjectShortName">clk_x2</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/tb/rst">
       <obj_property name="ElementShortName">rst</obj_property>
@@ -88,6 +88,10 @@
             <obj_property name="ObjectShortName">avm_waitrequest_o</obj_property>
          </wvobject>
       </wvobject>
+      <wvobject type="other" fp_name="/tb/i_system/i_hyperram/i_hyperram_ctrl/state">
+         <obj_property name="ElementShortName">state</obj_property>
+         <obj_property name="ObjectShortName">state</obj_property>
+      </wvobject>
       <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/ctrl_rstn">
          <obj_property name="ElementShortName">ctrl_rstn</obj_property>
          <obj_property name="ObjectShortName">ctrl_rstn</obj_property>
@@ -112,9 +116,9 @@
          <obj_property name="ElementShortName">ctrl_dq_oe</obj_property>
          <obj_property name="ObjectShortName">ctrl_dq_oe</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_system/i_hyperram/ctrl_rwds_ddr_in">
-         <obj_property name="ElementShortName">ctrl_rwds_ddr_in[1:0]</obj_property>
-         <obj_property name="ObjectShortName">ctrl_rwds_ddr_in[1:0]</obj_property>
+      <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/ctrl_dq_ie">
+         <obj_property name="ElementShortName">ctrl_dq_ie</obj_property>
+         <obj_property name="ObjectShortName">ctrl_dq_ie</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb/i_system/i_hyperram/ctrl_rwds_ddr_out">
          <obj_property name="ElementShortName">ctrl_rwds_ddr_out[1:0]</obj_property>
@@ -144,5 +148,21 @@
          <obj_property name="ElementShortName">hr_dq_io[7:0]</obj_property>
          <obj_property name="ObjectShortName">hr_dq_io[7:0]</obj_property>
       </wvobject>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/i_hyperram_io/rwds_x2">
+      <obj_property name="ElementShortName">rwds_x2</obj_property>
+      <obj_property name="ObjectShortName">rwds_x2</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/i_system/i_hyperram/i_hyperram_io/dq_x2">
+      <obj_property name="ElementShortName">dq_x2[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dq_x2[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/i_hyperram_io/rwds_x2_d">
+      <obj_property name="ElementShortName">rwds_x2_d</obj_property>
+      <obj_property name="ObjectShortName">rwds_x2_d</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/i_system/i_hyperram/i_hyperram_io/dq_x2_d">
+      <obj_property name="ElementShortName">dq_x2_d[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dq_x2_d[7:0]</obj_property>
    </wvobject>
 </wave_config>

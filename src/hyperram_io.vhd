@@ -11,7 +11,7 @@ entity hyperram_io is
    port (
       clk_i               : in    std_logic;
       clk_90_i            : in    std_logic;
-      clk_x4_i            : in    std_logic;
+      clk_x2_i            : in    std_logic;
       rst_i               : in    std_logic;
 
       -- Connect to HyperRAM controller
@@ -21,7 +21,7 @@ entity hyperram_io is
       ctrl_dq_ddr_in_o    : out   std_logic_vector(15 downto 0);
       ctrl_dq_ddr_out_i   : in    std_logic_vector(15 downto 0);
       ctrl_dq_oe_i        : in    std_logic;
-      ctrl_rwds_ddr_in_o  : out   std_logic_vector(1 downto 0);
+      ctrl_dq_ie_o        : out   std_logic;
       ctrl_rwds_ddr_out_i : in    std_logic_vector(1 downto 0);
       ctrl_rwds_oe_i      : in    std_logic;
 
@@ -45,7 +45,10 @@ architecture synthesis of hyperram_io is
    signal dq_oe_d   : std_logic;
 
    -- Over-sampled RWDS signal
-   signal rwds_x4_n : std_logic;
+   signal rwds_x2   : std_logic;
+   signal dq_x2     : std_logic_vector(7 downto 0);
+   signal rwds_x2_d : std_logic;
+   signal dq_x2_d   : std_logic_vector(7 downto 0);
 
 begin
 
@@ -93,42 +96,33 @@ begin
 
 
    ------------------------------------------------
-   -- Input buffers
+   -- Input sampling
    ------------------------------------------------
 
-   p_input : process (clk_x4_i)
+   p_pipeline : process (clk_x2_i)
    begin
-      if rising_edge(clk_x4_i) then
-         -- Delay RWDS input
-         rwds_x4_n <= not hr_rwds_io;
+      if rising_edge(clk_x2_i) then
+         rwds_x2   <= hr_rwds_io;
+         dq_x2     <= hr_dq_io;
+         rwds_x2_d <= rwds_x2;
+         dq_x2_d   <= dq_x2;
+      end if;
+   end process p_pipeline;
+
+   p_input : process (clk_i)
+   begin
+      if rising_edge(clk_i) then
+         ctrl_dq_ie_o <= '0';
+         if rwds_x2_d = '1' and rwds_x2 = '0' then
+            ctrl_dq_ddr_in_o <= dq_x2_d & dq_x2;
+            ctrl_dq_ie_o     <= '1';
+         end if;
+         if rwds_x2_d = '0' and rwds_x2 = '1' then
+            ctrl_dq_ddr_in_o <= dq_x2 & hr_dq_io;
+            ctrl_dq_ie_o     <= '1';
+         end if;
       end if;
    end process p_input;
-
-   gen_iddr_dq : for i in 0 to 7 generate
-      i_iddr_dq : IDDR
-         generic map (
-            DDR_CLK_EDGE => "SAME_EDGE"
-         )
-         port map (
-            D  => hr_dq_io(i),
-            Q1 => ctrl_dq_ddr_in_o(i),
-            Q2 => ctrl_dq_ddr_in_o(i+8),
-            CE => '1',
-            C  => rwds_x4_n
-         ); -- i_iddr_dq
-   end generate gen_iddr_dq;
-
-   i_iddr_rwds : IDDR
-      generic map (
-         DDR_CLK_EDGE => "SAME_EDGE"
-      )
-      port map (
-         D  => hr_rwds_io,
-         Q1 => ctrl_rwds_ddr_in_o(0),
-         Q2 => ctrl_rwds_ddr_in_o(1),
-         CE => '1',
-         C  => clk_i
-      ); -- i_oddr_rwds
 
 
    ------------------------------------------------

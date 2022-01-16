@@ -11,7 +11,7 @@ entity clk is
    port (
       sys_clk_i    : in  std_logic;   -- expects 100 MHz
       sys_rstn_i   : in  std_logic;   -- Asynchronous, asserted low
-      clk_x4_o     : out std_logic;   -- 400 MHz
+      clk_x2_o     : out std_logic;   -- 200 MHz
       clk_90_o     : out std_logic;   -- 100 MHz delayed 90 degrees
       rst_o        : out std_logic
    );
@@ -22,15 +22,15 @@ architecture synthesis of clk is
    signal clkfb       : std_logic;
    signal clkfb_mmcm  : std_logic;
    signal clk_90_mmcm : std_logic;
-   signal clk_x4_mmcm : std_logic;
+   signal clk_x2_mmcm : std_logic;
    signal locked      : std_logic;
 
 begin
 
-   -- generate 400 MHz for 720p @ 60 Hz and 5x74.25 MHz = 371.25 MHz for HDMI
+   -- generate 200 MHz and 100 MHz @ 90 degrees phase shift.
    -- VCO frequency range for Artix 7 speed grade -1 : 600 MHz - 1200 MHz
    -- f_VCO = f_CLKIN * CLKFBOUT_MULT_F / DIVCLK_DIVIDE   
-   i_clk_x4_90 : MMCME2_ADV
+   i_clk_x2_90 : MMCME2_ADV
       generic map (
          BANDWIDTH            => "OPTIMIZED",
          CLKOUT4_CASCADE      => FALSE,
@@ -42,7 +42,7 @@ begin
          CLKFBOUT_MULT_F      => 8.000,      -- f_VCO = (100 MHz / 1) x 8.000 = 800 MHz
          CLKFBOUT_PHASE       => 0.000,
          CLKFBOUT_USE_FINE_PS => FALSE,
-         CLKOUT0_DIVIDE_F     => 2.000,      -- 400 MHz
+         CLKOUT0_DIVIDE_F     => 4.000,      -- 200 MHz
          CLKOUT0_PHASE        => 0.000,
          CLKOUT0_DUTY_CYCLE   => 0.500,
          CLKOUT0_USE_FINE_PS  => FALSE,
@@ -54,7 +54,7 @@ begin
       port map (
          -- Output clocks
          CLKFBOUT            => clkfb_mmcm,
-         CLKOUT0             => clk_x4_mmcm,
+         CLKOUT0             => clk_x2_mmcm,
          CLKOUT1             => clk_90_mmcm,
          -- Input clock control
          CLKFBIN             => clkfb,
@@ -81,7 +81,7 @@ begin
          CLKFBSTOPPED        => open,
          PWRDWN              => '0',
          RST                 => not sys_rstn_i
-      ); -- i_clk_x4_90
+      ); -- i_clk_x2_90
 
 
    -------------------------------------
@@ -94,11 +94,11 @@ begin
          O => clkfb
       ); -- i_bufg_clkfb
 
-   i_bufg_clk_x4 : BUFG
+   i_bufg_clk_x2 : BUFG
       port map (
-         I => clk_x4_mmcm,
-         O => clk_x4_o
-      ); -- i_bufg_clk_x4
+         I => clk_x2_mmcm,
+         O => clk_x2_o
+      ); -- i_bufg_clk_x2
 
    i_bufg_clk_90 : BUFG
       port map (
