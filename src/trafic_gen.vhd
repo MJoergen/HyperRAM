@@ -45,6 +45,20 @@ architecture synthesis of trafic_gen is
 
    signal init_counter : integer range 0 to C_INIT_DELAY;
 
+   constant C_DEBUG_MODE                       : boolean := false;
+   attribute mark_debug                        : boolean;
+   attribute mark_debug of avm_write_o         : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_read_o          : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_address_o       : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_writedata_o     : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_byteenable_o    : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_burstcount_o    : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_readdata_i      : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_readdatavalid_i : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_waitrequest_i   : signal is C_DEBUG_MODE;
+   attribute mark_debug of uled_o              : signal is C_DEBUG_MODE;
+   attribute mark_debug of state               : signal is C_DEBUG_MODE;
+
 begin
 
    p_fsm : process (clk_i)
