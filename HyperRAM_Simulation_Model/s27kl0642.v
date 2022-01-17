@@ -49,7 +49,7 @@
 //////////////////////////////////////////////////////////////////////////////
 `timescale 1 ps/1 ps
 
-`define S27KS0642GABHI
+//`define S27KS0642GABHI
 //`define S27KS0642DPBHI
 //`define S27KL0642GABHI
 //`define S27KL0642DPBHI
@@ -65,6 +65,8 @@
 	`define INDUSTRIAL
 `elsif S27KL0642DPBHI
 	`define FREQ_166MHz_3P3V
+	`define INDUSTRIAL
+`else // IS66WVH8M8BLL-100B1LI
 	`define INDUSTRIAL
 `endif	
 
@@ -89,6 +91,7 @@ module s27kl0642
 
 
 `ifdef FREQ_200MHz_1P8V
+    `define CONFIG_REG0_DEFAULT 16'h8F2F
 	`define tDSV           		5000 //tDSZ,tDSV
 	`define tCKDS              	5000 //tCKDS
 	`define tCKD               	5000 //tCKD,tCKDS
@@ -119,6 +122,7 @@ module s27kl0642
 	`define tCK              	5000//tCK
 //-------------------------------------------------------------
 `elsif FREQ_166MHz_3P3V
+    `define CONFIG_REG0_DEFAULT 16'h8F2F
 	`define tDSV           		12000 //tDSV
 	`define tCKDS              	7000 //tCKDS
 	`define tCKD               	7000 //tCKD,tCKDS
@@ -150,6 +154,7 @@ module s27kl0642
 	`define tCK              	6000//tCK
 
 `elsif FREQ_200MHz_3P3V
+    `define CONFIG_REG0_DEFAULT 16'h8F2F
 	`define tDSV           		6500 //tDSZ,tDSV
 	`define tCKDS              	6500 //tCKDS
 	`define tCKD               	6500 //tCKD,tCKDS
@@ -181,6 +186,7 @@ module s27kl0642
 	`define tCK              	5000//tCK
 //-------------------------------------------------------------
 `elsif FREQ_166MHz_1P8V
+    `define CONFIG_REG0_DEFAULT 16'h8F2F
 	`define tDSV           		12000 //tDSV
 	`define tCKDS              	5500 //tCKDS
 	`define tCKD               	5500 //tCKD,tCKDS
@@ -210,6 +216,36 @@ module s27kl0642
 	
 			//tperiod values
 	`define tCK              	6000//tCK
+`else // IS66WVH8M8BLL-100B1LI
+    `define CONFIG_REG0_DEFAULT 16'h8F1F
+	`define tDSV           		6000 //tDSZ,tDSV
+	`define tCKDS              	4000 //tCKDS
+	`define tCKD               	4000 //tCKD,tCKDS
+	`define tCKDI				2900
+	`define tCKDSR				5500
+			//tsetup values
+	`define tCSS          		3000  //tCSS  edge /
+	`define tIS            		1000  //tIS
+
+			//thold values
+	`define tCSH           		0  //tCSH  edge 
+	`define tIH             	1000  //tIH
+	`define tRH    				40000  //tRH
+
+	`define tRWR       			40000  //tRWR
+
+			//tpw values: pulse width
+	`define tCL           		5000 //tCL 50% of the min clock period
+	`define tCH           		5000 //tCH 50% of the min clock period
+	`define tCSHI        		10e3 //tCSHI
+	`define tRP     			200e3 //tRP
+	`define tACC				60e3
+	`define tOZ					3500
+	`define tDSZ				3500
+	`define tDQLZ				0
+	`define tRFH				40e3  //refresh time
+			//tperiod values
+	`define tCK              	10000//tCK
 `endif
 
 `ifdef INDUSTRIAL
@@ -573,7 +609,7 @@ module s27kl0642
 	reg HS_ACT		   = 0;
     integer Address; // entire address
 
-    reg [15:0] Config_reg0 = 16'h8F2F;
+    reg [15:0] Config_reg0 = `CONFIG_REG0_DEFAULT;
 	reg [15:0] Config_reg1 = {14'h3FF0,`DRI};
 	reg [15:0] Identification_reg0 = 16'h0C81;
 	reg [15:0] Identification_reg1 = 16'h0001;
@@ -1303,7 +1339,7 @@ module s27kl0642
             glitch_rwds = 1'b0;
             glitch_rwdsR = 1'b0;
             if (falling_edge_RESETNeg) begin
-                Config_reg0 = 16'h8F2F;// default value
+                Config_reg0 = `CONFIG_REG0_DEFAULT;
                 Config_reg1 = {14'h3FF0,`DRI};// default value 11 1111 1111 0000 01
 				Identification_reg0 = 16'h0C81;//default value
 				Identification_reg1 = 16'h0001;//default value
@@ -1322,7 +1358,7 @@ module s27kl0642
       begin
         bus_cycle_state = STAND_BY;
         if (falling_edge_RESETNeg) begin
-            Config_reg0 = 16'h8F2F;// default value
+            Config_reg0 = `CONFIG_REG0_DEFAULT;
             Config_reg1 = {14'h3FF0,`DRI};// default value
 			Identification_reg0 = 16'h0C81;//default value
 			Identification_reg1 = 16'h0001;//default value

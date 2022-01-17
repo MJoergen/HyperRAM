@@ -8,8 +8,7 @@ use ieee.numeric_std.all;
 
 entity trafic_gen is
    generic (
-      G_ADDRESS_SIZE : integer; -- Number of bits
-      G_INIT_DELAY   : integer  -- Number of clock cycles
+      G_ADDRESS_SIZE : integer  -- Number of bits
    );
    port (
       clk_i               : in  std_logic;
@@ -31,6 +30,7 @@ end entity trafic_gen;
 
 architecture synthesis of trafic_gen is
 
+   constant C_INIT_DELAY   : integer := 150*100; -- 150 us @ 100 MHz.
    constant C_DATA_INIT    : std_logic_vector(15 downto 0) := X"1357";
 
    signal address : std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
@@ -46,7 +46,7 @@ architecture synthesis of trafic_gen is
 
    signal state : state_t := INIT_ST;
 
-   signal init_counter : integer range 0 to G_INIT_DELAY;
+   signal init_counter : integer range 0 to C_INIT_DELAY;
 
    constant C_DEBUG_MODE                       : boolean := false;
    attribute mark_debug                        : boolean;
@@ -159,7 +159,7 @@ begin
          end case;
 
          if rst_i = '1' then
-            init_counter <= G_INIT_DELAY;
+            init_counter <= C_INIT_DELAY;
             avm_write_o  <= '0';
             avm_read_o   <= '0';
             active_o     <= '0';

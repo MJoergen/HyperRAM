@@ -11,7 +11,7 @@ end entity tb;
 architecture simulation of tb is
 
    -- Testbench signals
-   constant CLK_PERIOD : time := 5 ns;     -- 200 MHz
+   constant CLK_PERIOD : time := 10 ns;     -- 100 MHz
    signal stop_test    : std_logic := '0';
 
    signal clk          : std_logic;
@@ -103,8 +103,7 @@ begin
 
    i_system : entity work.system
       generic map (
-         G_ADDRESS_SIZE => 3,
-         G_INIT_DELAY   => 151*200
+         G_ADDRESS_SIZE => 3
       )
       port map (
          clk_i       => clk,

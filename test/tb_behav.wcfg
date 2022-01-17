@@ -11,15 +11,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="161610605fs"></ZoomStartTime>
-      <ZoomEndTime time="161631746fs"></ZoomEndTime>
-      <Cursor1Time time="161619545fs"></Cursor1Time>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="180000001fs"></ZoomEndTime>
+      <Cursor1Time time="179831000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="290"></NameColumnWidth>
-      <ValueColumnWidth column_width="165"></ValueColumnWidth>
+      <ValueColumnWidth column_width="160"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="11" />
+   <WVObjectSize size="8" />
    <wvobject type="logic" fp_name="/tb/stop_test">
       <obj_property name="ElementShortName">stop_test</obj_property>
       <obj_property name="ObjectShortName">stop_test</obj_property>
@@ -40,9 +40,13 @@
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb/uled">
-      <obj_property name="ElementShortName">uled</obj_property>
-      <obj_property name="ObjectShortName">uled</obj_property>
+   <wvobject type="logic" fp_name="/tb/led_active">
+      <obj_property name="ElementShortName">led_active</obj_property>
+      <obj_property name="ObjectShortName">led_active</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/led_error">
+      <obj_property name="ElementShortName">led_error</obj_property>
+      <obj_property name="ObjectShortName">led_error</obj_property>
    </wvobject>
    <wvobject type="group" fp_name="group82">
       <obj_property name="label">HyperRAM interface</obj_property>
@@ -148,21 +152,5 @@
          <obj_property name="ElementShortName">hr_dq_io[7:0]</obj_property>
          <obj_property name="ObjectShortName">hr_dq_io[7:0]</obj_property>
       </wvobject>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/i_hyperram_io/rwds_x2">
-      <obj_property name="ElementShortName">rwds_x2</obj_property>
-      <obj_property name="ObjectShortName">rwds_x2</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb/i_system/i_hyperram/i_hyperram_io/dq_x2">
-      <obj_property name="ElementShortName">dq_x2[7:0]</obj_property>
-      <obj_property name="ObjectShortName">dq_x2[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/i_hyperram_io/rwds_x2_d">
-      <obj_property name="ElementShortName">rwds_x2_d</obj_property>
-      <obj_property name="ObjectShortName">rwds_x2_d</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb/i_system/i_hyperram/i_hyperram_io/dq_x2_d">
-      <obj_property name="ElementShortName">dq_x2_d[7:0]</obj_property>
-      <obj_property name="ObjectShortName">dq_x2_d[7:0]</obj_property>
    </wvobject>
 </wave_config>
