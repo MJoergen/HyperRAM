@@ -51,6 +51,10 @@ begin
       ); -- i_clk
 
    i_system : entity work.system
+      generic map (
+         G_ADDRESS_SIZE => 22,      -- 4M entries of 16 bits each.
+         G_INIT_DELAY   => 151*100  -- 151 us @ 100 MHz.
+      )
       port map (
          clk_i        => clk,
          clk_90_i     => clk_90,

@@ -7,6 +7,10 @@ use ieee.numeric_std.all;
 -- and verifies the data can be read back again.
 
 entity trafic_gen is
+   generic (
+      G_ADDRESS_SIZE : integer; -- Number of bits
+      G_INIT_DELAY   : integer  -- Number of clock cycles
+   );
    port (
       clk_i               : in  std_logic;
       rst_i               : in  std_logic;
@@ -27,12 +31,9 @@ end entity trafic_gen;
 
 architecture synthesis of trafic_gen is
 
-   constant C_ADDRESS_SIZE : integer := 22; -- 8 MB
-   -- constant C_ADDRESS_SIZE : integer := 3; -- 8 B
-   constant C_INIT_DELAY   : integer := 151*100; -- Wait for 151 us for device to initialize
    constant C_DATA_INIT    : std_logic_vector(15 downto 0) := X"1357";
 
-   signal address : std_logic_vector(C_ADDRESS_SIZE-1 downto 0);
+   signal address : std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
    signal data    : std_logic_vector(15 downto 0);
 
    type state_t is (
@@ -45,7 +46,7 @@ architecture synthesis of trafic_gen is
 
    signal state : state_t := INIT_ST;
 
-   signal init_counter : integer range 0 to C_INIT_DELAY;
+   signal init_counter : integer range 0 to G_INIT_DELAY;
 
    constant C_DEBUG_MODE                       : boolean := false;
    attribute mark_debug                        : boolean;
@@ -93,7 +94,7 @@ begin
                avm_write_o      <= '1';
                avm_read_o       <= '0';
                avm_address_o    <= (others => '0');
-               avm_address_o(C_ADDRESS_SIZE-1 downto 0) <= address;
+               avm_address_o(G_ADDRESS_SIZE-1 downto 0) <= address;
                avm_writedata_o  <= data;
                avm_byteenable_o <= "11";
                avm_burstcount_o <= X"01";
@@ -120,7 +121,7 @@ begin
                avm_write_o      <= '0';
                avm_read_o       <= '1';
                avm_address_o    <= (others => '0');
-               avm_address_o(C_ADDRESS_SIZE-1 downto 0) <= address;
+               avm_address_o(G_ADDRESS_SIZE-1 downto 0) <= address;
                avm_burstcount_o <= X"01";
 
                if avm_read_o = '1' and avm_waitrequest_i = '0' then
@@ -158,7 +159,7 @@ begin
          end case;
 
          if rst_i = '1' then
-            init_counter <= C_INIT_DELAY;
+            init_counter <= G_INIT_DELAY;
             avm_write_o  <= '0';
             avm_read_o   <= '0';
             active_o     <= '0';

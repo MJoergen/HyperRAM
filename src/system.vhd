@@ -3,6 +3,10 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity system is
+   generic (
+      G_ADDRESS_SIZE : integer; -- Number of bits
+      G_INIT_DELAY   : integer  -- Number of clock cycles
+   );
    port (
       clk_i       : in    std_logic;
       clk_90_i    : in    std_logic;
@@ -41,6 +45,10 @@ begin
    --------------------------------------------------------
 
    i_trafic_gen : entity work.trafic_gen
+      generic map (
+         G_ADDRESS_SIZE => G_ADDRESS_SIZE,
+         G_INIT_DELAY   => G_INIT_DELAY
+      )
       port map (
          clk_i               => clk_i,
          rst_i               => rst_i,
