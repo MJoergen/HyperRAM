@@ -1,8 +1,6 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+library ieee;
+use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
---use Std.TextIO.all;
---use work.debugtools.all;
 
 entity mega65kbd_to_matrix is
   port (
@@ -23,9 +21,6 @@ entity mega65kbd_to_matrix is
     kio9 : out std_logic; -- data output to keyboard
     kio10 : in std_logic; -- data input from keyboard
 
-    matrix_col : out std_logic_vector(7 downto 0) := (others => '1');
-    matrix_col_idx : in integer range 0 to 8;
-
     delete_out : out std_logic;
     return_out : out std_logic;
     fastkey_out : out std_logic;
@@ -44,10 +39,7 @@ end entity mega65kbd_to_matrix;
 
 architecture behavioural of mega65kbd_to_matrix is
 
-  signal matrix_ram_offset : integer range 0 to 15 := 0;
-  signal keyram_wea : std_logic_vector(7 downto 0);
   signal keyram_dia : std_logic_vector(7 downto 0);
-  signal matrix_dia : std_logic_vector(7 downto 0);
   
   signal enabled : std_logic := '0';
 
@@ -66,16 +58,6 @@ architecture behavioural of mega65kbd_to_matrix is
   signal fastkey : std_logic := '1';
   
 begin  -- behavioural
-
-  widget_kmm: entity work.kb_matrix_ram
-    port map (
-      clkA => cpuclock,
-      addressa => matrix_ram_offset,
-      dia => matrix_dia,
-      wea => keyram_wea,
-      addressb => matrix_col_idx,
-      dob => matrix_col
-      );
 
   process (cpuclock)
     variable keyram_write_enable : std_logic_vector(7 downto 0);
@@ -143,16 +125,6 @@ begin  -- behavioural
             kbd_commit(phase - 96) <= kio10;
           end if;
           
-          -- Work around the data arriving 2 cycles late from the keyboard controller
-          if phase = 0 then
-            matrix_dia <= (others => deletekey);
-          elsif phase = 1 then
-            matrix_dia <= (others => returnkey);
-          else
-            matrix_dia <= (others => kio10); -- present byte of input bits to
-                                             -- ram for writing
-          end if;
-          
           
           report "Writing received bit " & std_logic'image(kio10) & " to bit position " & integer'image(phase);
           
@@ -168,8 +140,6 @@ begin  -- behavioural
             when others => null;
           end case;
         end if;        
-        matrix_ram_offset <= keyram_offset;
-        keyram_wea <= keyram_write_enable;
         
         if kbd_clock='0' then
           report "phase = " & integer'image(phase) & ", sync=" & std_logic'image(sync_pulse);

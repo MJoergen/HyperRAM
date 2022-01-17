@@ -83,8 +83,6 @@ begin
          kio8           => kb_io0,
          kio9           => kb_io1,
          kio10          => kb_io2,
-         matrix_col     => open,
-         matrix_col_idx => 0,
          delete_out     => open,
          return_out     => return_out, -- Active low
          fastkey_out    => open,

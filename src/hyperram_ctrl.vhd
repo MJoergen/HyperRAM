@@ -2,15 +2,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
--- This is a HyperRAM controller
-
--- This module operates in a single clock domain. The input clock
--- is the same as the HyperRAM clock.
-
--- Bit 31 of avm_address_i is used to indicate register space
-
--- The datawidth is fixed at 16 bits.
-
 entity hyperram_ctrl is
    port (
       clk_i               : in  std_logic;
