@@ -18,7 +18,8 @@ architecture simulation of tb is
    signal clk_90       : std_logic;
    signal clk_x2       : std_logic;
    signal rst          : std_logic;
-   signal uled         : std_logic;
+   signal led_active   : std_logic;
+   signal led_error    : std_logic;
 
    -- HyperRAM simulation device interface
    signal hr_resetn    : std_logic;
@@ -112,7 +113,8 @@ begin
          hr_ck_o     => hr_ck,
          hr_rwds_io  => hr_rwds,
          hr_dq_io    => hr_dq,
-         uled_o      => uled
+         active_o    => led_active,
+         error_o     => led_error
       ); -- i_system
 
 
