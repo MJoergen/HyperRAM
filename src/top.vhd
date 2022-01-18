@@ -72,24 +72,14 @@ begin
    i_mega65kbd_to_matrix : entity work.mega65kbd_to_matrix
       port map (
          cpuclock       => clk_40,
-         flopmotor      => '0',
          flopled        => led_error,
          powerled       => led_active,
-         kbd_datestamp  => open,
-         kbd_commit     => open,
-         disco_led_id   => X"00",
-         disco_led_val  => X"00",
-         disco_led_en   => '0',
          kio8           => kb_io0,
          kio9           => kb_io1,
          kio10          => kb_io2,
          delete_out     => open,
          return_out     => return_out, -- Active low
-         fastkey_out    => open,
-         restore        => open,
-         capslock_out   => open,
-         leftkey        => open,
-         upkey          => open
+         fastkey_out    => open
       ); -- i_mega65kbd_to_matrix
 
    p_start : process (clk)

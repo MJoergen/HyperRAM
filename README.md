@@ -34,7 +34,7 @@ specific for the MEGA65 HyperRAM device, see lines 219-249 in
 
 ## Overview of project contents
 
-The project consists of the following:
+This project contains the following:
 
 * Main HyperRAM controller
 * Traffic generator
@@ -50,12 +50,12 @@ I've split the HyperRAM controller implementation into two parts:
 * The state machine ([hyperram\_ctrl.vhd](hyperram_ctrl.vhd)), running in a
   single clock domain, same as HyperRAM device, i.e. 100 MHz.
 * The I/O ports ([hyperram\_io.vhd](hyperram_io.vhd)), using two additional
-  clocks for correct timing: A 100 MHz clock phase shifted 90 degrees. and a
-  double-speed clock at 200 MHz.
+  clocks for correct timing: A 100 MHz clock delayed 90 degrees (quarter
+  cycle). and a double-speed clock at 200 MHz.
 
 The phase shifted clock is used to delay the HyperRAM clock signal `CK`
-relative to the transitions on the `DQ` signal. This ensures correct timing of
-`t_IS` and `t_IH` during WRITE operation.
+relative to the transitions on the `DQ` signal. This ensures correct values of
+the timing parameters `t_IS` and `t_IH` during WRITE operation.
 
 The double-speed clock is used to manually sample the `DQ` signal during READ
 operation.
@@ -68,11 +68,11 @@ This is a very common bus interface, and quite easy to use.
 
 ### Traffic generator
 
-The traffic generator's sole purpose is to test the interface between the
-HyperRAM controller and the physical HyperRAM device. It does this by
-generating first a sequence of WRITE operations (writing pseudo-random data to
-the entire RAM), and then a corresponding sequence of READ operations,
-verifying that the correct values are read back again.
+The traffic generator's sole purpose is to test the HyperRAM controller. It
+does this by generating first a sequence of WRITE operations (writing
+pseudo-random data to the entire HyperRAM device), and then a corresponding
+sequence of READ operations, verifying that the correct values are read back
+again.
 
 The traffic generator has a single control input (`start_i`) that starts the above mentioned
 process. There are two output signals indicating progress:
@@ -84,8 +84,8 @@ process. There are two output signals indicating progress:
 ### Clock synthesis
 
 As mentioned previously, controlling the physical I/O to the HyperRAM device
-requires two additional clocks:
-* A 100 MHz clock phase shifted 90 degrees.
+requires two additional clocks to get the correct timing:
+* A 100 MHz clock delayed 90 degrees.
 * A 200 MHz clock.
 
 Both are generated using a single MMCM. This is done in the file
