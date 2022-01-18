@@ -10,8 +10,8 @@ use unisim.vcomponents.all;
 entity hyperram_io is
    port (
       clk_i               : in    std_logic;
-      clk_90_i            : in    std_logic;
-      clk_x2_i            : in    std_logic;
+      clk_90_i            : in    std_logic; -- Quarter cycle delayed.
+      clk_x2_i            : in    std_logic; -- Double frequency.
       rst_i               : in    std_logic;
 
       -- Connect to HyperRAM controller
@@ -36,20 +36,22 @@ end entity hyperram_io;
 
 architecture synthesis of hyperram_io is
 
-   -- Output signals before tristate buffer
-   signal rwds_out  : std_logic;
-   signal dq_out    : std_logic_vector(7 downto 0);
+   -- Output generation
+   signal rwds_out        : std_logic;
+   signal dq_out          : std_logic_vector(7 downto 0);
+   signal rwds_ddr_out_x2 : std_logic_vector(1 downto 0);
+   signal dq_ddr_out_x2   : std_logic_vector(15 downto 0);
+
+   -- Input sampling
+   signal csn_in_x2       : std_logic;
+   signal rwds_in_x2      : std_logic;
+   signal dq_in_x2        : std_logic_vector(7 downto 0);
+   signal rwds_in_x2_d    : std_logic;
+   signal dq_in_x2_d      : std_logic_vector(7 downto 0);
 
    -- Delayed output enables
-   signal rwds_oe_d : std_logic;
-   signal dq_oe_d   : std_logic;
-
-   -- Over-sampled RWDS signal
-   signal csn_in_x2    : std_logic;
-   signal rwds_in_x2   : std_logic;
-   signal dq_in_x2     : std_logic_vector(7 downto 0);
-   signal rwds_in_x2_d : std_logic;
-   signal dq_in_x2_d   : std_logic_vector(7 downto 0);
+   signal rwds_oe_d       : std_logic;
+   signal dq_oe_d         : std_logic;
 
    constant C_DEBUG_MODE              : boolean := false;
    attribute mark_debug               : boolean;
@@ -59,47 +61,48 @@ architecture synthesis of hyperram_io is
 
 begin
 
+   hr_csn_o    <= ctrl_csn_i;
+   hr_resetn_o <= ctrl_rstn_i;
+
+
    ------------------------------------------------
-   -- Output buffers
+   -- Output generation
    ------------------------------------------------
 
-   i_oddr_clk : ODDR
-      generic map (
-         DDR_CLK_EDGE => "SAME_EDGE"
-      )
-      port map (
-         D1 => ctrl_ck_ddr_i(1),
-         D2 => ctrl_ck_ddr_i(0),
-         CE => '1',
-         Q  => hr_ck_o,
-         C  => clk_90_i
-      ); -- i_oddr_clk
+   p_output_clk : process (clk_x2_i)
+   begin
+      if falling_edge(clk_x2_i) then
+         if hr_ck_o = '0' then
+            hr_ck_o <= ctrl_ck_ddr_i(1);
+         else
+            hr_ck_o <= '0';
+         end if;
+      end if;
+   end process p_output_clk;
 
-   i_oddr_rwds : ODDR
-      generic map (
-         DDR_CLK_EDGE => "SAME_EDGE"
-      )
-      port map (
-         D1 => ctrl_rwds_ddr_out_i(1),
-         D2 => ctrl_rwds_ddr_out_i(0),
-         CE => '1',
-         Q  => rwds_out,
-         C  => clk_i
-      ); -- i_oddr_rwds
+   p_output_rwds : process (clk_x2_i)
+   begin
+      if rising_edge(clk_x2_i) then
+         rwds_ddr_out_x2 <= ctrl_rwds_ddr_out_i;
+         if hr_ck_o = '0' then
+            rwds_out <= rwds_ddr_out_x2(1);
+         else
+            rwds_out <= rwds_ddr_out_x2(0);
+         end if;
+      end if;
+   end process p_output_rwds;
 
-   gen_oddr_dq : for i in 0 to 7 generate
-      i_oddr_dq : ODDR
-         generic map (
-            DDR_CLK_EDGE => "SAME_EDGE"
-         )
-         port map (
-            D1 => ctrl_dq_ddr_out_i(i+8),
-            D2 => ctrl_dq_ddr_out_i(i),
-            CE => '1',
-            Q  => dq_out(i),
-            C  => clk_i
-         ); -- i_oddr_dq
-   end generate gen_oddr_dq;
+   p_output_dq : process (clk_x2_i)
+   begin
+      if rising_edge(clk_x2_i) then
+         dq_ddr_out_x2 <= ctrl_dq_ddr_out_i;
+         if hr_ck_o = '0' then
+            dq_out <= dq_ddr_out_x2(15 downto 8);
+         else
+            dq_out <= dq_ddr_out_x2(7 downto 0);
+         end if;
+      end if;
+   end process p_output_dq;
 
 
    ------------------------------------------------
@@ -148,9 +151,6 @@ begin
 
    hr_rwds_io <= rwds_out when rwds_oe_d = '1' else 'Z';
    hr_dq_io   <= dq_out   when dq_oe_d   = '1' else (others => 'Z');
-
-   hr_csn_o    <= ctrl_csn_i;
-   hr_resetn_o <= ctrl_rstn_i;
 
 end architecture synthesis;
 

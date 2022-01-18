@@ -1,22 +1,18 @@
 # HyperRAM
 
-This repository is my attempt at a HyperRAM controller suitable for the Xilinx
-Artix 7 FPGA.
+This repository is my attempt at a portable HyperRAM controller.  I've looked
+at several other implementations, and they all seemed lacking in various
+regards.
 
 I'm testing my HyperRAM controller on the [MEGA65](https://mega65.org/)
-hardware platform.  It contains the [8 MB HyperRAM
-chip](doc/66-67WVH8M8ALL-BLL-938852.pdf) from ISSI (Integrated Silicon Solution
-Inc.).  Specifically, the part number is `IS66WVH8M8BLL-100B1LI`, which
-indicates a 64 Mbit, 100 MHz, 3.0 V, single-ended clock version.
+hardware platform (revision 3).  It contains the [8 MB
+HyperRAM](doc/66-67WVH8M8ALL-BLL-938852.pdf) chip from ISSI (Integrated Silicon
+Solution Inc.).  Specifically, the part number of the HyperRAM device is
+`IS66WVH8M8BLL-100B1LI`, which indicates a 64 Mbit, 100 MHz version with 3.0 V
+supply and a single-ended clock.
 
-The current implementation makes use of Xilinx-specific ODDR
-blocks. This can likely be re-implemented using a more portable approach.
-
-I've looked at several other implementations, and they all seemed lacking in
-various regards.
-
-So, this is a complete rewrite from scratch, and it's provided with a
-[MIT license](LICENSE).
+The HyperRAM controller in this repository is a complete rewrite from scratch,
+and is provided with a [MIT license](LICENSE).
 
 
 ## Testing in simulation
@@ -31,8 +27,9 @@ this allows testing the implementation in simulation, and thus finding and
 fixing bugs much faster.
 
 However, since the HyperRAM in the MEGA65 is a different device (and with
-different timings), I've modified the simulation model by adding specific
-timing values (and default configuration values), see lines 219-249 in
+different timings) than the above mentioned simulation model, I've modified the
+simulation model by adding timing values (and default configuration values)
+specific for the MEGA65 HyperRAM device, see lines 219-249 in
 [HyperRAM\_Simulation\_Model/s27kl0642.v](HyperRAM_Simulation_Model/s27kl0642.v)
 
 ## Overview of project contents
@@ -62,9 +59,6 @@ relative to the transitions on the `DQ` signal. This ensures correct timing of
 
 The double-speed clock is used to manually sample the `DQ` signal during READ
 operation.
-
-The I/O port contains the Xilinx-specific ODDR blocks. It should be relatively
-easy to modify this part using a more portable approach.
 
 The user interface to the HyperRAM controller is a 16-bit Avalon Memory Map
 interface with support for burst operations, see
