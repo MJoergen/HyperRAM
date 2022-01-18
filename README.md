@@ -142,7 +142,7 @@ requires two additional clocks to get the correct timing:
 * A 200 MHz clock.
 
 Both are generated using a single MMCM. This is done in the file
-[src/clk.vhd](src/clk.vhd).
+[src/MEGA65/clk.vhd](src/MEGA65/clk.vhd).
 
 This file also generates a 40 MHz clock, but this is only used by the support files
 needed for the MEGA65.
