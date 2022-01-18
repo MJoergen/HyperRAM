@@ -61,7 +61,7 @@ Refresh Time                             | t_RFH  | 40   |  -   | ns
 ```
 
 The symbol names refer to the following figure (taken from the [Cypress HyperRAM datasheet](doc/s27kl0642.pdf)):
-![timing diagram](Timing_Diagram.png)
+![timing diagram](doc/Timing_Diagram.png)
 
 
 ## Overview of project contents
@@ -116,7 +116,7 @@ To perform the simulation test just start up Vivado, load the project file
 [top.xpr](top.xpr), and select "Run Simulation".
 
 This generates the following waveform:
-![waveform](waveform.png)
+![waveform](doc/waveform.png)
 
 In simulation mode, only 8 writes and 8 reads are performed, to keep the
 simulation time reasonable. The above waveform shows these 16 transactions.
