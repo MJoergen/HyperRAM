@@ -9,8 +9,7 @@ use unisim.vcomponents.all;
 
 entity hyperram_io is
    port (
-      clk_i               : in  std_logic;
-      clk_90_i            : in  std_logic; -- Quarter cycle delayed.
+      clk_x1_i            : in  std_logic;
       clk_x2_i            : in  std_logic; -- Double frequency.
       rst_i               : in  std_logic;
 
@@ -125,9 +124,9 @@ begin
       end if;
    end process p_pipeline;
 
-   p_input : process (clk_i)
+   p_input : process (clk_x1_i)
    begin
-      if rising_edge(clk_i) then
+      if rising_edge(clk_x1_i) then
          ctrl_dq_ie_o <= '0';
          if rwds_in_x2_d = '1' and rwds_in_x2 = '0' then
             ctrl_dq_ddr_in_o <= dq_in_x2_d & dq_in_x2;
@@ -145,9 +144,9 @@ begin
    -- Tri-state buffers
    ------------------------------------------------
 
-   p_delay : process (clk_i)
+   p_delay : process (clk_x1_i)
    begin
-      if rising_edge(clk_i) then
+      if rising_edge(clk_x1_i) then
          dq_oe_d   <= ctrl_dq_oe_i;
          rwds_oe_d <= ctrl_rwds_oe_i;
       end if;

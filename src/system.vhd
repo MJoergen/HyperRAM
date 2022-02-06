@@ -8,7 +8,6 @@ entity system is
    );
    port (
       clk_i         : in  std_logic;
-      clk_90_i      : in  std_logic;
       clk_x2_i      : in  std_logic;
       rst_i         : in  std_logic;
       start_i       : in  std_logic;
@@ -75,8 +74,7 @@ begin
 
    i_hyperram : entity work.hyperram
       port map (
-         clk_i               => clk_i,
-         clk_90_i            => clk_90_i,
+         clk_x1_i            => clk_i,
          clk_x2_i            => clk_x2_i,
          rst_i               => rst_i,
          avm_write_i         => avm_write,
