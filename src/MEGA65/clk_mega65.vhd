@@ -41,7 +41,7 @@ begin
          CLKIN1_PERIOD        => 10.0,       -- INPUT @ 100 MHz
          REF_JITTER1          => 0.010,
          DIVCLK_DIVIDE        => 5,
-         CLKFBOUT_MULT_F      => 37.500,     -- f_VCO = (100 MHz / 5) x 37.500 = 742.5 MHz
+         CLKFBOUT_MULT_F      => 37.125,     -- f_VCO = (100 MHz / 5) x 37.125 = 742.5 MHz
          CLKFBOUT_PHASE       => 0.000,
          CLKFBOUT_USE_FINE_PS => FALSE,
          CLKOUT0_DIVIDE_F     => 18.500,     -- 40.135 MHz

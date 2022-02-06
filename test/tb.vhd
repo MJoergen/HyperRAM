@@ -144,10 +144,6 @@ begin
          error_o       => led_error
       ); -- i_system
 
-   ----------------------------------
-   -- Tri-state buffers for HyperRAM
-   ----------------------------------
-
    sys_rwds <= sys_rwds_out when sys_rwds_oe = '1' else 'Z';
    sys_dq   <= sys_dq_out   when sys_dq_oe   = '1' else (others => 'Z');
 

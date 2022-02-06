@@ -168,7 +168,6 @@ begin
                   data_read_o <= (others => '0');
                   state       <= WRITING_ST;
                end if;
-
          end case;
 
          if rst_i = '1' then

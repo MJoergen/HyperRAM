@@ -58,19 +58,19 @@
   <FileSets Version="1" Minor="31">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
       <Filter Type="Srcs"/>
-      <File Path="$PPRDIR/../HyperRAM.config_write/src/MEGA65/types_pkg.vhd">
+      <File Path="$PPRDIR/src/MEGA65/types_pkg.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../HyperRAM.config_write/src/MEGA65/hdmi/hdmi_tx_encoder.vhd">
+      <File Path="$PPRDIR/src/MEGA65/hdmi/hdmi_tx_encoder.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../HyperRAM.config_write/src/MEGA65/hdmi/audio_video_to_hdmi.vhd">
+      <File Path="$PPRDIR/src/MEGA65/hdmi/audio_video_to_hdmi.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -82,19 +82,19 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../HyperRAM.config_write/src/MEGA65/hdmi/video_modes_pkg.vhd">
+      <File Path="$PPRDIR/src/MEGA65/hdmi/video_modes_pkg.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../HyperRAM.config_write/src/MEGA65/font.vhd">
+      <File Path="$PPRDIR/src/MEGA65/font.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../HyperRAM.config_write/src/MEGA65/digits.vhd">
+      <File Path="$PPRDIR/src/MEGA65/digits.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -130,7 +130,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../HyperRAM.config_write/src/MEGA65/hdmi/serialiser_10to1_selectio.vhd">
+      <File Path="$PPRDIR/src/MEGA65/hdmi/serialiser_10to1_selectio.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -148,13 +148,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../HyperRAM.config_write/src/MEGA65/video_sync.vhd">
+      <File Path="$PPRDIR/src/MEGA65/video_sync.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../HyperRAM.config_write/src/MEGA65/video.vhd">
+      <File Path="$PPRDIR/src/MEGA65/video.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
