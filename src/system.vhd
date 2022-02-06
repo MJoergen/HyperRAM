@@ -23,6 +23,10 @@ entity system is
       hr_rwds_oe_o  : out std_logic;
       hr_dq_oe_o    : out std_logic;
 
+      address_o     : out std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
+      data_exp_o    : out std_logic_vector(15 downto 0);
+      data_read_o   : out std_logic_vector(15 downto 0);
+
       active_o      : out std_logic;
       error_o       : out std_logic
    );
@@ -63,6 +67,9 @@ begin
          avm_readdata_i      => avm_readdata,
          avm_readdatavalid_i => avm_readdatavalid,
          avm_waitrequest_i   => avm_waitrequest,
+         address_o           => address_o,
+         data_exp_o          => data_exp_o,
+         data_read_o         => data_read_o,
          active_o            => active_o,
          error_o             => error_o
       ); -- i_trafic_gen

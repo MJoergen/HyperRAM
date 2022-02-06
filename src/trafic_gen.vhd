@@ -23,6 +23,9 @@ entity trafic_gen is
       avm_readdata_i      : in  std_logic_vector(15 downto 0);
       avm_readdatavalid_i : in  std_logic;
       avm_waitrequest_i   : in  std_logic;
+      address_o           : out std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
+      data_exp_o          : out std_logic_vector(15 downto 0);
+      data_read_o         : out std_logic_vector(15 downto 0);
       active_o            : out std_logic;
       error_o             : out std_logic
    );
@@ -75,6 +78,9 @@ begin
             when INIT_ST =>
                address     <= (others => '0');
                data        <= C_DATA_INIT;
+               address_o   <= (others => '0');
+               data_exp_o  <= (others => '0');
+               data_read_o <= (others => '0');
                active_o    <= '0';
                error_o     <= '0';
 
@@ -119,11 +125,17 @@ begin
 
                if avm_read_o = '1' and avm_waitrequest_i = '0' then
                   avm_read_o <= '0';
+                  address_o   <= address;
+                  data_exp_o  <= (others => '0');
+                  data_read_o <= (others => '0');
                   state <= VERIFYING_ST;
                end if;
 
             when VERIFYING_ST =>
                if avm_readdatavalid_i = '1' then
+                  data_exp_o  <= data;
+                  data_read_o <= avm_readdata_i;
+
                   address <= std_logic_vector(unsigned(address) + 1);
                   if data(15) = '1' then
                      data <= (data(14 downto 0) & "0") xor X"002D";
@@ -148,10 +160,12 @@ begin
 
             when STOPPED_ST =>
                state <= STOPPED_ST;
-
                if start_i = '1' then
                   active_o    <= '1';
                   error_o     <= '0';
+                  address_o   <= (others => '0');
+                  data_exp_o  <= (others => '0');
+                  data_read_o <= (others => '0');
                   state       <= WRITING_ST;
                end if;
 
