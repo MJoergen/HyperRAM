@@ -30,7 +30,6 @@ end entity trafic_gen;
 
 architecture synthesis of trafic_gen is
 
-   constant C_INIT_DELAY   : integer := 150*100; -- 150 us @ 100 MHz.
    constant C_DATA_INIT    : std_logic_vector(15 downto 0) := X"1357";
 
    signal address : std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
@@ -45,8 +44,6 @@ architecture synthesis of trafic_gen is
    );
 
    signal state : state_t := INIT_ST;
-
-   signal init_counter : integer range 0 to C_INIT_DELAY;
 
    constant C_DEBUG_MODE                       : boolean := false;
    attribute mark_debug                        : boolean;
@@ -74,23 +71,19 @@ begin
             avm_read_o  <= '0';
          end if;
 
-         case state is 
+         case state is
             when INIT_ST =>
-               address  <= (others => '0');
-               data     <= C_DATA_INIT;
-               active_o <= '0';
-               if init_counter > 0 then
-                  init_counter <= init_counter - 1;
-               else
-                  report "Init completed";
-                  if start_i = '1' then
-                     active_o <= '1';
-                     state    <= WRITING_ST;
-                  end if;
+               address     <= (others => '0');
+               data        <= C_DATA_INIT;
+               active_o    <= '0';
+               error_o     <= '0';
+
+               if start_i = '1' then
+                  active_o <= '1';
+                  state    <= WRITING_ST;
                end if;
 
             when WRITING_ST =>
-
                avm_write_o      <= '1';
                avm_read_o       <= '0';
                avm_address_o    <= (others => '0');
@@ -131,11 +124,6 @@ begin
 
             when VERIFYING_ST =>
                if avm_readdatavalid_i = '1' then
-                  if avm_readdata_i /= data then
-                     report "ERROR: Expected " & to_hstring(data) & ", read " & to_hstring(avm_readdata_i);
-                     error_o <= '1';
-                  end if;
-
                   address <= std_logic_vector(unsigned(address) + 1);
                   if data(15) = '1' then
                      data <= (data(14 downto 0) & "0") xor X"002D";
@@ -143,7 +131,12 @@ begin
                      data <= (data(14 downto 0) & "0");
                   end if;
 
-                  if signed(address) = -1 then
+                  if avm_readdata_i /= data then
+                     report "ERROR: Expected " & to_hstring(data) & ", read " & to_hstring(avm_readdata_i);
+                     error_o  <= '1';
+                     active_o <= '0';
+                     state    <= STOPPED_ST;
+                  elsif signed(address) = -1 then
                      report "Test stopped";
                      data     <= C_DATA_INIT;
                      active_o <= '0';
@@ -156,19 +149,23 @@ begin
             when STOPPED_ST =>
                state <= STOPPED_ST;
 
+               if start_i = '1' then
+                  active_o    <= '1';
+                  error_o     <= '0';
+                  state       <= WRITING_ST;
+               end if;
+
          end case;
 
          if rst_i = '1' then
-            init_counter <= C_INIT_DELAY;
-            avm_write_o  <= '0';
-            avm_read_o   <= '0';
-            active_o     <= '0';
-            error_o      <= '0';
-            state        <= INIT_ST;
+            avm_write_o <= '0';
+            avm_read_o  <= '0';
+            active_o    <= '0';
+            error_o     <= '0';
+            state       <= INIT_ST;
          end if;
       end if;
    end process p_fsm;
-
 
 end architecture synthesis;
 

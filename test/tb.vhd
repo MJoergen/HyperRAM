@@ -11,25 +11,27 @@ end entity tb;
 architecture simulation of tb is
 
    -- Testbench signals
-   constant CLK_PERIOD : time := 10 ns;     -- 100 MHz
-   signal stop_test    : std_logic := '0';
+   constant C_CLK_PERIOD : time := 10 ns;     -- 100 MHz
+   signal stop_test      : std_logic := '0';
 
-   signal clk          : std_logic;
-   signal clk_x2       : std_logic;
-   signal rst          : std_logic;
-   signal led_active   : std_logic;
-   signal led_error    : std_logic;
+   signal clk            : std_logic;
+   signal clk_x2         : std_logic;
+   signal rst            : std_logic;
+   signal led_active     : std_logic;
+   signal led_error      : std_logic;
+   signal start          : std_logic;
+   signal start_ready    : std_logic;
 
    -- HyperRAM simulation device interface
-   signal hr_resetn    : std_logic;
-   signal hr_csn       : std_logic;
-   signal hr_ck        : std_logic;
-   signal hr_rwds      : std_logic;
-   signal hr_dq        : std_logic_vector(7 downto 0);
-   signal hr_rwds_out  : std_logic;
-   signal hr_dq_out    : std_logic_vector(7 downto 0);
-   signal hr_rwds_oe   : std_logic;
-   signal hr_dq_oe     : std_logic;
+   signal hr_resetn      : std_logic;
+   signal hr_csn         : std_logic;
+   signal hr_ck          : std_logic;
+   signal hr_rwds        : std_logic;
+   signal hr_dq          : std_logic_vector(7 downto 0);
+   signal hr_rwds_out    : std_logic;
+   signal hr_dq_out      : std_logic_vector(7 downto 0);
+   signal hr_rwds_oe     : std_logic;
+   signal hr_dq_oe       : std_logic;
 
 
    component s27kl0642 is
@@ -60,9 +62,9 @@ begin
    begin
       while stop_test = '0' loop
          clk <= '1';
-         wait for CLK_PERIOD/2;
+         wait for C_CLK_PERIOD/2;
          clk <= '0';
-         wait for CLK_PERIOD/2;
+         wait for C_CLK_PERIOD/2;
       end loop;
       wait;
    end process p_clk;
@@ -71,9 +73,9 @@ begin
    begin
       while stop_test = '0' loop
          clk_x2 <= '1';
-         wait for CLK_PERIOD/4;
+         wait for C_CLK_PERIOD/4;
          clk_x2 <= '0';
-         wait for CLK_PERIOD/4;
+         wait for C_CLK_PERIOD/4;
       end loop;
       wait;
    end process p_clk_x2;
@@ -81,11 +83,32 @@ begin
    p_rst : process
    begin
       rst <= '1';
-      wait for 10*CLK_PERIOD;
+      wait for 10*C_CLK_PERIOD;
       wait until clk = '1';
       rst <= '0';
       wait;
    end process p_rst;
+
+   p_start_ready : process
+   begin
+      start_ready <= '0';
+      wait for 160 us;
+      start_ready <= '1';
+      wait until led_active = '1';
+      start_ready <= '0';
+      wait;
+   end process p_start_ready;
+
+
+   p_start : process (clk)
+   begin
+      if rising_edge(clk) then
+         start <= start_ready;
+         if led_active = '1' then
+            start <= '0';
+         end if;
+      end if;
+   end process p_start;
 
 
    ---------------------------------------------------------
@@ -100,7 +123,7 @@ begin
          clk_i         => clk,
          clk_x2_i      => clk_x2,
          rst_i         => rst,
-         start_i       => '1',
+         start_i       => start,
          hr_resetn_o   => hr_resetn,
          hr_csn_o      => hr_csn,
          hr_ck_o       => hr_ck,

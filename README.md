@@ -79,9 +79,9 @@ I've split the HyperRAM controller implementation into two parts:
 
 * The state machine ([hyperram\_ctrl.vhd](hyperram_ctrl.vhd)), running in a
   single clock domain, same as HyperRAM device, i.e. 100 MHz.
-* The I/O ports ([hyperram\_io.vhd](hyperram_io.vhd)), using two additional
-  clocks for correct timing: A 100 MHz clock delayed 90 degrees (quarter
-  cycle). and a double-speed clock at 200 MHz.
+* The I/O ports ([hyperram\_io.vhd](hyperram_io.vhd)), using an additional
+  clock at double-speed (200 MHz) for correct timing of the HyperRAM signals.
+
 
 The phase shifted clock is used to delay the HyperRAM clock signal `CK`
 relative to the transitions on the `DQ` signal. This ensures correct values of
@@ -137,11 +137,9 @@ This section discusses the following:
 ### Clock synthesis
 
 As mentioned previously, controlling the physical I/O to the HyperRAM device
-requires two additional clocks to get the correct timing:
-* A 100 MHz clock delayed 90 degrees.
-* A 200 MHz clock.
+requires an additional clock (at twice the frequency) to get the correct timing.
 
-Both are generated using a single MMCM. This is done in the file
+This double-speed clock is generated using a single MMCM. This is done in the file
 [src/MEGA65/clk.vhd](src/MEGA65/clk.vhd).
 
 This file also generates a 40 MHz clock, but this is only used by the support files

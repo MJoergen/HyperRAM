@@ -9,7 +9,7 @@ use ieee.numeric_std.all;
 -- The datawidth is fixed at 16 bits.
 -- The address is word-based, i.e. units of 2 bytes.
 
--- This module requires three clocks:
+-- This module requires two clocks:
 -- clk_x1_i : 100 MHz. This is the main clock used for the Avalon MM interface
 --            as well as controlling the HyperRAM device.
 -- clk_x2_i :_200 MHz. Used for I/O to HyperRAM device.
@@ -46,6 +46,18 @@ end entity hyperram;
 
 architecture synthesis of hyperram is
 
+   constant C_LATENCY : integer := 4;
+
+   signal cfg_write         : std_logic;
+   signal cfg_read          : std_logic;
+   signal cfg_address       : std_logic_vector(31 downto 0);
+   signal cfg_writedata     : std_logic_vector(15 downto 0);
+   signal cfg_byteenable    : std_logic_vector(1 downto 0);
+   signal cfg_burstcount    : std_logic_vector(7 downto 0);
+   signal cfg_readdata      : std_logic_vector(15 downto 0);
+   signal cfg_readdatavalid : std_logic;
+   signal cfg_waitrequest   : std_logic;
+
    signal ctrl_rstn         : std_logic;
    signal ctrl_ck_ddr       : std_logic_vector(1 downto 0);
    signal ctrl_csn          : std_logic;
@@ -59,22 +71,57 @@ architecture synthesis of hyperram is
 begin
 
    --------------------------------------------------------
+   -- Instantiate HyperRAM configurator
+   --------------------------------------------------------
+
+   i_hyperram_config : entity work.hyperram_config
+      generic map (
+         G_LATENCY => C_LATENCY
+      )
+      port map (
+         clk_i                 => clk_x1_i,
+         rst_i                 => rst_i,
+         s_avm_write_i         => avm_write_i,
+         s_avm_read_i          => avm_read_i,
+         s_avm_address_i       => avm_address_i,
+         s_avm_writedata_i     => avm_writedata_i,
+         s_avm_byteenable_i    => avm_byteenable_i,
+         s_avm_burstcount_i    => avm_burstcount_i,
+         s_avm_readdata_o      => avm_readdata_o,
+         s_avm_readdatavalid_o => avm_readdatavalid_o,
+         s_avm_waitrequest_o   => avm_waitrequest_o,
+         m_avm_write_o         => cfg_write,
+         m_avm_read_o          => cfg_read,
+         m_avm_address_o       => cfg_address,
+         m_avm_writedata_o     => cfg_writedata,
+         m_avm_byteenable_o    => cfg_byteenable,
+         m_avm_burstcount_o    => cfg_burstcount,
+         m_avm_readdata_i      => cfg_readdata,
+         m_avm_readdatavalid_i => cfg_readdatavalid,
+         m_avm_waitrequest_i   => cfg_waitrequest
+      ); -- i_hyperram_config
+
+
+   --------------------------------------------------------
    -- Instantiate HyperRAM controller
    --------------------------------------------------------
 
    i_hyperram_ctrl : entity work.hyperram_ctrl
+      generic map (
+         G_LATENCY => C_LATENCY
+      )
       port map (
          clk_i                => clk_x1_i,
          rst_i                => rst_i,
-         avm_write_i          => avm_write_i,
-         avm_read_i           => avm_read_i,
-         avm_address_i        => avm_address_i,
-         avm_writedata_i      => avm_writedata_i,
-         avm_byteenable_i     => avm_byteenable_i,
-         avm_burstcount_i     => avm_burstcount_i,
-         avm_readdata_o       => avm_readdata_o,
-         avm_readdatavalid_o  => avm_readdatavalid_o,
-         avm_waitrequest_o    => avm_waitrequest_o,
+         avm_write_i          => cfg_write,
+         avm_read_i           => cfg_read,
+         avm_address_i        => cfg_address,
+         avm_writedata_i      => cfg_writedata,
+         avm_byteenable_i     => cfg_byteenable,
+         avm_burstcount_i     => cfg_burstcount,
+         avm_readdata_o       => cfg_readdata,
+         avm_readdatavalid_o  => cfg_readdatavalid,
+         avm_waitrequest_o    => cfg_waitrequest,
          hb_rstn_o            => ctrl_rstn,
          hb_ck_ddr_o          => ctrl_ck_ddr,
          hb_csn_o             => ctrl_csn,
@@ -83,7 +130,8 @@ begin
          hb_dq_oe_o           => ctrl_dq_oe,
          hb_dq_ie_i           => ctrl_dq_ie,
          hb_rwds_ddr_out_o    => ctrl_rwds_ddr_out,
-         hb_rwds_oe_o         => ctrl_rwds_oe
+         hb_rwds_oe_o         => ctrl_rwds_oe,
+         hb_rwds_in_i         => hr_rwds_in_i
       ); -- i_hyperram_ctrl
 
 

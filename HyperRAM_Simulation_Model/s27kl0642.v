@@ -239,7 +239,7 @@ module s27kl0642
 	`define tCH           		5000 //tCH 50% of the min clock period
 	`define tCSHI        		10e3 //tCSHI
 	`define tRP     			200e3 //tRP
-	`define tACC				60e3
+	`define tACC				40e3
 	`define tOZ					3500
 	`define tDSZ				3500
 	`define tDQLZ				0

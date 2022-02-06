@@ -12,14 +12,14 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="180000001fs"></ZoomEndTime>
-      <Cursor1Time time="179831000fs"></Cursor1Time>
+      <ZoomEndTime time="181000001fs"></ZoomEndTime>
+      <Cursor1Time time="181000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="290"></NameColumnWidth>
-      <ValueColumnWidth column_width="160"></ValueColumnWidth>
+      <ValueColumnWidth column_width="150"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="8" />
+   <WVObjectSize size="7" />
    <wvobject type="logic" fp_name="/tb/stop_test">
       <obj_property name="ElementShortName">stop_test</obj_property>
       <obj_property name="ObjectShortName">stop_test</obj_property>
@@ -27,10 +27,6 @@
    <wvobject type="logic" fp_name="/tb/clk">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb/clk_90">
-      <obj_property name="ElementShortName">clk_90</obj_property>
-      <obj_property name="ObjectShortName">clk_90</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/tb/clk_x2">
       <obj_property name="ElementShortName">clk_x2</obj_property>
@@ -144,13 +140,29 @@
          <obj_property name="ElementShortName">hr_ck_o</obj_property>
          <obj_property name="ObjectShortName">hr_ck_o</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/hr_rwds_io">
-         <obj_property name="ElementShortName">hr_rwds_io</obj_property>
-         <obj_property name="ObjectShortName">hr_rwds_io</obj_property>
+      <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/hr_rwds_in_i">
+         <obj_property name="ElementShortName">hr_rwds_in_i</obj_property>
+         <obj_property name="ObjectShortName">hr_rwds_in_i</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_system/i_hyperram/hr_dq_io">
-         <obj_property name="ElementShortName">hr_dq_io[7:0]</obj_property>
-         <obj_property name="ObjectShortName">hr_dq_io[7:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/i_system/i_hyperram/hr_dq_in_i">
+         <obj_property name="ElementShortName">hr_dq_in_i[7:0]</obj_property>
+         <obj_property name="ObjectShortName">hr_dq_in_i[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/hr_rwds_out_o">
+         <obj_property name="ElementShortName">hr_rwds_out_o</obj_property>
+         <obj_property name="ObjectShortName">hr_rwds_out_o</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/i_system/i_hyperram/hr_dq_out_o">
+         <obj_property name="ElementShortName">hr_dq_out_o[7:0]</obj_property>
+         <obj_property name="ObjectShortName">hr_dq_out_o[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/hr_rwds_oe_o">
+         <obj_property name="ElementShortName">hr_rwds_oe_o</obj_property>
+         <obj_property name="ObjectShortName">hr_rwds_oe_o</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_system/i_hyperram/hr_dq_oe_o">
+         <obj_property name="ElementShortName">hr_dq_oe_o</obj_property>
+         <obj_property name="ObjectShortName">hr_dq_oe_o</obj_property>
       </wvobject>
    </wvobject>
 </wave_config>
