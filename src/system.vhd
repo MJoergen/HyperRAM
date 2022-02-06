@@ -7,21 +7,25 @@ entity system is
       G_ADDRESS_SIZE : integer  -- Number of bits
    );
    port (
-      clk_i       : in    std_logic;
-      clk_90_i    : in    std_logic;
-      clk_x2_i    : in    std_logic;
-      rst_i       : in    std_logic;
-      start_i     : in    std_logic;
+      clk_i         : in  std_logic;
+      clk_90_i      : in  std_logic;
+      clk_x2_i      : in  std_logic;
+      rst_i         : in  std_logic;
+      start_i       : in  std_logic;
 
       -- HyperRAM device interface
-      hr_resetn_o : out   std_logic;
-      hr_csn_o    : out   std_logic;
-      hr_ck_o     : out   std_logic;
-      hr_rwds_io  : inout std_logic;
-      hr_dq_io    : inout std_logic_vector(7 downto 0);
+      hr_resetn_o   : out std_logic;
+      hr_csn_o      : out std_logic;
+      hr_ck_o       : out std_logic;
+      hr_rwds_in_i  : in  std_logic;
+      hr_dq_in_i    : in  std_logic_vector(7 downto 0);
+      hr_rwds_out_o : out std_logic;
+      hr_dq_out_o   : out std_logic_vector(7 downto 0);
+      hr_rwds_oe_o  : out std_logic;
+      hr_dq_oe_o    : out std_logic;
 
-      active_o    : out   std_logic;
-      error_o     : out   std_logic
+      active_o      : out std_logic;
+      error_o       : out std_logic
    );
 end entity system;
 
@@ -87,8 +91,12 @@ begin
          hr_resetn_o         => hr_resetn_o,
          hr_csn_o            => hr_csn_o,
          hr_ck_o             => hr_ck_o,
-         hr_rwds_io          => hr_rwds_io,
-         hr_dq_io            => hr_dq_io
+         hr_rwds_in_i        => hr_rwds_in_i,
+         hr_dq_in_i          => hr_dq_in_i,
+         hr_rwds_out_o       => hr_rwds_out_o,
+         hr_dq_out_o         => hr_dq_out_o,
+         hr_rwds_oe_o        => hr_rwds_oe_o,
+         hr_dq_oe_o          => hr_dq_oe_o
       ); -- i_hyperram
 
 end architecture synthesis;

@@ -18,28 +18,32 @@ use ieee.numeric_std.all;
 
 entity hyperram is
    port (
-      clk_i               : in    std_logic; -- Main clock
-      clk_90_i            : in    std_logic; -- Physical I/O only
-      clk_x2_i            : in    std_logic; -- Physical I/O only
-      rst_i               : in    std_logic;
+      clk_i               : in  std_logic; -- Main clock
+      clk_90_i            : in  std_logic; -- Physical I/O only
+      clk_x2_i            : in  std_logic; -- Physical I/O only
+      rst_i               : in  std_logic;
 
       -- Avalon Memory Map
-      avm_write_i         : in    std_logic;
-      avm_read_i          : in    std_logic;
-      avm_address_i       : in    std_logic_vector(31 downto 0);
-      avm_writedata_i     : in    std_logic_vector(15 downto 0);
-      avm_byteenable_i    : in    std_logic_vector(1 downto 0);
-      avm_burstcount_i    : in    std_logic_vector(7 downto 0);
-      avm_readdata_o      : out   std_logic_vector(15 downto 0);
-      avm_readdatavalid_o : out   std_logic;
-      avm_waitrequest_o   : out   std_logic;
+      avm_write_i         : in  std_logic;
+      avm_read_i          : in  std_logic;
+      avm_address_i       : in  std_logic_vector(31 downto 0);
+      avm_writedata_i     : in  std_logic_vector(15 downto 0);
+      avm_byteenable_i    : in  std_logic_vector(1 downto 0);
+      avm_burstcount_i    : in  std_logic_vector(7 downto 0);
+      avm_readdata_o      : out std_logic_vector(15 downto 0);
+      avm_readdatavalid_o : out std_logic;
+      avm_waitrequest_o   : out std_logic;
 
       -- HyperRAM device interface
-      hr_resetn_o         : out   std_logic;
-      hr_csn_o            : out   std_logic;
-      hr_ck_o             : out   std_logic;
-      hr_rwds_io          : inout std_logic;
-      hr_dq_io            : inout std_logic_vector(7 downto 0)
+      hr_resetn_o         : out std_logic;
+      hr_csn_o            : out std_logic;
+      hr_ck_o             : out std_logic;
+      hr_rwds_in_i        : in  std_logic;
+      hr_dq_in_i          : in  std_logic_vector(7 downto 0);
+      hr_rwds_out_o       : out std_logic;
+      hr_dq_out_o         : out std_logic_vector(7 downto 0);
+      hr_rwds_oe_o        : out std_logic;
+      hr_dq_oe_o          : out std_logic
    );
 end entity hyperram;
 
@@ -108,8 +112,12 @@ begin
          hr_resetn_o         => hr_resetn_o,
          hr_csn_o            => hr_csn_o,
          hr_ck_o             => hr_ck_o,
-         hr_rwds_io          => hr_rwds_io,
-         hr_dq_io            => hr_dq_io
+         hr_rwds_in_i        => hr_rwds_in_i,
+         hr_dq_in_i          => hr_dq_in_i,
+         hr_rwds_out_o       => hr_rwds_out_o,
+         hr_dq_out_o         => hr_dq_out_o,
+         hr_rwds_oe_o        => hr_rwds_oe_o,
+         hr_dq_oe_o          => hr_dq_oe_o
       ); -- i_hyperram_io
 
 end architecture synthesis;

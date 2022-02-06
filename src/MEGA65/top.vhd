@@ -31,13 +31,26 @@ architecture synthesis of top is
    -- resets
    signal rst    : std_logic;
 
-   signal return_out  : std_logic;
-   signal start       : std_logic;
+   signal return_out   : std_logic;
+   signal start        : std_logic;
 
-   signal led_active  : std_logic;
-   signal led_error   : std_logic;
+   signal led_active   : std_logic;
+   signal led_error    : std_logic;
+
+   signal hr_rwds_out  : std_logic;
+   signal hr_dq_out    : std_logic_vector(7 downto 0);
+   signal hr_rwds_oe   : std_logic;
+   signal hr_dq_oe     : std_logic;
 
 begin
+
+   ----------------------------------
+   -- Tri-state buffers for HyperRAM
+   ----------------------------------
+
+   hr_rwds <= hr_rwds_out when hr_rwds_oe = '1' else 'Z';
+   hr_dq   <= hr_dq_out   when hr_dq_oe   = '1' else (others => 'Z');
+
 
    i_clk : entity work.clk
       port map
@@ -55,18 +68,22 @@ begin
          G_ADDRESS_SIZE => 22       -- 4M entries of 16 bits each.
       )
       port map (
-         clk_i        => clk,
-         clk_90_i     => clk_90,
-         clk_x2_i     => clk_x2,
-         rst_i        => rst,
-         start_i      => start,
-         hr_resetn_o  => hr_resetn,
-         hr_csn_o     => hr_csn,
-         hr_ck_o      => hr_ck,
-         hr_rwds_io   => hr_rwds,
-         hr_dq_io     => hr_dq,
-         active_o     => led_active,
-         error_o      => led_error
+         clk_i         => clk,
+         clk_90_i      => clk_90,
+         clk_x2_i      => clk_x2,
+         rst_i         => rst,
+         start_i       => start,
+         hr_resetn_o   => hr_resetn,
+         hr_csn_o      => hr_csn,
+         hr_ck_o       => hr_ck,
+         hr_rwds_in_i  => hr_rwds,
+         hr_dq_in_i    => hr_dq,
+         hr_rwds_out_o => hr_rwds_out,
+         hr_dq_out_o   => hr_dq_out,
+         hr_rwds_oe_o  => hr_rwds_oe,
+         hr_dq_oe_o    => hr_dq_oe,
+         active_o      => led_active,
+         error_o       => led_error
       ); -- i_system
 
    i_mega65kbd_to_matrix : entity work.mega65kbd_to_matrix

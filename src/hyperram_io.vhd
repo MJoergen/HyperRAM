@@ -9,28 +9,32 @@ use unisim.vcomponents.all;
 
 entity hyperram_io is
    port (
-      clk_i               : in    std_logic;
-      clk_90_i            : in    std_logic; -- Quarter cycle delayed.
-      clk_x2_i            : in    std_logic; -- Double frequency.
-      rst_i               : in    std_logic;
+      clk_i               : in  std_logic;
+      clk_90_i            : in  std_logic; -- Quarter cycle delayed.
+      clk_x2_i            : in  std_logic; -- Double frequency.
+      rst_i               : in  std_logic;
 
       -- Connect to HyperRAM controller
-      ctrl_rstn_i         : in    std_logic;
-      ctrl_ck_ddr_i       : in    std_logic_vector(1 downto 0);
-      ctrl_csn_i          : in    std_logic;
-      ctrl_dq_ddr_in_o    : out   std_logic_vector(15 downto 0);
-      ctrl_dq_ddr_out_i   : in    std_logic_vector(15 downto 0);
-      ctrl_dq_oe_i        : in    std_logic;
-      ctrl_dq_ie_o        : out   std_logic;
-      ctrl_rwds_ddr_out_i : in    std_logic_vector(1 downto 0);
-      ctrl_rwds_oe_i      : in    std_logic;
+      ctrl_rstn_i         : in  std_logic;
+      ctrl_ck_ddr_i       : in  std_logic_vector(1 downto 0);
+      ctrl_csn_i          : in  std_logic;
+      ctrl_dq_ddr_in_o    : out std_logic_vector(15 downto 0);
+      ctrl_dq_ddr_out_i   : in  std_logic_vector(15 downto 0);
+      ctrl_dq_oe_i        : in  std_logic;
+      ctrl_dq_ie_o        : out std_logic;
+      ctrl_rwds_ddr_out_i : in  std_logic_vector(1 downto 0);
+      ctrl_rwds_oe_i      : in  std_logic;
 
       -- Connect to HyperRAM device
-      hr_resetn_o         : out   std_logic;
-      hr_csn_o            : out   std_logic;
-      hr_ck_o             : out   std_logic;
-      hr_rwds_io          : inout std_logic;
-      hr_dq_io            : inout std_logic_vector(7 downto 0)
+      hr_resetn_o         : out std_logic;
+      hr_csn_o            : out std_logic;
+      hr_ck_o             : out std_logic;
+      hr_rwds_in_i        : in  std_logic;
+      hr_dq_in_i          : in  std_logic_vector(7 downto 0);
+      hr_rwds_out_o       : out std_logic;
+      hr_dq_out_o         : out std_logic_vector(7 downto 0);
+      hr_rwds_oe_o        : out std_logic;
+      hr_dq_oe_o          : out std_logic
    );
 end entity hyperram_io;
 
@@ -113,8 +117,8 @@ begin
    begin
       if rising_edge(clk_x2_i) then
          csn_in_x2    <= hr_csn_o;
-         rwds_in_x2   <= hr_rwds_io;
-         dq_in_x2     <= hr_dq_io;
+         rwds_in_x2   <= hr_rwds_in_i;
+         dq_in_x2     <= hr_dq_in_i;
 
          rwds_in_x2_d <= rwds_in_x2;
          dq_in_x2_d   <= dq_in_x2;
@@ -130,7 +134,7 @@ begin
             ctrl_dq_ie_o     <= '1';
          end if;
          if rwds_in_x2_d = '0' and rwds_in_x2 = '1' then
-            ctrl_dq_ddr_in_o <= dq_in_x2 & hr_dq_io;
+            ctrl_dq_ddr_in_o <= dq_in_x2 & hr_dq_in_i;
             ctrl_dq_ie_o     <= '1';
          end if;
       end if;
@@ -149,8 +153,10 @@ begin
       end if;
    end process p_delay;
 
-   hr_rwds_io <= rwds_out when rwds_oe_d = '1' else 'Z';
-   hr_dq_io   <= dq_out   when dq_oe_d   = '1' else (others => 'Z');
+   hr_rwds_oe_o  <= rwds_oe_d;
+   hr_dq_oe_o    <= dq_oe_d;
+   hr_rwds_out_o <= rwds_out;
+   hr_dq_out_o   <= dq_out;
 
 end architecture synthesis;
 
