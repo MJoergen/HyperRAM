@@ -8,6 +8,9 @@ library xpm;
 use xpm.vcomponents.all;
 
 entity clk is
+   generic (
+      G_HYPERRAM_FREQ_MHZ : integer
+   );
    port (
       sys_clk_i    : in  std_logic;   -- expects 100 MHz
       sys_rstn_i   : in  std_logic;   -- Asynchronous, asserted low
@@ -21,8 +24,8 @@ architecture synthesis of clk is
 
    signal clkfb       : std_logic;
    signal clkfb_mmcm  : std_logic;
-   signal clk_x1_mmcm : std_logic;
    signal clk_x2_mmcm : std_logic;
+   signal clk_x1_mmcm : std_logic;
    signal locked      : std_logic;
 
 begin
@@ -39,7 +42,7 @@ begin
          CLKIN1_PERIOD        => 10.0,       -- INPUT @ 100 MHz
          REF_JITTER1          => 0.010,
          DIVCLK_DIVIDE        => 1,
-         CLKFBOUT_MULT_F      => 10.000,     -- f_VCO = (100 MHz / 1) x 8.000 = 800 MHz
+         CLKFBOUT_MULT_F      => (10.0*real(G_HYPERRAM_FREQ_MHZ)/100.0),
          CLKFBOUT_PHASE       => 0.000,
          CLKFBOUT_USE_FINE_PS => FALSE,
          CLKOUT1_DIVIDE       => 5,          -- 200 MHz

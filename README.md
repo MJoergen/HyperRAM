@@ -82,7 +82,6 @@ I've split the HyperRAM controller implementation into two parts:
 * The I/O ports ([hyperram\_io.vhd](hyperram_io.vhd)), using an additional
   clock at double-speed (200 MHz) for correct timing of the HyperRAM signals.
 
-
 The phase shifted clock is used to delay the HyperRAM clock signal `CK`
 relative to the transitions on the `DQ` signal. This ensures correct values of
 the timing parameters `t_IS` and `t_IH` during WRITE operation.

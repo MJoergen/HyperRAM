@@ -26,6 +26,8 @@ end entity top;
 
 architecture synthesis of top is
 
+   constant C_HYPERRAM_FREQ_MHZ : integer := 100;
+
    -- HyperRAM clocks
    signal clk_x1      : std_logic; -- HyperRAM clock
    signal clk_x2      : std_logic; -- Double speed clock
@@ -69,6 +71,10 @@ begin
       ); -- i_clk_mega65
 
    i_clk : entity work.clk
+      generic map
+      (
+         G_HYPERRAM_FREQ_MHZ => C_HYPERRAM_FREQ_MHZ
+      )
       port map
       (
          sys_clk_i  => clk,

@@ -68,18 +68,28 @@ architecture synthesis of hyperram_ctrl is
    subtype  R_CA_RESERVED is natural range 15 downto  3;
    subtype  R_CA_ADDR_LSB is natural range  2 downto  0;
 
-   constant C_DEBUG_MODE                     : boolean := false;
-   attribute mark_debug                      : boolean;
-   attribute mark_debug of hb_rstn_o         : signal is C_DEBUG_MODE;
-   attribute mark_debug of hb_ck_ddr_o       : signal is C_DEBUG_MODE;
-   attribute mark_debug of hb_csn_o          : signal is C_DEBUG_MODE;
-   attribute mark_debug of hb_dq_ddr_in_i    : signal is C_DEBUG_MODE;
-   attribute mark_debug of hb_dq_ddr_out_o   : signal is C_DEBUG_MODE;
-   attribute mark_debug of hb_dq_oe_o        : signal is C_DEBUG_MODE;
-   attribute mark_debug of hb_dq_ie_i        : signal is C_DEBUG_MODE;
-   attribute mark_debug of hb_rwds_ddr_out_o : signal is C_DEBUG_MODE;
-   attribute mark_debug of hb_rwds_oe_o      : signal is C_DEBUG_MODE;
-   attribute mark_debug of state             : signal is C_DEBUG_MODE;
+   constant C_DEBUG_MODE                       : boolean := false;
+   attribute mark_debug                        : boolean;
+   attribute mark_debug of hb_rstn_o           : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_ck_ddr_o         : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_csn_o            : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_dq_ddr_in_i      : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_dq_ddr_out_o     : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_dq_oe_o          : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_dq_ie_i          : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_rwds_ddr_out_o   : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_rwds_oe_o        : signal is C_DEBUG_MODE;
+   attribute mark_debug of hb_rwds_in_i        : signal is C_DEBUG_MODE;
+   attribute mark_debug of state               : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_write_i         : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_read_i          : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_address_i       : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_writedata_i     : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_byteenable_i    : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_burstcount_i    : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_readdata_o      : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_readdatavalid_o : signal is C_DEBUG_MODE;
+   attribute mark_debug of avm_waitrequest_o   : signal is C_DEBUG_MODE;
 
 begin
 
