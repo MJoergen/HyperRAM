@@ -37,6 +37,7 @@ end entity top;
 architecture synthesis of top is
 
    constant C_HYPERRAM_FREQ_MHZ : integer := 100;
+   constant C_HYPERRAM_PHASE    : real := 189.000;
 
    -- video mode selection: 720p @ 60 Hz
    constant C_VIDEO_MODE : video_modes_t := C_VIDEO_MODE_1280_720_60;
@@ -57,6 +58,7 @@ architecture synthesis of top is
    -- HyperRAM clocks
    signal clk_x1      : std_logic; -- HyperRAM clock
    signal clk_x2      : std_logic; -- Double speed clock
+   signal clk_x2_del  : std_logic; -- Double speed clock, phase shifted
 
    -- MEGA65 clocks
    signal kbd_clk     : std_logic; -- Keyboard clock
@@ -81,7 +83,8 @@ architecture synthesis of top is
    signal data_read   : std_logic_vector(15 downto 0);
 
    signal freq_str    : std_logic_vector(11 downto 0);
-   signal digits      : std_logic_vector(67 downto 0);
+   signal phase_str   : std_logic_vector(11 downto 0);
+   signal digits      : std_logic_vector(79 downto 0);
 
    signal hr_rwds_out : std_logic;
    signal hr_dq_out   : std_logic_vector(7 downto 0);
@@ -112,15 +115,17 @@ begin
    i_clk : entity work.clk
       generic map
       (
-         G_HYPERRAM_FREQ_MHZ => C_HYPERRAM_FREQ_MHZ
+         G_HYPERRAM_FREQ_MHZ => C_HYPERRAM_FREQ_MHZ,
+         G_HYPERRAM_PHASE    => C_HYPERRAM_PHASE
       )
       port map
       (
-         sys_clk_i  => clk,
-         sys_rstn_i => reset_n,
-         clk_x1_o   => clk_x1,
-         clk_x2_o   => clk_x2,
-         rst_o      => rst
+         sys_clk_i    => clk,
+         sys_rstn_i   => reset_n,
+         clk_x1_o     => clk_x1,
+         clk_x2_o     => clk_x2,
+         clk_x2_del_o => clk_x2_del,
+         rst_o        => rst
       ); -- i_clk
 
    i_system : entity work.system
@@ -130,6 +135,7 @@ begin
       port map (
          clk_i         => clk_x1,
          clk_x2_i      => clk_x2,
+         clk_x2_del_i  => clk_x2_del,
          rst_i         => rst,
          start_i       => start,
          hr_resetn_o   => hr_resetn,
@@ -150,7 +156,7 @@ begin
 
    i_cdc_video: xpm_cdc_array_single
       generic map (
-         WIDTH => 68
+         WIDTH => 80
       )
       port map (
          src_clk              => clk_x1,
@@ -159,6 +165,7 @@ begin
          src_in(53 downto 32) => address,
          src_in(55 downto 54) => "00",
          src_in(67 downto 56) => freq_str,
+         src_in(79 downto 68) => phase_str,
          dest_clk             => video_clk,
          dest_out             => digits
       ); -- i_cdc
@@ -166,6 +173,10 @@ begin
    freq_str(11 downto 8) <= std_logic_vector(to_unsigned((C_HYPERRAM_FREQ_MHZ/100) mod 10, 4));
    freq_str( 7 downto 4) <= std_logic_vector(to_unsigned((C_HYPERRAM_FREQ_MHZ/10)  mod 10, 4));
    freq_str( 3 downto 0) <= std_logic_vector(to_unsigned((C_HYPERRAM_FREQ_MHZ/1)   mod 10, 4));
+
+   phase_str(11 downto 8) <= std_logic_vector(to_unsigned((integer(C_HYPERRAM_PHASE)/100) mod 10, 4));
+   phase_str( 7 downto 4) <= std_logic_vector(to_unsigned((integer(C_HYPERRAM_PHASE)/10)  mod 10, 4));
+   phase_str( 3 downto 0) <= std_logic_vector(to_unsigned((integer(C_HYPERRAM_PHASE)/1)   mod 10, 4));
 
    i_cdc_keyboard: xpm_cdc_array_single
       generic map (
@@ -184,7 +195,7 @@ begin
       generic map
       (
          G_FONT_FILE   => C_FONT_FILE,
-         G_DIGITS_SIZE => 68,
+         G_DIGITS_SIZE => 80,
          G_VIDEO_MODE  => C_VIDEO_MODE
       )
       port map

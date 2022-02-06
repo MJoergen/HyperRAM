@@ -18,6 +18,7 @@ entity hyperram is
    port (
       clk_x1_i            : in  std_logic; -- Main clock
       clk_x2_i            : in  std_logic; -- Physical I/O only
+      clk_x2_del_i        : in  std_logic; -- Double frequency, phase shifted
       rst_i               : in  std_logic;
 
       -- Avalon Memory Map
@@ -143,6 +144,7 @@ begin
       port map (
          clk_x1_i            => clk_x1_i,
          clk_x2_i            => clk_x2_i,
+         clk_x2_del_i        => clk_x2_del_i,
          rst_i               => rst_i,
          ctrl_rstn_i         => ctrl_rstn,
          ctrl_ck_ddr_i       => ctrl_ck_ddr,

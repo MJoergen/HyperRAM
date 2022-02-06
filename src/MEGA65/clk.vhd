@@ -9,12 +9,14 @@ use xpm.vcomponents.all;
 
 entity clk is
    generic (
-      G_HYPERRAM_FREQ_MHZ : integer
+      G_HYPERRAM_FREQ_MHZ : integer;
+      G_HYPERRAM_PHASE    : real      -- Must be a multiple of 45/5 = 9
    );
    port (
       sys_clk_i    : in  std_logic;   -- expects 100 MHz
       sys_rstn_i   : in  std_logic;   -- Asynchronous, asserted low
       clk_x2_o     : out std_logic;   -- 200 MHz
+      clk_x2_del_o : out std_logic;   -- 200 MHz phase shifted
       clk_x1_o     : out std_logic;   -- 100 MHz
       rst_o        : out std_logic
    );
@@ -22,11 +24,12 @@ end entity clk;
 
 architecture synthesis of clk is
 
-   signal clkfb       : std_logic;
-   signal clkfb_mmcm  : std_logic;
-   signal clk_x2_mmcm : std_logic;
-   signal clk_x1_mmcm : std_logic;
-   signal locked      : std_logic;
+   signal clkfb           : std_logic;
+   signal clkfb_mmcm      : std_logic;
+   signal clk_x2_mmcm     : std_logic;
+   signal clk_x2_del_mmcm : std_logic;
+   signal clk_x1_mmcm     : std_logic;
+   signal locked          : std_logic;
 
 begin
 
@@ -49,6 +52,10 @@ begin
          CLKOUT1_PHASE        => 0.000,
          CLKOUT1_DUTY_CYCLE   => 0.500,
          CLKOUT1_USE_FINE_PS  => FALSE,
+         CLKOUT2_DIVIDE       => 5,          -- 200 MHz
+         CLKOUT2_PHASE        => G_HYPERRAM_PHASE,
+         CLKOUT2_DUTY_CYCLE   => 0.500,
+         CLKOUT2_USE_FINE_PS  => FALSE,
          CLKOUT3_DIVIDE       => 10,         -- 100 MHz
          CLKOUT3_PHASE        => 0.000,
          CLKOUT3_DUTY_CYCLE   => 0.500,
@@ -58,6 +65,7 @@ begin
          -- Output clocks
          CLKFBOUT            => clkfb_mmcm,
          CLKOUT1             => clk_x2_mmcm,
+         CLKOUT2             => clk_x2_del_mmcm,
          CLKOUT3             => clk_x1_mmcm,
          -- Input clock control
          CLKFBIN             => clkfb,
@@ -108,6 +116,12 @@ begin
          I => clk_x2_mmcm,
          O => clk_x2_o
       ); -- i_bufg_clk_x2
+
+   i_bufg_clk_x2_del : BUFG
+      port map (
+         I => clk_x2_del_mmcm,
+         O => clk_x2_del_o
+      ); -- i_bufg_clk_x2_del
 
 
    -------------------------------------

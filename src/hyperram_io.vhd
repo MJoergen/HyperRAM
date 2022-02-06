@@ -11,6 +11,7 @@ entity hyperram_io is
    port (
       clk_x1_i            : in  std_logic;
       clk_x2_i            : in  std_logic; -- Double frequency.
+      clk_x2_del_i        : in  std_logic; -- Double frequency, phase shifted.
       rst_i               : in  std_logic;
 
       -- Connect to HyperRAM controller
@@ -77,9 +78,9 @@ begin
    -- Output generation
    ------------------------------------------------
 
-   p_output_clk : process (clk_x2_i)
+   p_output_clk : process (clk_x2_del_i)
    begin
-      if falling_edge(clk_x2_i) then
+      if rising_edge(clk_x2_del_i) then
          if hr_ck_o = '0' then
             hr_ck_o <= ctrl_ck_ddr_i(1);
          else
