@@ -12,6 +12,7 @@ architecture simulation of tb is
 
    -- Testbench signals
    constant C_CLK_PERIOD : time := 10 ns;     -- 100 MHz
+   constant C_DELAY      : time := 1 ns;
    signal stop_test      : std_logic := '0';
 
    signal clk            : std_logic;
@@ -22,16 +23,22 @@ architecture simulation of tb is
    signal start          : std_logic;
    signal start_ready    : std_logic;
 
+   signal sys_resetn     : std_logic;
+   signal sys_csn        : std_logic;
+   signal sys_ck         : std_logic;
+   signal sys_rwds       : std_logic;
+   signal sys_dq         : std_logic_vector(7 downto 0);
+   signal sys_rwds_out   : std_logic;
+   signal sys_dq_out     : std_logic_vector(7 downto 0);
+   signal sys_rwds_oe    : std_logic;
+   signal sys_dq_oe      : std_logic;
+
    -- HyperRAM simulation device interface
    signal hr_resetn      : std_logic;
    signal hr_csn         : std_logic;
    signal hr_ck          : std_logic;
    signal hr_rwds        : std_logic;
    signal hr_dq          : std_logic_vector(7 downto 0);
-   signal hr_rwds_out    : std_logic;
-   signal hr_dq_out      : std_logic_vector(7 downto 0);
-   signal hr_rwds_oe     : std_logic;
-   signal hr_dq_oe       : std_logic;
 
 
    component s27kl0642 is
@@ -124,15 +131,15 @@ begin
          clk_x2_i      => clk_x2,
          rst_i         => rst,
          start_i       => start,
-         hr_resetn_o   => hr_resetn,
-         hr_csn_o      => hr_csn,
-         hr_ck_o       => hr_ck,
-         hr_rwds_in_i  => hr_rwds,
-         hr_dq_in_i    => hr_dq,
-         hr_rwds_out_o => hr_rwds_out,
-         hr_dq_out_o   => hr_dq_out,
-         hr_rwds_oe_o  => hr_rwds_oe,
-         hr_dq_oe_o    => hr_dq_oe,
+         hr_resetn_o   => sys_resetn,
+         hr_csn_o      => sys_csn,
+         hr_ck_o       => sys_ck,
+         hr_rwds_in_i  => sys_rwds,
+         hr_dq_in_i    => sys_dq,
+         hr_rwds_out_o => sys_rwds_out,
+         hr_dq_out_o   => sys_dq_out,
+         hr_rwds_oe_o  => sys_rwds_oe,
+         hr_dq_oe_o    => sys_dq_oe,
          active_o      => led_active,
          error_o       => led_error
       ); -- i_system
@@ -141,8 +148,37 @@ begin
    -- Tri-state buffers for HyperRAM
    ----------------------------------
 
-   hr_rwds <= hr_rwds_out when hr_rwds_oe = '1' else 'Z';
-   hr_dq   <= hr_dq_out   when hr_dq_oe   = '1' else (others => 'Z');
+   sys_rwds <= sys_rwds_out when sys_rwds_oe = '1' else 'Z';
+   sys_dq   <= sys_dq_out   when sys_dq_oe   = '1' else (others => 'Z');
+
+
+   ---------------------------------------------------------
+   -- Connect controller to device (with delay)
+   ---------------------------------------------------------
+
+   hr_resetn <= sys_resetn after C_DELAY;
+   hr_csn    <= sys_csn    after C_DELAY;
+   hr_ck     <= sys_ck     after C_DELAY;
+
+   i_wiredelay2_rwds : entity work.wiredelay2
+      generic map (
+         G_DELAY => C_DELAY
+      )
+      port map (
+         A => sys_rwds,
+         B => hr_rwds
+      );
+
+   gen_dq_delay : for i in 0 to 7 generate
+   i_wiredelay2_rwds : entity work.wiredelay2
+      generic map (
+         G_DELAY => C_DELAY
+      )
+      port map (
+         A => sys_dq(i),
+         B => hr_dq(i)
+      );
+   end generate gen_dq_delay;
 
 
    ---------------------------------------------------------
