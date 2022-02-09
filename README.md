@@ -8,10 +8,12 @@ stability, portability, etc.)
 The HyperRAM controller in this repository is a complete rewrite from scratch,
 and is provided with a [MIT license](LICENSE).
 
+## Features
+
 This implementation has support for:
 
 * Maximum HyperRAM clock speed of 100 MHz
-* burst mde
+* burst mode
 * variable latency
 * configuration registers read and write
 * identification registers read and write
@@ -19,7 +21,7 @@ This implementation has support for:
 
 All the source files for the HyperRAM controller are in the
 [src/hyperram](src/hyperram) directory, and all files needed for simulation are
-in the [test](test) directory.
+in the [simulation](simulation) directory.
 
 
 ## Development platform

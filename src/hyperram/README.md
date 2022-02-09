@@ -14,18 +14,17 @@ I've split the HyperRAM controller implementation into three parts:
 The above three entities are described in more detail further down in this
 file.
 
+The three entities are instantiated and connected in a wrapper
+file ([hyperram.vhd](hyperram.vhd)).
 
 ## Source files
 
-* `hyperram_config.vhd`
 * `hyperram_ctrl.vhd`
 * `hyperram_io.vhd`
+* `hyperram_config.vhd`
 * `hyperram.vhd`
 
 ## Implementation details
-
-The three entities are instantiated and connected in a wrapper
-file ([hyperram.vhd](hyperram.vhd)).
 
 The phase shifted clock is used to delay the HyperRAM clock signal `CK`
 relative to the transitions on the `DQ` signal. This ensures correct values of
@@ -38,21 +37,6 @@ The user interface to the HyperRAM controller is a 16-bit Avalon Memory Map
 interface with support for burst operations, see
 [doc/Avalon\_Interface\_Specifications.pdf](doc/Avalon_Interface_Specifications.pdf).
 This is a very common bus interface, and quite easy to use.
-
-### Traffic generator
-
-The traffic generator's sole purpose is to test the HyperRAM controller. It
-does this by generating first a sequence of WRITE operations (writing
-pseudo-random data to the entire HyperRAM device), and then a corresponding
-sequence of READ operations, verifying that the correct values are read back
-again.
-
-The traffic generator has a single control input (`start_i`) that starts the above mentioned
-process. There are two output signals indicating progress:
-
-* `led_active`: indicates the test is in progress.
-* `led_error`: indicates at least one error has occurred.
-
 
 ### Timing constraints
 
