@@ -2,10 +2,10 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library unisim;
-use unisim.vcomponents.all;
-
 -- This is the HyperRAM I/O connections
+-- The additional clock clk_x2_i is used to drive the DQ/RWDS output and to
+-- sample the DQ/RWDS input.
+-- The additional clock clk_x2_del_i is used to drive the CK output.
 
 entity hyperram_io is
    port (
@@ -41,8 +41,6 @@ end entity hyperram_io;
 architecture synthesis of hyperram_io is
 
    -- Output generation
-   signal rwds_out        : std_logic;
-   signal dq_out          : std_logic_vector(7 downto 0);
    signal rwds_ddr_out_x2 : std_logic_vector(1 downto 0);
    signal dq_ddr_out_x2   : std_logic_vector(15 downto 0);
 
@@ -52,21 +50,6 @@ architecture synthesis of hyperram_io is
    signal dq_in_x2        : std_logic_vector(7 downto 0);
    signal rwds_in_x2_d    : std_logic;
    signal dq_in_x2_d      : std_logic_vector(7 downto 0);
-
-   -- Delayed output enables
-   signal rwds_oe_d       : std_logic;
-   signal dq_oe_d         : std_logic;
-
-   constant C_DEBUG_MODE                 : boolean := false;
-   attribute mark_debug                  : boolean;
-   attribute mark_debug of rwds_in_x2    : signal is C_DEBUG_MODE;
-   attribute mark_debug of dq_in_x2      : signal is C_DEBUG_MODE;
-   attribute mark_debug of csn_in_x2     : signal is C_DEBUG_MODE;
-   attribute mark_debug of hr_resetn_o   : signal is C_DEBUG_MODE;
-   attribute mark_debug of hr_csn_o      : signal is C_DEBUG_MODE;
-   attribute mark_debug of hr_ck_o       : signal is C_DEBUG_MODE;
-   attribute mark_debug of hr_rwds_out_o : signal is C_DEBUG_MODE;
-   attribute mark_debug of hr_dq_out_o   : signal is C_DEBUG_MODE;
 
 begin
 
@@ -94,9 +77,9 @@ begin
       if rising_edge(clk_x2_i) then
          rwds_ddr_out_x2 <= ctrl_rwds_ddr_out_i;
          if hr_ck_o = '0' then
-            rwds_out <= rwds_ddr_out_x2(1);
+            hr_rwds_out_o <= rwds_ddr_out_x2(1);
          else
-            rwds_out <= rwds_ddr_out_x2(0);
+            hr_rwds_out_o <= rwds_ddr_out_x2(0);
          end if;
       end if;
    end process p_output_rwds;
@@ -106,19 +89,27 @@ begin
       if rising_edge(clk_x2_i) then
          dq_ddr_out_x2 <= ctrl_dq_ddr_out_i;
          if hr_ck_o = '0' then
-            dq_out <= dq_ddr_out_x2(15 downto 8);
+            hr_dq_out_o <= dq_ddr_out_x2(15 downto 8);
          else
-            dq_out <= dq_ddr_out_x2(7 downto 0);
+            hr_dq_out_o <= dq_ddr_out_x2(7 downto 0);
          end if;
       end if;
    end process p_output_dq;
+
+   p_delay : process (clk_x1_i)
+   begin
+      if rising_edge(clk_x1_i) then
+         hr_dq_oe_o   <= ctrl_dq_oe_i;
+         hr_rwds_oe_o <= ctrl_rwds_oe_i;
+      end if;
+   end process p_delay;
 
 
    ------------------------------------------------
    -- Input sampling
    ------------------------------------------------
 
-   p_pipeline : process (clk_x2_i)
+   p_sampling : process (clk_x2_i)
    begin
       if rising_edge(clk_x2_i) then
          csn_in_x2    <= hr_csn_o;
@@ -128,7 +119,7 @@ begin
          rwds_in_x2_d <= rwds_in_x2;
          dq_in_x2_d   <= dq_in_x2;
       end if;
-   end process p_pipeline;
+   end process p_sampling;
 
    p_input : process (clk_x1_i)
    begin
@@ -144,24 +135,6 @@ begin
          end if;
       end if;
    end process p_input;
-
-
-   ------------------------------------------------
-   -- Tri-state buffers
-   ------------------------------------------------
-
-   p_delay : process (clk_x1_i)
-   begin
-      if rising_edge(clk_x1_i) then
-         dq_oe_d   <= ctrl_dq_oe_i;
-         rwds_oe_d <= ctrl_rwds_oe_i;
-      end if;
-   end process p_delay;
-
-   hr_rwds_oe_o  <= rwds_oe_d;
-   hr_dq_oe_o    <= dq_oe_d;
-   hr_rwds_out_o <= rwds_out;
-   hr_dq_out_o   <= dq_out;
 
 end architecture synthesis;
 
