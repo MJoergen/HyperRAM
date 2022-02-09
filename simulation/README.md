@@ -5,28 +5,44 @@ implementation. The testbench [tb.vhd](tb.vhd) instantiates the HyperRAM
 controller and the trafic generator. The memory size (and hence the number of
 writes and reads) is limited in the test bench to reduce simulation time.
 
-### Testing in simulation
+In the [testbench top level file](tb.vhd) the constants `C_HYPERRAM_FREQ_MHZ`
+and `C_HYPERRAM_PHASE` can be defined, just as in the [hardware top level
+file](../src/MEGA65/top.vhd). In this way, the simulation can mimic the real
+hardware as close as possible.
+
+One extra feature of the testbench is the insertion of board delay. It is
+expected that the physical hardware will introduce a non-trivial amount of
+propagation delay between the FPGA and the HyperRAM device. Since the timing is
+very delicate, I chose to include the board delay in the testbench.  This is
+done by the constant `C_DELAY`, which for now I've set to 1 ns in each
+direction.
+
+The actual test itself is carried out by the [trafic
+generator](../src/trafic_gen.vhd).
+
+## HyperRAM simulation model
 
 In order to test my HyperRAM controller I've found a [simulation
 model](HyperRAM_Simulation_Model) (downloaded from
 [Cypress](https://www.cypress.com/documentation/models/verilog/verilog-model-hyperbus-interface))
-of a real [Cypress HyperRAM device](doc/s27kl0642.pdf).
+of a real [Cypress HyperRAM device](../doc/s27kl0642.pdf).
 
 Using a (presumably correct) simulation model is vital when developing. Because
 this allows testing the implementation in simulation, and thus finding and
-fixing bugs much faster.
+fixing bugs much faster. However, since I'm targetting the MEGA65 board I need
+a model of the specific HyperRAM device. I decided to manually edit the
+simulation model and insert the correct timing parameters.
 
-### Running simulation
+## Running simulation
 
 To perform the simulation test just start up Vivado, load the project file
 [top.xpr](top.xpr), and select "Run Simulation".
 
 This generates the following waveform:
-![waveform](doc/waveform.png)
+![waveform](../doc/waveform.png)
 
 In simulation mode, only 8 writes and 8 reads are performed, to keep the
 simulation time reasonable. The above waveform shows these 16 transactions.
 Specifically, at the top we see `led_active` being first asserted and then
 de-asserted, while `led_error` remains de-asserted all the time.
-
 

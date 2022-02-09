@@ -2,17 +2,17 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library unisim;
-use unisim.vcomponents.all;
-
 entity tb is
 end entity tb;
 
 architecture simulation of tb is
 
    -- Testbench signals
-   constant C_CLK_PERIOD : time := 10 ns;     -- 100 MHz
+   constant C_HYPERRAM_FREQ_MHZ : integer := 100;
+   constant C_HYPERRAM_PHASE    : real := 162.000;
    constant C_DELAY      : time := 1 ns;
+
+   constant C_CLK_PERIOD : time := (1000/C_HYPERRAM_FREQ_MHZ) * 1 ns;
    signal stop_test      : std_logic := '0';
 
    signal clk            : std_logic;
@@ -90,7 +90,7 @@ begin
 
    p_clk_x2_del : process
    begin
-      wait for C_CLK_PERIOD/4;   -- 180 degrees
+      wait for C_CLK_PERIOD/2*(C_HYPERRAM_PHASE/360.0);
       while stop_test = '0' loop
          clk_x2_del <= '1';
          wait for C_CLK_PERIOD/4;
@@ -118,7 +118,6 @@ begin
       start_ready <= '0';
       wait;
    end process p_start_ready;
-
 
    p_start : process (clk)
    begin
@@ -158,6 +157,7 @@ begin
          error_o       => led_error
       ); -- i_system
 
+   -- Tri-state buffers
    sys_rwds <= sys_rwds_out when sys_rwds_oe = '1' else 'Z';
    sys_dq   <= sys_dq_out   when sys_dq_oe   = '1' else (others => 'Z');
 

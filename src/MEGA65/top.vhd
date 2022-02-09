@@ -37,7 +37,7 @@ end entity top;
 architecture synthesis of top is
 
    constant C_HYPERRAM_FREQ_MHZ : integer := 100;
-   constant C_HYPERRAM_PHASE    : real := 189.000;
+   constant C_HYPERRAM_PHASE    : real := 162.000;
 
    -- video mode selection: 720p @ 60 Hz
    constant C_VIDEO_MODE : video_modes_t := C_VIDEO_MODE_1280_720_60;

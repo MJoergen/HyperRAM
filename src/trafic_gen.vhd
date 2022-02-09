@@ -23,6 +23,7 @@ entity trafic_gen is
       avm_readdata_i      : in  std_logic_vector(15 downto 0);
       avm_readdatavalid_i : in  std_logic;
       avm_waitrequest_i   : in  std_logic;
+      -- Debug output (HDMI and LED)
       address_o           : out std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
       data_exp_o          : out std_logic_vector(15 downto 0);
       data_read_o         : out std_logic_vector(15 downto 0);
@@ -33,7 +34,7 @@ end entity trafic_gen;
 
 architecture synthesis of trafic_gen is
 
-   constant C_DATA_INIT    : std_logic_vector(15 downto 0) := X"1357";
+   constant C_DATA_INIT : std_logic_vector(15 downto 0) := X"1357";
 
    signal address : std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
    signal data    : std_logic_vector(15 downto 0);
@@ -47,22 +48,6 @@ architecture synthesis of trafic_gen is
    );
 
    signal state : state_t := INIT_ST;
-
-   constant C_DEBUG_MODE                       : boolean := false;
-   attribute mark_debug                        : boolean;
-   attribute mark_debug of avm_write_o         : signal is C_DEBUG_MODE;
-   attribute mark_debug of avm_read_o          : signal is C_DEBUG_MODE;
-   attribute mark_debug of avm_address_o       : signal is C_DEBUG_MODE;
-   attribute mark_debug of avm_writedata_o     : signal is C_DEBUG_MODE;
-   attribute mark_debug of avm_byteenable_o    : signal is C_DEBUG_MODE;
-   attribute mark_debug of avm_burstcount_o    : signal is C_DEBUG_MODE;
-   attribute mark_debug of avm_readdata_i      : signal is C_DEBUG_MODE;
-   attribute mark_debug of avm_readdatavalid_i : signal is C_DEBUG_MODE;
-   attribute mark_debug of avm_waitrequest_i   : signal is C_DEBUG_MODE;
-   attribute mark_debug of start_i             : signal is C_DEBUG_MODE;
-   attribute mark_debug of active_o            : signal is C_DEBUG_MODE;
-   attribute mark_debug of error_o             : signal is C_DEBUG_MODE;
-   attribute mark_debug of state               : signal is C_DEBUG_MODE;
 
 begin
 
@@ -124,11 +109,11 @@ begin
                avm_burstcount_o <= X"01";
 
                if avm_read_o = '1' and avm_waitrequest_i = '0' then
-                  avm_read_o <= '0';
+                  avm_read_o  <= '0';
                   address_o   <= address;
                   data_exp_o  <= (others => '0');
                   data_read_o <= (others => '0');
-                  state <= VERIFYING_ST;
+                  state       <= VERIFYING_ST;
                end if;
 
             when VERIFYING_ST =>
