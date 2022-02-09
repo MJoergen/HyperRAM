@@ -23,6 +23,9 @@ All the source files for the HyperRAM controller are in the
 [src/hyperram](src/hyperram) directory, and all files needed for simulation are
 in the [simulation](simulation) directory.
 
+Porting to another platform may require hand-tuning of some clock parameters,
+see the section on [porting](PORTING.md).
+
 
 ## Development platform
 

@@ -21,7 +21,7 @@ entity hyperram is
       clk_x1_i            : in  std_logic; -- Main clock
       clk_x2_i            : in  std_logic; -- Physical I/O only
       clk_x2_del_i        : in  std_logic; -- Double frequency, phase shifted
-      rst_i               : in  std_logic;
+      rst_i               : in  std_logic; -- Synchronous reset
 
       -- Avalon Memory Map
       avm_write_i         : in  std_logic;
@@ -39,11 +39,11 @@ entity hyperram is
       hr_csn_o            : out std_logic;
       hr_ck_o             : out std_logic;
       hr_rwds_in_i        : in  std_logic;
-      hr_dq_in_i          : in  std_logic_vector(7 downto 0);
       hr_rwds_out_o       : out std_logic;
+      hr_rwds_oe_o        : out std_logic;   -- Output enable for RWDS
+      hr_dq_in_i          : in  std_logic_vector(7 downto 0);
       hr_dq_out_o         : out std_logic_vector(7 downto 0);
-      hr_rwds_oe_o        : out std_logic;
-      hr_dq_oe_o          : out std_logic
+      hr_dq_oe_o          : out std_logic    -- Output enable for DQ
    );
 end entity hyperram;
 
