@@ -2,6 +2,11 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+-- This is the HyperRAM initial configuration.
+-- It performs two functions:
+-- * Wait until the HyperRAM device is operational after reset.
+-- * Perform a write to configuration register 0 to set latency mode.
+
 entity hyperram_config is
    generic (
       G_LATENCY : integer
@@ -38,6 +43,7 @@ architecture synthesis of hyperram_config is
 
    constant C_INIT_DELAY : integer := 150*100; -- 150 us @ 100 MHz.
 
+   --Decode configuration register 0
    constant R_C0_DPD          : integer := 15;
    subtype  R_C0_DRIVE    is natural range 14 downto 12;
    subtype  R_C0_RESERCED is natural range 11 downto  8;
@@ -65,28 +71,6 @@ architecture synthesis of hyperram_config is
    signal cfg_writedata     : std_logic_vector(15 downto 0);
    signal cfg_byteenable    : std_logic_vector(1 downto 0);
    signal cfg_burstcount    : std_logic_vector(7 downto 0);
-
-   constant C_DEBUG_MODE                         : boolean := false;
-   attribute mark_debug                          : boolean;
-   attribute mark_debug of s_avm_write_i         : signal is C_DEBUG_MODE;
-   attribute mark_debug of s_avm_read_i          : signal is C_DEBUG_MODE;
-   attribute mark_debug of s_avm_address_i       : signal is C_DEBUG_MODE;
-   attribute mark_debug of s_avm_writedata_i     : signal is C_DEBUG_MODE;
-   attribute mark_debug of s_avm_byteenable_i    : signal is C_DEBUG_MODE;
-   attribute mark_debug of s_avm_burstcount_i    : signal is C_DEBUG_MODE;
-   attribute mark_debug of s_avm_readdata_o      : signal is C_DEBUG_MODE;
-   attribute mark_debug of s_avm_readdatavalid_o : signal is C_DEBUG_MODE;
-   attribute mark_debug of s_avm_waitrequest_o   : signal is C_DEBUG_MODE;
-   attribute mark_debug of m_avm_write_o         : signal is C_DEBUG_MODE;
-   attribute mark_debug of m_avm_read_o          : signal is C_DEBUG_MODE;
-   attribute mark_debug of m_avm_address_o       : signal is C_DEBUG_MODE;
-   attribute mark_debug of m_avm_writedata_o     : signal is C_DEBUG_MODE;
-   attribute mark_debug of m_avm_byteenable_o    : signal is C_DEBUG_MODE;
-   attribute mark_debug of m_avm_burstcount_o    : signal is C_DEBUG_MODE;
-   attribute mark_debug of m_avm_readdata_i      : signal is C_DEBUG_MODE;
-   attribute mark_debug of m_avm_readdatavalid_i : signal is C_DEBUG_MODE;
-   attribute mark_debug of m_avm_waitrequest_i   : signal is C_DEBUG_MODE;
-   attribute mark_debug of state                 : signal is C_DEBUG_MODE;
 
 begin
 
