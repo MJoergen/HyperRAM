@@ -26,7 +26,7 @@ It performs two functions:
 * Perform a write to configuration register 0 to set latency mode.
 
 I've chosen to implement it as an Avalon MM "sandwich" to be connected
-directly to the HyperRAM controller
+directly to the HyperRAM controller.
 
 ## `hyperram_ctrl.vhd`
 
@@ -35,16 +35,15 @@ The purpose is to implement the HyperBus protocol, i.e.
 to decode the Avalon MM requests and generate the control
 signals for the HyperRAM device.
 
-The user interface to the HyperRAM controller is a 16-bit Avalon Memory Map
-interface with support for burst operations, see
-[doc/Avalon\_Interface\_Specifications.pdf](doc/Avalon_Interface_Specifications.pdf).
-This is a very common bus interface, and quite easy to use.
+The user interface to the HyperRAM controller is a 16-bit [Avalon Memory
+Map](doc/Avalon_Interface_Specifications.pdf) interface with support for burst
+operations.  This is a very common bus interface, and quite easy to use.
 
 ## `hyperram_io.vhd`
 
 This is the HyperRAM I/O connections.  The additional clock `clk_x2_i` is used
-to drive the DQ/RWDS output and to sample the DQ/RWDS input.  The additional
-clock `clk_x2_del_i` is used to drive the CK output.
+to drive the `DQ`/`RWDS` output and to sample the `DQ`/`RWDS` input.  The additional
+clock `clk_x2_del_i` is used to drive the `CK` output.
 
 The phase shifted clock is used to delay the HyperRAM clock signal `CK`
 relative to the transitions on the output `DQ` signal. This ensures correct
@@ -67,13 +66,13 @@ great variation.
 ### Timing constraints
 
 Since the HyperRAM in the MEGA65 is a different device (and with
-different timings) than the above mentioned simulation model, I've modified the
+different timings) than the Cypress simulation model, I've modified the
 simulation model by adding timing values (and default configuration values)
 specific for the MEGA65 HyperRAM device, see lines 219-249 in
-[HyperRAM\_Simulation\_Model/s27kl0642.v](HyperRAM_Simulation_Model/s27kl0642.v)
+[HyperRAM\_Simulation\_Model/s27kl0642.v](../../HyperRAM_Simulation_Model/s27kl0642.v)
 
 The timing parameters are given in the table below (taken from the
-[documentation](doc/66-67WVH8M8ALL-BLL-938852.pdf)):
+[documentation](../../doc/66-67WVH8M8ALL-BLL-938852.pdf)):
 
 ```
 Parameter                                | Symbol | Min  | Max  | Unit
@@ -98,7 +97,7 @@ HyperRAM Chip Select Maximum Low Time    | t_CSM  | -    |  4.0 | us
 Refresh Time                             | t_RFH  | 40   |  -   | ns
 ```
 
-The symbol names refer to the following figure (taken from the [Cypress HyperRAM datasheet](doc/s27kl0642.pdf)):
-![timing diagram](doc/Timing_Diagram.png)
+The symbol names refer to the following figure (taken from the [Cypress HyperRAM datasheet](../../doc/s27kl0642.pdf)):
+![timing diagram](../../doc/Timing_Diagram.png)
 
 
