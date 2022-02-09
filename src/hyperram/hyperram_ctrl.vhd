@@ -91,11 +91,11 @@ begin
                   state <= WRITE_ST;
                end if;
                if avm_read_i = '1' or avm_write_i = '1' then
-                  read            <= avm_read_i;
-                  config          <= avm_address_i(31);
-                  writedata       <= avm_writedata_i;
-                  byteenable      <= avm_byteenable_i;
-                  burst_count     <= to_integer(unsigned(avm_burstcount_i));
+                  read        <= avm_read_i;
+                  config      <= avm_address_i(31);
+                  writedata   <= avm_writedata_i;
+                  byteenable  <= avm_byteenable_i;
+                  burst_count <= to_integer(unsigned(avm_burstcount_i));
 
                   command_address(R_CA_RW)       <= avm_read_i;
                   command_address(R_CA_AS)       <= avm_address_i(31);
@@ -127,14 +127,13 @@ begin
                   else
                      latency_count <= G_LATENCY - 2;
                   end if;
-                  if config = '1' then
+                  if config = '1' and read = '0' then
                      recovery_count <= 3;
                      state <= RECOVERY_ST;
                   else
                      state <= LATENCY_ST;
                   end if;
                end if;
-
 
             when LATENCY_ST =>
                if latency_count > 0 then
@@ -204,10 +203,8 @@ begin
       end if;
    end process p_fsm;
 
-   hb_dq_ddr_out_o <= writedata when state = WRITE_ST else
-                      command_address(47 downto 32);
-   hb_rwds_ddr_out_o <= not byteenable when state = WRITE_ST else
-                      "00";
+   hb_dq_ddr_out_o   <= writedata      when state = WRITE_ST else command_address(47 downto 32);
+   hb_rwds_ddr_out_o <= not byteenable when state = WRITE_ST else "00";
 
 end architecture synthesis;
 

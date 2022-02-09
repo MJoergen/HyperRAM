@@ -25,7 +25,7 @@ end entity digits;
 architecture synthesis of digits is
 
    -- Define positioning of first digit
-   constant DIGITS_CHAR_X : integer := 15;
+   constant DIGITS_CHAR_X : integer := 5;
    constant DIGITS_CHAR_Y : integer := 5;
 
    -- A single character bitmap is defined by 8x8 = 64 bits.

@@ -61,6 +61,7 @@ begin
    -- Output generation
    ------------------------------------------------
 
+   -- Note the use of clk_x2_del_i
    p_output_clk : process (clk_x2_del_i)
    begin
       if rising_edge(clk_x2_del_i) then

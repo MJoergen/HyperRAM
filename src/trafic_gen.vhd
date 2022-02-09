@@ -27,6 +27,8 @@ entity trafic_gen is
       address_o           : out std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
       data_exp_o          : out std_logic_vector(15 downto 0);
       data_read_o         : out std_logic_vector(15 downto 0);
+      id_0_o              : out std_logic_vector(15 downto 0);
+      id_1_o              : out std_logic_vector(15 downto 0);
       active_o            : out std_logic;
       error_o             : out std_logic
    );
@@ -41,6 +43,10 @@ architecture synthesis of trafic_gen is
 
    type state_t is (
       INIT_ST,
+      READ_DEVICE_ID_0_ST,
+      WAIT_DEVICE_ID_0_ST,
+      READ_DEVICE_ID_1_ST,
+      WAIT_DEVICE_ID_1_ST,
       WRITING_ST,
       READING_ST,
       VERIFYING_ST,
@@ -71,7 +77,48 @@ begin
 
                if start_i = '1' then
                   active_o <= '1';
-                  state    <= WRITING_ST;
+                  state    <= READ_DEVICE_ID_0_ST;
+               end if;
+
+            when READ_DEVICE_ID_0_ST =>
+               avm_write_o       <= '0';
+               avm_read_o        <= '1';
+               avm_address_o     <= (others => '0');
+               avm_address_o(31) <= '1';
+               avm_writedata_o   <= (others => '0');
+               avm_byteenable_o  <= "00";
+               avm_burstcount_o  <= X"01";
+               if avm_read_o = '1' and avm_waitrequest_i = '0' then
+                  avm_read_o <= '0';
+                  state      <= WAIT_DEVICE_ID_0_ST;
+               end if;
+
+            when WAIT_DEVICE_ID_0_ST =>
+               if avm_readdatavalid_i = '1' then
+                  report "Device ID 0 : 0x" & to_hstring(avm_readdata_i);
+                  id_0_o <= avm_readdata_i;
+                  state  <= READ_DEVICE_ID_1_ST;
+               end if;
+
+            when READ_DEVICE_ID_1_ST =>
+               avm_write_o       <= '0';
+               avm_read_o        <= '1';
+               avm_address_o     <= (others => '0');
+               avm_address_o(0)  <= '1';
+               avm_address_o(31) <= '1';
+               avm_writedata_o   <= (others => '0');
+               avm_byteenable_o  <= "00";
+               avm_burstcount_o  <= X"01";
+               if avm_read_o = '1' and avm_waitrequest_i = '0' then
+                  avm_read_o <= '0';
+                  state      <= WAIT_DEVICE_ID_1_ST;
+               end if;
+
+            when WAIT_DEVICE_ID_1_ST =>
+               if avm_readdatavalid_i = '1' then
+                  report "Device ID 1 : 0x" & to_hstring(avm_readdata_i);
+                  id_1_o <= avm_readdata_i;
+                  state  <= WRITING_ST;
                end if;
 
             when WRITING_ST =>
@@ -160,6 +207,8 @@ begin
             avm_read_o  <= '0';
             active_o    <= '0';
             error_o     <= '0';
+            id_0_o      <= (others => '0');
+            id_1_o      <= (others => '0');
             state       <= INIT_ST;
          end if;
       end if;
