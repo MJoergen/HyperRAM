@@ -12,12 +12,12 @@ and is provided with a [MIT license](LICENSE).
 
 This implementation has support for:
 
-* Maximum HyperRAM clock speed of 100 MHz
-* burst mode
-* variable latency
-* configuration registers read and write
-* identification registers read and write
-* 16-bit Avalon Memory Map interface including burst mode
+* Maximum HyperRAM clock speed of 100 MHz.
+* burst mode.
+* variable latency.
+* configuration registers read and write.
+* identification registers read and write.
+* 16-bit Avalon Memory Map interface including burst mode.
 
 All the source files for the HyperRAM controller are in the
 [src/hyperram](src/hyperram) directory, and all files needed for simulation are
@@ -32,6 +32,9 @@ HyperRAM](doc/66-67WVH8M8ALL-BLL-938852.pdf) chip from ISSI (Integrated Silicon
 Solution Inc.).  Specifically, the part number of the HyperRAM device is
 `IS66WVH8M8BLL-100B1LI`, which indicates a 64 Mbit, 100 MHz version with 3.0 V
 supply and a single-ended clock.
+
+The additional source files needed for the MEGA65 platform are placed in
+[src/MEGA65](src/MEGA65).
 
 
 ## Further reading
