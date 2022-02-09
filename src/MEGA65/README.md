@@ -5,33 +5,38 @@ controller on the MEGA65 platform.
 
 The features provided by these files are:
 
-* Top level file connecting everything together
 * Clock synthesis
 * HDMI output
 * Limited keyboard support
 
-### Testing on the MEGA65 hardware platform
-
-In order to make use of the MEGA65 hardware platform we need to generate the
-necessary clocks, and some way to start the test and see the result.
-
-This section discusses the following:
-
-* Clock synthesis
-* MEGA65-specific support files
-
-### Clock synthesis
+## Clock synthesis
 
 As mentioned previously, controlling the physical I/O to the HyperRAM device
-requires an additional clock (at twice the frequency) to get the correct timing.
+requires two additional clocks (at twice the frequency, but with non-zero phase
+shift) to get the correct timing.
 
 This double-speed clock is generated using a single MMCM. This is done in the file
-[src/MEGA65/clk.vhd](src/MEGA65/clk.vhd).
+[clk.vhd](clk.vhd). Note that all the HyperRAM clocks are
+generated from this single MMCM. That includes the HyperRAM main clock (at 100 MHz),
+which is the same speed as the board clock. It's important that the HyperRAM controller
+is connected to a clock output of the MMCM, to ensure correct relative phase shifts.
 
-This file also generates a 40 MHz clock, but this is only used by the support files
-needed for the MEGA65.
+A separate file [clk_mega65.vhd](clk_mega65.vhd) generates a 40 MHz keyboard
+clock and a 74.25 MHz video clock for the HDMI output.
 
-### MEGA65-specific support files
+## HDMI output
+
+The HDMI code generates a 1280x720 @ 60 Hz image.
+It shows a string of characters: `PPPFFFAAAAAAWWWWRRRR`,
+where:
+
+* `PPP` is the phase shift in angles.
+* `FFF` is the frequency in MHz.
+* `AAAAAÀ` is the hex address in units of words.
+* `WWWW` is the hex value written.
+* `RRRR` is the hex value read.
+
+## Limited keyboard support
 
 The MEGA65 comes with a keyboard and two visible LED's. In order to make use of
 these I've copied the file `mega65kbd_to_matrix.vhdl` from the [MEGA65
