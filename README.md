@@ -1,8 +1,28 @@
 # HyperRAM
 
-This repository is my attempt at a portable HyperRAM controller.  I've looked
-at several other implementations, and they all seemed lacking in various
-regards.
+This repository is my attempt at a (reasonably) portable HyperRAM controller.
+I'm writing my own implementation because I've looked at several other
+implementations, and they all seemed lacking in various regards (features,
+stability, portability, etc.)
+
+The HyperRAM controller in this repository is a complete rewrite from scratch,
+and is provided with a [MIT license](LICENSE).
+
+This implementation has support for:
+
+* Maximum HyperRAM clock speed of 100 MHz
+* burst mde
+* variable latency
+* configuration registers read and write
+* identification registers read and write
+* 16-bit Avalon Memory Map interface including burst mode
+
+All the source files for the HyperRAM controller are in the
+[src/hyperram](src/hyperram) directory, and all files needed for simulation are
+in the [test](test) directory.
+
+
+## Development platform
 
 I'm testing my HyperRAM controller on the [MEGA65](https://mega65.org/)
 hardware platform (revision 3).  It contains the [8 MB
@@ -11,22 +31,77 @@ Solution Inc.).  Specifically, the part number of the HyperRAM device is
 `IS66WVH8M8BLL-100B1LI`, which indicates a 64 Mbit, 100 MHz version with 3.0 V
 supply and a single-ended clock.
 
-The HyperRAM controller in this repository is a complete rewrite from scratch,
-and is provided with a [MIT license](LICENSE).
+
+## Further reading
+The documentation for this HyperRAM controller is divided into
+different files:
+
+* [Porting guideline](PORTING-md)
+* [Detailed design description](src/hyperram/README-md)
+
+--------------------------------------------------------
+
+# Porting guidelines
+
+* Clocking
+* Constraints
+* Tri-state buffering
+
+Note that tri-state buffering of the I/O portd is not included, and is
+implemented in the project top-level file.
+
+--------------------------------------------------------
+
+# Overview of HyperRAM controller
+
+I've split the HyperRAM controller implementation into three parts:
+
+* The state machine ([hyperram\_ctrl.vhd](hyperram_ctrl.vhd)), running in a
+  single clock domain, same as HyperRAM device, i.e. 100 MHz.
+* The I/O ports ([hyperram\_io.vhd](hyperram_io.vhd)), using two additional
+  clock (phase shifted) at double-speed (200 MHz) for correct timing of the
+  HyperRAM signals.
+* The initial configuration of the HyperRAM
+  ([hyperram\_config.vhd](hyperram_config.vhd)), running at the HyperRAM clock
+  speed, i.e. 100 MHz.
+
+The above three entities are described in more detail further down in this
+file.
 
 
-## Testing in simulation
+## Implementation details
 
-In order to test my HyperRAM controller I've found a [simulation
-model](HyperRAM_Simulation_Model) (downloaded from
-[Cypress](https://www.cypress.com/documentation/models/verilog/verilog-model-hyperbus-interface))
-of a real [Cypress HyperRAM device](doc/s27kl0642.pdf).
+The three entities are instantiated and connected in a wrapper
+file ([hyperram.vhd](hyperram.vhd)).
 
-Using a (presumably correct) simulation model is vital when developing. Because
-this allows testing the implementation in simulation, and thus finding and
-fixing bugs much faster.
+The phase shifted clock is used to delay the HyperRAM clock signal `CK`
+relative to the transitions on the `DQ` signal. This ensures correct values of
+the timing parameters `t_IS` and `t_IH` during WRITE operation.
 
-## Timing constraints
+The double-speed clock is used to manually sample the `DQ` signal during READ
+operation.
+
+The user interface to the HyperRAM controller is a 16-bit Avalon Memory Map
+interface with support for burst operations, see
+[doc/Avalon\_Interface\_Specifications.pdf](doc/Avalon_Interface_Specifications.pdf).
+This is a very common bus interface, and quite easy to use.
+
+### Traffic generator
+
+The traffic generator's sole purpose is to test the HyperRAM controller. It
+does this by generating first a sequence of WRITE operations (writing
+pseudo-random data to the entire HyperRAM device), and then a corresponding
+sequence of READ operations, verifying that the correct values are read back
+again.
+
+The traffic generator has a single control input (`start_i`) that starts the above mentioned
+process. There are two output signals indicating progress:
+
+* `led_active`: indicates the test is in progress.
+* `led_error`: indicates at least one error has occurred.
+
+
+### Timing constraints
 
 Since the HyperRAM in the MEGA65 is a different device (and with
 different timings) than the above mentioned simulation model, I've modified the
@@ -64,52 +139,18 @@ The symbol names refer to the following figure (taken from the [Cypress HyperRAM
 ![timing diagram](doc/Timing_Diagram.png)
 
 
-## Overview of project contents
+### Testing in simulation
 
-This project contains the following:
+In order to test my HyperRAM controller I've found a [simulation
+model](HyperRAM_Simulation_Model) (downloaded from
+[Cypress](https://www.cypress.com/documentation/models/verilog/verilog-model-hyperbus-interface))
+of a real [Cypress HyperRAM device](doc/s27kl0642.pdf).
 
-* Main HyperRAM controller
-* Traffic generator
+Using a (presumably correct) simulation model is vital when developing. Because
+this allows testing the implementation in simulation, and thus finding and
+fixing bugs much faster.
 
-This is all that is needed to verify the implementation in simulation.
-
-### Main HyperRAM controller
-
-I've split the HyperRAM controller implementation into two parts:
-
-* The state machine ([hyperram\_ctrl.vhd](hyperram_ctrl.vhd)), running in a
-  single clock domain, same as HyperRAM device, i.e. 100 MHz.
-* The I/O ports ([hyperram\_io.vhd](hyperram_io.vhd)), using an additional
-  clock at double-speed (200 MHz) for correct timing of the HyperRAM signals.
-
-The phase shifted clock is used to delay the HyperRAM clock signal `CK`
-relative to the transitions on the `DQ` signal. This ensures correct values of
-the timing parameters `t_IS` and `t_IH` during WRITE operation.
-
-The double-speed clock is used to manually sample the `DQ` signal during READ
-operation.
-
-The user interface to the HyperRAM controller is a 16-bit Avalon Memory Map
-interface with support for burst operations, see
-[doc/Avalon\_Interface\_Specifications.pdf](doc/Avalon_Interface_Specifications.pdf).
-This is a very common bus interface, and quite easy to use.
-
-### Traffic generator
-
-The traffic generator's sole purpose is to test the HyperRAM controller. It
-does this by generating first a sequence of WRITE operations (writing
-pseudo-random data to the entire HyperRAM device), and then a corresponding
-sequence of READ operations, verifying that the correct values are read back
-again.
-
-The traffic generator has a single control input (`start_i`) that starts the above mentioned
-process. There are two output signals indicating progress:
-
-* `led_active`: indicates the test is in progress.
-* `led_error`: indicates at least one error has occurred.
-
-
-## Running simulation
+### Running simulation
 
 To perform the simulation test just start up Vivado, load the project file
 [top.xpr](top.xpr), and select "Run Simulation".
@@ -123,7 +164,7 @@ Specifically, at the top we see `led_active` being first asserted and then
 de-asserted, while `led_error` remains de-asserted all the time.
 
 
-## Testing on the MEGA65 hardware platform
+### Testing on the MEGA65 hardware platform
 
 In order to make use of the MEGA65 hardware platform we need to generate the
 necessary clocks, and some way to start the test and see the result.
