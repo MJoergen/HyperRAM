@@ -26,11 +26,11 @@ It performs two functions:
 * Perform a write to configuration register 0 to set latency mode.
 
 I've chosen to implement it as an Avalon MM "sandwich" to be connected
-directly to the HyperRAM controller.
+directly between the client and the main state machine.
 
 ## `hyperram_ctrl.vhd`
 
-This is the main state machine of the HyperRAM controller
+This is the main state machine of the HyperRAM controller.
 The purpose is to implement the HyperBus protocol, i.e.
 to decode the Avalon MM requests and generate the control
 signals for the HyperRAM device.
@@ -42,34 +42,30 @@ operations.  This is a very common bus interface, and quite easy to use.
 ## `hyperram_io.vhd`
 
 This is the HyperRAM I/O connections.  The additional clock `clk_x2_i` is used
-to drive the `DQ`/`RWDS` output and to sample the `DQ`/`RWDS` input.  The additional
-clock `clk_x2_del_i` is used to drive the `CK` output.
+to drive the `DQ`/`RWDS` output and to sample the `DQ`/`RWDS` input.  The
+additional clock `clk_x2_del_i` is used to drive the `CK` output.
 
 The phase shifted clock is used to delay the HyperRAM clock signal `CK`
 relative to the transitions on the output `DQ` signal. This ensures correct
-values of the timing parameters `t_IS` and `t_IH` during WRITE operation.
+values of the timing parameters `t_IS` and `t_IH` during WRITE operation, see
+below.
 
 The non-phase shifted clock is used to sample the `DQ` input signal during READ
 operation.
 
 From the above it follows that the HyperRAM device is phase shifted relative to
-the FPGA. The actual amount of phase shift is likely both board and device
-dependent. On the MEGA65 a phase shift of 180 degrees is seen to work, and in
-such case we could alternatively just use the falling edge of `clk_x2_i`.
-However, I've chosen to keep the general phase shifted clock for greater
-flexibility.
+the FPGA. This is done to satisfy the `t_CKD` timing parameter.  The actual
+amount of phase shift required is likely both board and device dependent. On
+the MEGA65 a phase shift of 180 degrees is seen to work, and in such case we
+could alternatively just use the falling edge of `clk_x2_i`.  However, I've
+chosen to keep the general phase shifted clock for greater flexibility and to
+make [porting](../../PORTING.md) to other platforms easier.
 
-In the above it is assumed that the `CK` output to `DQ` input delay is constant
-for any given specific HyperRAM device, even though the datasheet allows for
-great variation.
+In the above it is assumed that the timing parameter `t_CKD` is constant for
+any given specific HyperRAM device, even though the datasheet allows for great
+variation.
 
-### Timing constraints
-
-Since the HyperRAM in the MEGA65 is a different device (and with
-different timings) than the Cypress simulation model, I've modified the
-simulation model by adding timing values (and default configuration values)
-specific for the MEGA65 HyperRAM device, see lines 219-249 in
-[HyperRAM\_Simulation\_Model/s27kl0642.v](../../HyperRAM_Simulation_Model/s27kl0642.v)
+### Timing parameters
 
 The timing parameters are given in the table below (taken from the
 [documentation](../../doc/66-67WVH8M8ALL-BLL-938852.pdf)):

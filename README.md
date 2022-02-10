@@ -16,7 +16,7 @@ This implementation has support for:
 * burst mode.
 * variable latency.
 * configuration registers read and write.
-* identification registers read and write.
+* identification registers read.
 * 16-bit Avalon Memory Map interface including burst mode.
 
 All the source files for the HyperRAM controller are in the
