@@ -36,7 +36,7 @@ to decode the Avalon MM requests and generate the control
 signals for the HyperRAM device.
 
 The user interface to the HyperRAM controller is a 16-bit [Avalon Memory
-Map](doc/Avalon_Interface_Specifications.pdf) interface with support for burst
+Map](../../doc/Avalon_Interface_Specifications.pdf) interface with support for burst
 operations.  This is a very common bus interface, and quite easy to use.
 
 ## `hyperram_io.vhd`

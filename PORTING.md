@@ -17,7 +17,7 @@ with tri-state capability for the wires `RWDS` and `DQ`. Vivado can
 automatically infer tri-state buffers when assigning `'Z'` to a port declared
 as `inout`.  It is good design practice to infer the tri-state buffers from the
 top-level file. Therefore, this HyperRAM controller does not itself infer any
-tri-state buffers. Instead, it contain three signals for each of the `RWDS` and
+tri-state buffers. Instead, it contains three signals for each of the `RWDS` and
 `DQ` wires: One for input, one for output, and one for output enable.
 
 In the top-level file of your own project you should include the following lines:

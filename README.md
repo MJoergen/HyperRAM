@@ -45,5 +45,5 @@ The following links provide additional information:
 
 * [Porting guideline](PORTING.md)
 * [Detailed design description](src/hyperram/README.md)
-
-
+* [MEGA 65 specific support files](src/MEGA65/README.md)
+* [Simulation](simulation/README.md)
