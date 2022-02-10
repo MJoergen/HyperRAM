@@ -24,9 +24,15 @@ end entity digits;
 
 architecture synthesis of digits is
 
-   -- Define positioning of first digit
-   constant DIGITS_CHAR_X : integer := 5;
-   constant DIGITS_CHAR_Y : integer := 5;
+   -- Number of rows of text on screen
+   constant NUM_ROWS : integer := G_DIGITS_SIZE / 16;
+
+   -- Define positioning of text on screen
+   constant TEXT_CHAR_X : integer := 14;
+   constant TEXT_CHAR_Y : integer := 2;
+
+   constant DIGITS_CHAR_X : integer := TEXT_CHAR_X+8;
+   constant DIGITS_CHAR_Y : integer := TEXT_CHAR_Y;
 
    -- A single character bitmap is defined by 8x8 = 64 bits.
    subtype bitmap_t is std_logic_vector(63 downto 0);
@@ -38,13 +44,22 @@ architecture synthesis of digits is
    constant PIXEL_LIGHT : std_logic_vector(7 downto 0) := B"100_100_10";
    constant PIXEL_WHITE : std_logic_vector(7 downto 0) := B"111_111_11";
 
+   type txt_t is array (0 to 7*NUM_ROWS-1) of character;
+   constant txt : txt_t := "  PHASE" &
+                           "   FREQ" &
+                           "ADDR-HI" &
+                           "ADDR-LO" &
+                           "  WRITE" &
+                           "   READ";
+
    -- Stage 0
    signal black_0        : std_logic;
    signal char_col_0     : integer range 0 to G_VIDEO_MODE.H_MAX/16-1;
    signal char_row_0     : integer range 0 to G_VIDEO_MODE.V_MAX/16-1;
    signal pix_col_0      : integer range 0 to 7;
    signal pix_row_0      : integer range 0 to 7;
-   signal nibble_index_0 : integer range 0 to G_DIGITS_SIZE/4-1;
+   signal nibble_index_0 : integer range 0 to 4*NUM_ROWS-1;
+   signal txt_offset_0   : integer range 0 to 7*NUM_ROWS-1;
 
    -- Stage 1
    signal black_1        : std_logic;
@@ -53,6 +68,8 @@ architecture synthesis of digits is
    signal pix_col_1      : integer range 0 to 7;
    signal pix_row_1      : integer range 0 to 7;
    signal nibble_1       : std_logic_vector(3 downto 0);
+   signal char_nibble_1  : std_logic_vector(7 downto 0);
+   signal char_txt_1     : std_logic_vector(7 downto 0);
    signal char_1         : std_logic_vector(7 downto 0);
 
    -- Stage 2
@@ -82,7 +99,8 @@ begin
    pix_row_0  <= 7 - to_integer(pix_y_i(4 downto 2));
 
    -- Calculate value of nibble at current position
-   nibble_index_0 <= (G_DIGITS_SIZE/4-1 - (char_col_0 - DIGITS_CHAR_X)) mod (G_DIGITS_SIZE/4);
+   nibble_index_0 <= (NUM_ROWS-1 - (char_row_0 - DIGITS_CHAR_Y))*4 + 3 - (char_col_0 - DIGITS_CHAR_X);
+   txt_offset_0 <= (char_row_0 - TEXT_CHAR_Y)*7 + (char_col_0 - TEXT_CHAR_X);
 
 
    --------------------------------------------------
@@ -92,6 +110,7 @@ begin
    p_stage1 : process (clk_i)
    begin
       if rising_edge(clk_i) then
+         char_txt_1 <= to_std_logic_vector(character'pos(txt(txt_offset_0)), 8);
          nibble_1   <= digits_i(4*nibble_index_0+3 downto 4*nibble_index_0);
          black_1    <= black_0;
          char_col_1 <= char_col_0;
@@ -102,8 +121,13 @@ begin
    end process p_stage1;
 
    -- Calculate character to display at current position
-   char_1 <= nibble_1 + X"30" when nibble_1 < 10 else
-             nibble_1 + X"41" - 10;
+   char_nibble_1 <= nibble_1 + X"30" when nibble_1 < 10 else
+                    nibble_1 + X"41" - 10;
+   char_1 <= char_nibble_1 when char_row_1 >= DIGITS_CHAR_Y and char_row_1 < DIGITS_CHAR_Y+NUM_ROWS and
+                                char_col_1 >= DIGITS_CHAR_X and char_col_1 < DIGITS_CHAR_X+4 else
+             char_txt_1    when char_row_1 >= TEXT_CHAR_Y   and char_row_1 < TEXT_CHAR_Y+NUM_ROWS and
+                                char_col_1 >= TEXT_CHAR_X   and char_col_1 < TEXT_CHAR_X+7 else
+             X"20"; -- Fill the rest of the screen with spaces.
 
 
    --------------------------------------------------
@@ -150,8 +174,8 @@ begin
          pixel_3 <= PIXEL_GREY;
 
          -- Are we within the borders of the text?
-         if char_row_2 = DIGITS_CHAR_Y and
-            char_col_2 >= DIGITS_CHAR_X and char_col_2 < DIGITS_CHAR_X+G_DIGITS_SIZE/4 then
+         if char_row_2 >= TEXT_CHAR_Y and char_row_2 < TEXT_CHAR_Y+NUM_ROWS and
+            char_col_2 >= TEXT_CHAR_X and char_col_2 < DIGITS_CHAR_X+4 then
 
             if pix_2 = '1' then
                pixel_3 <= PIXEL_LIGHT;   -- Text foreground colour.

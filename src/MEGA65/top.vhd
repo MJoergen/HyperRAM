@@ -81,12 +81,10 @@ architecture synthesis of top is
    signal address     : std_logic_vector(21 downto 0);
    signal data_exp    : std_logic_vector(15 downto 0);
    signal data_read   : std_logic_vector(15 downto 0);
-   signal id_0        : std_logic_vector(15 downto 0);
-   signal id_1        : std_logic_vector(15 downto 0);
 
    signal freq_str    : std_logic_vector(11 downto 0);
    signal phase_str   : std_logic_vector(11 downto 0);
-   signal digits      : std_logic_vector(111 downto 0);
+   signal digits      : std_logic_vector(95 downto 0);
 
    signal hr_rwds_out : std_logic;
    signal hr_dq_out   : std_logic_vector(7 downto 0);
@@ -152,28 +150,24 @@ begin
          address_o     => address,
          data_exp_o    => data_exp,
          data_read_o   => data_read,
-         id_0_o        => id_0,
-         id_1_o        => id_1,
          active_o      => sys_active,
          error_o       => sys_error
       ); -- i_system
 
    i_cdc_video: xpm_cdc_array_single
       generic map (
-         WIDTH => 112
+         WIDTH => 96
       )
       port map (
-         src_clk               => clk_x1,
-         src_in( 15 downto  0) => data_read,
-         src_in( 31 downto 16) => data_exp,
-         src_in( 53 downto 32) => address,
-         src_in( 55 downto 54) => "00",
-         src_in( 67 downto 56) => freq_str,
-         src_in( 79 downto 68) => phase_str,
-         src_in( 95 downto 80) => id_0,
-         src_in(111 downto 96) => id_1,
-         dest_clk              => video_clk,
-         dest_out              => digits
+         src_clk                => clk_x1,
+         src_in( 15 downto   0) => data_read,
+         src_in( 31 downto  16) => data_exp,
+         src_in( 47 downto  32) => address(15 downto 0),
+         src_in( 63 downto  48) => X"00" & "00" & address(21 downto 16),
+         src_in( 79 downto  64) => "0000" & freq_str,
+         src_in( 95 downto  80) => "0000" & phase_str,
+         dest_clk               => video_clk,
+         dest_out               => digits
       ); -- i_cdc
 
    freq_str(11 downto 8) <= std_logic_vector(to_unsigned((C_HYPERRAM_FREQ_MHZ/100) mod 10, 4));
@@ -201,7 +195,7 @@ begin
       generic map
       (
          G_FONT_FILE   => C_FONT_FILE,
-         G_DIGITS_SIZE => 112,
+         G_DIGITS_SIZE => 96,
          G_VIDEO_MODE  => C_VIDEO_MODE
       )
       port map
