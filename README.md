@@ -39,6 +39,17 @@ supply and a single-ended clock.
 The additional source files needed for the MEGA65 platform are placed in the
 [src/MEGA65](src/MEGA65) directory.
 
+## Getting started
+The HyperRAM controller has just two interface, one for the HyperRAM and one
+for the client (user) of the HyperRAM. For the client interface I've chosen the
+[Avalon Memory Map](doc/Avalon_Interface_Specifications.pdf) protocol.
+This is an industry standard and is eady to use. The interface width is 16 bits
+corresponding to one word of the HyperRAM. The addressing is in units of words,
+not bytes.
+The Avalon interface supports burst mode, where you can write multiple words in
+a single HyperRAM transaction. Section 3.5.5 in the above document describes
+burst mode in detail.
+
 
 ## Further reading
 The following links provide additional information:
