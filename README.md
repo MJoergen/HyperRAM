@@ -46,8 +46,9 @@ one for the external HyperRAM device and one for the client (user) of the
 HyperRAM. For the client interface I've chosen the [Avalon Memory
 Map](doc/Avalon_Interface_Specifications.pdf) protocol.  This is an industry
 standard and is easy to use. The interface width is 16 bits corresponding to
-one word of the HyperRAM. The addressing is in units of words, not bytes.  The
-Avalon interface supports burst mode, where you can read or write multiple
+one word of the HyperRAM. The addressing is in units of words, not bytes.
+
+The Avalon interface supports burst mode, where you can read or write multiple
 words in a single HyperRAM transaction. Section 3.5.5 in the Avalon Memory Map
 specification describes burst mode in detail.
 

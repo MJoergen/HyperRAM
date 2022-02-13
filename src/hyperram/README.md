@@ -25,8 +25,9 @@ It performs two functions:
 * Wait until the HyperRAM device is operational after reset.
 * Perform a write to configuration register 0 to set latency mode.
 
-I've chosen to implement it as an Avalon MM "sandwich" to be connected
-directly between the client and the main state machine.
+I've chosen to implement it as an Avalon MM "sandwich" to be connected directly
+between the client and the main state machine. This makes it very easy to pull
+out this module if your design requires that.
 
 ## `hyperram_ctrl.vhd`
 
@@ -53,13 +54,13 @@ below.
 The non-phase shifted clock is used to sample the `DQ` input signal during READ
 operation.
 
-From the above it follows that the HyperRAM device is phase shifted relative to
-the FPGA. This is done to satisfy the `t_CKD` timing parameter.  The actual
-amount of phase shift required is likely both board and device dependent. On
-the MEGA65 a phase shift of 180 degrees is seen to work, and in such case we
-could alternatively just use the falling edge of `clk_x2_i`.  However, I've
-chosen to keep the general phase shifted clock for greater flexibility and to
-make [porting](../../PORTING.md) to other platforms easier.
+From the above it follows that the entire HyperRAM device is phase shifted
+relative to the FPGA. This is done to satisfy the `t_CKD` timing parameter.
+The actual amount of phase shift required is likely both board and device
+dependent. On the MEGA65 a phase shift of 180 degrees is seen to work, and in
+such case we could alternatively just use the falling edge of `clk_x2_i`.
+However, I've chosen to keep the general phase-shifted clock for greater
+flexibility and to make [porting](../../PORTING.md) to other platforms easier.
 
 In the above it is assumed that the timing parameter `t_CKD` is constant for
 any given specific HyperRAM device, even though the datasheet allows for great
@@ -67,7 +68,7 @@ variation.
 
 ### Timing parameters
 
-The timing parameters are given in the table below (taken from the
+The timing parameters are given in the table below (taken from Table 10.3 of the
 [documentation](../../doc/66-67WVH8M8ALL-BLL-938852.pdf)):
 
 ```

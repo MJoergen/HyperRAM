@@ -46,6 +46,10 @@ The HyperRAM implementation requires a total of three clocks:
 
 All three clocks should be generated from the same MMCM.
 
+The reason for the phase-shifted clock is to ensure correct timing when
+sampling the input date `DQ` from the HyperRAM. For more information, see
+[Detailed design description](src/hyperram/README.md#hyperram_io.vhd)
+
 The specific value of the phase shift for `clk_x2_del_i` is board and device
 dependent. To determine the value to use probably requires some hand tuning,
 i.e. experimentally trying different values to find a range where there are no
@@ -67,9 +71,10 @@ I/O pads as possible. I've found it sufficient to control the placement of the
 output register for the `CK` signal to the HyperRAM, i.e. the register
 `hr_ck_o_reg` in the file `hyperram_io.vhd`.
 
-On the MEGA65 the `CK` signal is connected to pin D22, which is in the upper left
-corner of the FPGA. The closest I/O pad is at X=0 and Y=205. Therefore, for the
-MEGA65 I've added the following constraint:
+On the MEGA65 the `CK` signal is connected to pin D22, which is in the upper
+left corner of the FPGA. The closest I/O pad is at X=0 and Y=205 (see below for
+further details). Therefore, for the MEGA65 I've added the following
+constraint:
 
 ```
 set_property LOC SLICE_X0Y205 [get_cells -hier hr_ck_o_reg]
@@ -81,4 +86,17 @@ right next to the corresponding I/O ports.
 There are other means of coercing Vivado to place the HyperRAM controller
 correctly, e.g. by setting appropriate input and output delays, but I was not
 successfull with that approach.
+
+### Locating the I/O pad
+
+To determine the correct constraint to use I first located the I/O pin D22 in
+the device view in Vivado:
+
+![device view](doc/device_view.png)
+
+Then selecting the pin and viewing the pin properties gives this result:
+
+![pin properties](doc/iopad.png)
+
+From here we directly see the value X=0 and Y=205.
 
