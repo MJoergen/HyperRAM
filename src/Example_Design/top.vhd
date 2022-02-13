@@ -45,7 +45,7 @@ architecture synthesis of top is
    -- Avalon Memory Map interface to HyperRAM Controller
    signal avm_write         : std_logic;
    signal avm_read          : std_logic;
-   signal avm_address       : std_logic_vector(31 downto 0);
+   signal avm_address       : std_logic_vector(31 downto 0) := (others => '0');
    signal avm_writedata     : std_logic_vector(15 downto 0);
    signal avm_byteenable    : std_logic_vector(1 downto 0);
    signal avm_burstcount    : std_logic_vector(7 downto 0);
@@ -101,6 +101,7 @@ begin
 
    i_trafic_gen : entity work.trafic_gen
       generic map (
+         G_DATA_SIZE    => 16,
          G_ADDRESS_SIZE => 22 -- 2^22 = 4 MegaWords = 8 MegaBytes
       )
       port map (
@@ -114,7 +115,7 @@ begin
          data_read_o         => sys_data_read,
          avm_write_o         => avm_write,
          avm_read_o          => avm_read,
-         avm_address_o       => avm_address,
+         avm_address_o       => avm_address(21 downto 0),
          avm_writedata_o     => avm_writedata,
          avm_byteenable_o    => avm_byteenable,
          avm_burstcount_o    => avm_burstcount,

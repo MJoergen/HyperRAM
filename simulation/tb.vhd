@@ -22,7 +22,7 @@ architecture simulation of tb is
 
    signal avm_write         : std_logic;
    signal avm_read          : std_logic;
-   signal avm_address       : std_logic_vector(31 downto 0);
+   signal avm_address       : std_logic_vector(31 downto 0) := (others => '0');
    signal avm_writedata     : std_logic_vector(15 downto 0);
    signal avm_byteenable    : std_logic_vector(1 downto 0);
    signal avm_burstcount    : std_logic_vector(7 downto 0);
@@ -109,6 +109,7 @@ begin
 
    i_trafic_gen : entity work.trafic_gen
       generic map (
+         G_DATA_SIZE    => 16,
          G_ADDRESS_SIZE => 3
       )
       port map (
@@ -119,7 +120,7 @@ begin
          error_o             => sys_error,
          avm_write_o         => avm_write,
          avm_read_o          => avm_read,
-         avm_address_o       => avm_address,
+         avm_address_o       => avm_address(2 downto 0),
          avm_writedata_o     => avm_writedata,
          avm_byteenable_o    => avm_byteenable,
          avm_burstcount_o    => avm_burstcount,
