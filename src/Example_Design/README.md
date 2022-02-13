@@ -1,13 +1,28 @@
-# MEGA65 support files
+# Example Design
 
-This folder contains all the additional files needed to test the HyperRAM
-controller on the MEGA65 platform.
+This folder contains a complete example design written for the MEGA65 platform.
+It consists of:
 
-The features provided by these files are:
-
+* Trafic generator
 * Clock synthesis
 * HDMI output
 * Limited keyboard support
+
+
+## Trafic generator
+
+The trafic generator's sole purpose is to test the HyperRAM controller. It
+does this by generating first a sequence of WRITE operations (writing
+pseudo-random data to the entire HyperRAM device), and then a corresponding
+sequence of READ operations, verifying that the correct values are read back
+again.
+
+The trafic generator has a single control input (`start_i`) that starts the
+above mentioned process. There are two output signals indicating progress:
+
+* `led_active`: indicates the test is in progress.
+* `led_error`: indicates at least one error has occurred.
+
 
 ## Clock synthesis
 
