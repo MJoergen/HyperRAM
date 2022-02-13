@@ -134,7 +134,7 @@ begin
       )
       port map (
          src_rst  => not (sys_rstn_i and locked),  -- 1-bit input: Source reset signal.
-         dest_clk => sys_clk_i,                    -- 1-bit input: Destination clock.
+         dest_clk => clk_x1_o,                     -- 1-bit input: Destination clock.
          dest_rst => rst_o                         -- 1-bit output: src_rst synchronized to the destination clock domain.
                                                    -- This output is registered.
       ); -- i_xpm_cdc_sync_rst_pixel

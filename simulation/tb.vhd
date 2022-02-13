@@ -7,39 +7,45 @@ end entity tb;
 
 architecture simulation of tb is
 
-   -- Testbench signals
    constant C_HYPERRAM_FREQ_MHZ : integer := 100;
    constant C_HYPERRAM_PHASE    : real := 162.000;
-   constant C_DELAY      : time := 1 ns;
+   constant C_DELAY         : time := 1 ns;
 
-   constant C_CLK_PERIOD : time := (1000/C_HYPERRAM_FREQ_MHZ) * 1 ns;
-   signal stop_test      : std_logic := '0';
+   signal clk_x1            : std_logic;
+   signal clk_x2            : std_logic;
+   signal clk_x2_del        : std_logic;
+   signal rst               : std_logic;
 
-   signal clk            : std_logic;
-   signal clk_x2         : std_logic;
-   signal clk_x2_del     : std_logic;
-   signal rst            : std_logic;
-   signal led_active     : std_logic;
-   signal led_error      : std_logic;
-   signal start          : std_logic;
-   signal start_ready    : std_logic;
+   signal sys_start         : std_logic;
+   signal sys_active        : std_logic;
+   signal sys_error         : std_logic;
 
-   signal sys_resetn     : std_logic;
-   signal sys_csn        : std_logic;
-   signal sys_ck         : std_logic;
-   signal sys_rwds       : std_logic;
-   signal sys_dq         : std_logic_vector(7 downto 0);
-   signal sys_rwds_out   : std_logic;
-   signal sys_dq_out     : std_logic_vector(7 downto 0);
-   signal sys_rwds_oe    : std_logic;
-   signal sys_dq_oe      : std_logic;
+   signal avm_write         : std_logic;
+   signal avm_read          : std_logic;
+   signal avm_address       : std_logic_vector(31 downto 0);
+   signal avm_writedata     : std_logic_vector(15 downto 0);
+   signal avm_byteenable    : std_logic_vector(1 downto 0);
+   signal avm_burstcount    : std_logic_vector(7 downto 0);
+   signal avm_readdata      : std_logic_vector(15 downto 0);
+   signal avm_readdatavalid : std_logic;
+   signal avm_waitrequest   : std_logic;
+
+   signal sys_resetn        : std_logic;
+   signal sys_csn           : std_logic;
+   signal sys_ck            : std_logic;
+   signal sys_rwds          : std_logic;
+   signal sys_dq            : std_logic_vector(7 downto 0);
+   signal sys_rwds_out      : std_logic;
+   signal sys_dq_out        : std_logic_vector(7 downto 0);
+   signal sys_rwds_oe       : std_logic;
+   signal sys_dq_oe         : std_logic;
 
    -- HyperRAM simulation device interface
-   signal hr_resetn      : std_logic;
-   signal hr_csn         : std_logic;
-   signal hr_ck          : std_logic;
-   signal hr_rwds        : std_logic;
-   signal hr_dq          : std_logic_vector(7 downto 0);
+   signal hr_resetn         : std_logic;
+   signal hr_csn            : std_logic;
+   signal hr_ck             : std_logic;
+   signal hr_rwds           : std_logic;
+   signal hr_dq             : std_logic_vector(7 downto 0);
 
 
    component s27kl0642 is
@@ -63,99 +69,96 @@ architecture simulation of tb is
 begin
 
    ---------------------------------------------------------
-   -- Controller clock and reset
+   -- Generate clock and reset
    ---------------------------------------------------------
 
-   p_clk : process
-   begin
-      while stop_test = '0' loop
-         clk <= '1';
-         wait for C_CLK_PERIOD/2;
-         clk <= '0';
-         wait for C_CLK_PERIOD/2;
-      end loop;
-      wait;
-   end process p_clk;
+   i_tb_clk : entity work.tb_clk
+      generic map (
+         G_HYPERRAM_FREQ_MHZ => C_HYPERRAM_FREQ_MHZ,
+         G_HYPERRAM_PHASE    => C_HYPERRAM_PHASE
+      )
+      port map (
+         clk_x1_o     => clk_x1,
+         clk_x2_o     => clk_x2,
+         clk_x2_del_o => clk_x2_del,
+         rst_o        => rst
+      ); -- i_tb_clk
 
-   p_clk_x2 : process
-   begin
-      while stop_test = '0' loop
-         clk_x2 <= '1';
-         wait for C_CLK_PERIOD/4;
-         clk_x2 <= '0';
-         wait for C_CLK_PERIOD/4;
-      end loop;
-      wait;
-   end process p_clk_x2;
 
-   p_clk_x2_del : process
-   begin
-      wait for C_CLK_PERIOD/2*(C_HYPERRAM_PHASE/360.0);
-      while stop_test = '0' loop
-         clk_x2_del <= '1';
-         wait for C_CLK_PERIOD/4;
-         clk_x2_del <= '0';
-         wait for C_CLK_PERIOD/4;
-      end loop;
-      wait;
-   end process p_clk_x2_del;
+   --------------------------------------------------------
+   -- Generate start signal for trafic generator
+   --------------------------------------------------------
 
-   p_rst : process
+   p_sys_start : process
    begin
-      rst <= '1';
-      wait for 10*C_CLK_PERIOD;
-      wait until clk = '1';
-      rst <= '0';
-      wait;
-   end process p_rst;
-
-   p_start_ready : process
-   begin
-      start_ready <= '0';
+      sys_start <= '0';
       wait for 160 us;
-      start_ready <= '1';
-      wait until led_active = '1';
-      start_ready <= '0';
+      wait until clk_x1 = '1';
+      sys_start <= '1';
+      wait until clk_x1 = '1';
+      sys_start <= '0';
       wait;
-   end process p_start_ready;
-
-   p_start : process (clk)
-   begin
-      if rising_edge(clk) then
-         start <= start_ready;
-         if led_active = '1' then
-            start <= '0';
-         end if;
-      end if;
-   end process p_start;
+   end process p_sys_start;
 
 
-   ---------------------------------------------------------
-   -- Instantiate DUT
-   ---------------------------------------------------------
+   --------------------------------------------------------
+   -- Instantiate trafic generator
+   --------------------------------------------------------
 
-   i_system : entity work.system
+   i_trafic_gen : entity work.trafic_gen
       generic map (
          G_ADDRESS_SIZE => 3
       )
       port map (
-         clk_i         => clk,
-         clk_x2_i      => clk_x2,
-         clk_x2_del_i  => clk_x2_del,
-         rst_i         => rst,
-         start_i       => start,
-         hr_resetn_o   => sys_resetn,
-         hr_csn_o      => sys_csn,
-         hr_ck_o       => sys_ck,
-         hr_rwds_in_i  => sys_rwds,
-         hr_dq_in_i    => sys_dq,
-         hr_rwds_out_o => sys_rwds_out,
-         hr_dq_out_o   => sys_dq_out,
-         hr_rwds_oe_o  => sys_rwds_oe,
-         hr_dq_oe_o    => sys_dq_oe,
-         active_o      => led_active,
-         error_o       => led_error
-      ); -- i_system
+         clk_i               => clk_x1,
+         rst_i               => rst,
+         start_i             => sys_start,
+         active_o            => sys_active,
+         error_o             => sys_error,
+         address_o           => open,
+         data_exp_o          => open,
+         data_read_o         => open,
+         avm_write_o         => avm_write,
+         avm_read_o          => avm_read,
+         avm_address_o       => avm_address,
+         avm_writedata_o     => avm_writedata,
+         avm_byteenable_o    => avm_byteenable,
+         avm_burstcount_o    => avm_burstcount,
+         avm_readdata_i      => avm_readdata,
+         avm_readdatavalid_i => avm_readdatavalid,
+         avm_waitrequest_i   => avm_waitrequest
+      ); -- i_trafic_gen
+
+
+   --------------------------------------------------------
+   -- Instantiate HyperRAM interface
+   --------------------------------------------------------
+
+   i_hyperram : entity work.hyperram
+      port map (
+         clk_x1_i            => clk_x1,
+         clk_x2_i            => clk_x2,
+         clk_x2_del_i        => clk_x2_del,
+         rst_i               => rst,
+         avm_write_i         => avm_write,
+         avm_read_i          => avm_read,
+         avm_address_i       => avm_address,
+         avm_writedata_i     => avm_writedata,
+         avm_byteenable_i    => avm_byteenable,
+         avm_burstcount_i    => avm_burstcount,
+         avm_readdata_o      => avm_readdata,
+         avm_readdatavalid_o => avm_readdatavalid,
+         avm_waitrequest_o   => avm_waitrequest,
+         hr_resetn_o         => sys_resetn,
+         hr_csn_o            => sys_csn,
+         hr_ck_o             => sys_ck,
+         hr_rwds_in_i        => sys_rwds,
+         hr_dq_in_i          => sys_dq,
+         hr_rwds_out_o       => sys_rwds_out,
+         hr_dq_out_o         => sys_dq_out,
+         hr_rwds_oe_o        => sys_rwds_oe,
+         hr_dq_oe_o          => sys_dq_oe
+      ); -- i_hyperram
 
    -- Tri-state buffers
    sys_rwds <= sys_rwds_out when sys_rwds_oe = '1' else 'Z';

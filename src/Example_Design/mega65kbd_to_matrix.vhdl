@@ -10,9 +10,9 @@ entity mega65kbd_to_matrix is
     kio8        : out std_logic; -- clock to keyboard
     kio9        : out std_logic; -- data output to keyboard
     kio10       : in  std_logic; -- data input from keyboard
-    delete_out  : out std_logic;
-    return_out  : out std_logic;
-    fastkey_out : out std_logic
+    delete_out  : out std_logic := '1';
+    return_out  : out std_logic := '1';
+    fastkey_out : out std_logic := '1'
   );
 end entity mega65kbd_to_matrix;
 
