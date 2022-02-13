@@ -65,11 +65,13 @@ clock synthesis is done on the MEGA65.
 ## Constraints
 
 My experiments have shown that the HyperRAM timing is very sensitive to
-variations in design placement within the FPGA. Therefore it is necessary to
-constrain the design so that the HyperRAM controller is placed as close to the
-I/O pads as possible. I've found it sufficient to control the placement of the
-output register for the `CK` signal to the HyperRAM, i.e. the register
-`hr_ck_o_reg` in the file `hyperram_io.vhd`.
+variations in design placement within the FPGA. Incorrect or sub-optimal
+placement can lead to large routing delays inside the FPGA that can interfere
+with the HyperRAM timing.  Therefore it is necessary to constrain the design so
+that the HyperRAM controller is placed as close to the I/O pads as possible.
+I've found it sufficient to control the placement of the output register for
+the `CK` signal to the HyperRAM, i.e. the register `hr_ck_o_reg` in the file
+`hyperram_io.vhd`.
 
 On the MEGA65 the `CK` signal is connected to pin D22, which is in the upper
 left corner of the FPGA. The closest I/O pad is at X=0 and Y=205 (see below for
@@ -98,5 +100,5 @@ Then selecting the pin and viewing the pin properties gives this result:
 
 ![pin properties](doc/iopad.png)
 
-From here we directly see the value X=0 and Y=205.
+From the line "Tile:" we directly see the value X=0 and Y=205.
 

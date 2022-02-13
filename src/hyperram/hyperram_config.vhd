@@ -93,18 +93,22 @@ begin
 
             when CONFIG_ST =>
                -- Write to configuration register 0
+               -- See section 5.2.1 of the datasheet.
+               -- The drive strength is chosen to the lowest resistance, i.e. strongest drive strength.
+               -- This improves signal quality (lower rise and fall times) and therefore larger timing margin.
+               -- The latency mode is set to variable. This results in lower latency on average.
                cfg_write       <= '1';
                cfg_read        <= '0';
                cfg_address     <= (others => '0');
                cfg_address(18 downto 11) <= X"01";
                cfg_address(31) <= '1';
-               cfg_writedata(R_C0_DPD)      <= '1';    -- normal
-               cfg_writedata(R_C0_DRIVE)    <= "111";  -- 19 ohms
+               cfg_writedata(R_C0_DPD)      <= '1';    -- normal (default)
+               cfg_writedata(R_C0_DRIVE)    <= "111";  -- 19 ohms (maximal drive strength)
                cfg_writedata(R_C0_RESERVED) <= "1111";
                cfg_writedata(R_C0_LATENCY)  <= std_logic_vector(to_unsigned(G_LATENCY, 4) - 5);
                cfg_writedata(R_C0_FIXED)    <= '0';    -- variable
-               cfg_writedata(R_C0_HYBRID)   <= '1';    -- legacy
-               cfg_writedata(R_C0_BURST)    <= "10";   -- 16 bytes
+               cfg_writedata(R_C0_HYBRID)   <= '1';    -- legacy (default)
+               cfg_writedata(R_C0_BURST)    <= "11";   -- 32 bytes (default)
                cfg_byteenable  <= "11";
                cfg_burstcount  <= X"01";
 
