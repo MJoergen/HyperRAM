@@ -3,10 +3,26 @@
 This folder contains a complete example design written for the MEGA65 platform.
 It consists of:
 
-* Trafic generator
 * Clock synthesis
-* HDMI output
-* Limited keyboard support
+* Trafic generator
+* HyperRAM controller
+* MEGA65 support module (keyboard and video)
+* Top-level file connecting all the above
+
+
+## Clock synthesis
+
+Controlling the physical I/O to the HyperRAM device requires a total of three clocks:
+
+* `clk_x1` : This is the HyperRAM clock @ 100 Mhz.
+* `clk_x2` : This is a double speed clock @ 200 MHz.
+* `clk_x2_del` : this is a phase-delayed double speed clock @ 200 MHz.
+
+These clocks are generated using a single MMCM. This is done in the file
+[clk.vhd](clk.vhd).  Even though `clk_x1` is running at the same frequency as
+the FPGA clock input, it is important that the HyperRAM controller is connected
+to the clock output (`clk_x1`) of the MMCM, rather than the FPGA clock, in
+order to ensure correct relative phase shifts.
 
 
 ## Trafic generator
@@ -20,45 +36,33 @@ again.
 The trafic generator has a single control input (`start_i`) that starts the
 above mentioned process. There are two output signals indicating progress:
 
-* `led_active`: indicates the test is in progress.
-* `led_error`: indicates at least one error has occurred.
+* `active_o`: indicates the test is in progress.
+* `error_o`: indicates at least one error has occurred.
 
 
-## Clock synthesis
+## HyperRAM controller
+This is the Device-Under-Test, and is described more detailed in
+[src/hyperram](../hyperram/README.md)
 
-As mentioned previously, controlling the physical I/O to the HyperRAM device
-requires two additional clocks (at twice the frequency, but with non-zero phase
-shift) to get the correct timing.
 
-This double-speed clock is generated using a single MMCM. This is done in the file
-[clk.vhd](clk.vhd). Note that all the HyperRAM clocks are
-generated from this single MMCM. That includes the HyperRAM main clock (at 100 MHz),
-which is the same speed as the board clock. It's important that the HyperRAM controller
-is connected to a clock output of the MMCM, to ensure correct relative phase shifts.
+## MEGA65 support module (keyboard and video)
 
-A separate file [clk_mega65.vhd](clk_mega65.vhd) generates a 40 MHz keyboard
-clock and a 74.25 MHz video clock for the HDMI output.
+The purpose of this module is to provide support for keyboard input and video
+output.  It's all encapsulated in a single module to keep the top-level file
+simple.
 
-## HDMI output
 
-The HDMI code generates a 1280x720 @ 60 Hz image.
-It shows a string of characters: `PPPFFFAAAAAAWWWWRRRR`,
-where:
+## Top-level file
 
-* `PPP` is the phase shift in angles.
-* `FFF` is the frequency in MHz.
-* `AAAAAÀ` is the hex address in units of words.
-* `WWWW` is the hex value written.
-* `RRRR` is the hex value read.
+The top-level file contains no logic of its own, and only instantiates other modules.
 
-## Limited keyboard support
+On thing to note is that the top-level contains the two constants:
 
-The MEGA65 comes with a keyboard and two visible LED's. In order to make use of
-these I've copied the file `mega65kbd_to_matrix.vhdl` from the [MEGA65
-project](https://github.com/MEGA65/mega65-core) and removed stuff I didn't need.
-
-In this way, I can start the test by pressing the `RETURN` key, and I can watch
-the progress of the test on the `POWER` LED and look for any errors on the
-`Floppy` LED. The entire test runs for approximately 2 seconds.
-
+* `C_HYPERRAM_FREQ_MHZ` : This controls the HyperRAM device clock speed. The
+  maximum value supported by the MEGA65 platform is 100 MHz.
+* `C_HYPERRAM_PHASE`    : This is used to fine-tune the phase of the
+  double-speed clock `clk_x2_del` used to control the HyperRAM I/O ports. The
+  value chosen here is obtained by trial-and-error, where empirically an
+  interval of working values was determined and the centre of this interval was
+  chosen.
 

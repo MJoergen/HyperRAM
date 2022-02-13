@@ -3,8 +3,9 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 -- This module is a simple kind of RAM test.
--- It fills the HyperRAM with pseudo-random data,
--- and verifies the data can be read back again.
+-- It generates a sequence of WRITES with pseudo-random data,
+-- followed by a sequence of READ and verifying the data read
+-- back is as expected.
 
 entity trafic_gen is
    generic (

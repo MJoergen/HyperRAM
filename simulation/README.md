@@ -2,24 +2,24 @@
 
 This folder contains files necessary to run an RTL simulation of the HyperRAM
 implementation. The testbench [tb.vhd](tb.vhd) instantiates the [HyperRAM
-controller](../src/hyperram) and the [trafic generator](../src/trafic_gen.vhd).
+controller](../src/hyperram) and the [trafic generator](../src/Example_Design/trafic_gen.vhd).
 The memory size (and hence the number of writes and reads) is limited in the
 test bench to reduce simulation time.
 
-In the [testbench top level file](tb.vhd#L11) the constants `C_HYPERRAM_FREQ_MHZ`
+In the [testbench top level file](tb.vhd#L10) the constants `C_HYPERRAM_FREQ_MHZ`
 and `C_HYPERRAM_PHASE` can be defined, just as in the [hardware top level
-file](../src/MEGA65/top.vhd#L39). In this way, the testbench provides the same
+file](../src/Example_Design/top.vhd#L40). In this way, the testbench provides the same
 tuning parameters as the hardware version.
 
-One extra feature of the testbench is the insertion of board delay. It is
-expected that the physical hardware will introduce a non-trivial amount of
-propagation delay between the FPGA and the HyperRAM device. Since the HyperRAM
-timing is very delicate, I chose to include the board delay in the testbench.
-This is done by the constant `C_DELAY`, which for now I've set to `1 ns` in each
-direction.
+One extra feature of the testbench is the artificial insertion of board delay.
+It is expected that the physical hardware will introduce a non-trivial amount
+of propagation delay between the FPGA and the HyperRAM device. Since the
+HyperRAM timing is very delicate, I chose to include this propagation delay in
+the testbench.  This is done by the constant `C_DELAY`, which for now I've set
+to `1 ns` in each direction.
 
 The actual validation of the HyperRAM controller is carried out by the [trafic
-generator](../src/trafic_gen.vhd).
+generator](../src/Example_Design/trafic_gen.vhd).
 
 ## HyperRAM simulation model
 

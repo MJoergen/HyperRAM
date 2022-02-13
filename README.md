@@ -54,23 +54,23 @@ specification describes burst mode in detail.
 To see an example of how to use the HyperRAM controller and how to connect it
 to the internal FPGA logic and to the external HyperRAM device. have a look at
 the [Example_Design](src/Example_Design), specifically at the [top level
-file](src/Example_Design/top.vhd).
+file](src/Example_Design/top.vhd) and the [trafic
+generator](src/Example_Design/trafic_gen.vhd)
 
-The HyperRAM configuration and identification registers are memory mapped to the
-following addresses:
+The HyperRAM configuration and identification registers can be accessed through
+the same Avalon Memory Map interface via the following addresses:
 
-* `0x80000000` : Identification Register 0
-* `0x80000001` : Identification Register 1
-* `0x80000800` : Configuration Register 0
-* `0x80000801` : Configuration Register 1
-
+* `0x80000000` : Identification Register 0 (Read-only)
+* `0x80000001` : Identification Register 1 (Read-only)
+* `0x80000800` : Configuration Register 0  (Read-write)
+* `0x80000801` : Configuration Register 1  (Read-write)
 
 
 ## Further reading
 The following links provide additional information:
 
+* [Example Design](src/Example_Design/README.md)
 * [Porting guideline](PORTING.md)
 * [Detailed design description](src/hyperram/README.md)
-* [Example Design](src/Example_Design/README.md)
 * [Simulation](simulation/README.md)
 

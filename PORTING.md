@@ -54,8 +54,8 @@ errors.
 On the MEGA65 platform I've had success with phase shifts in the range 144 to
 180 degrees, and have therefore settled on the central value of 162 degrees.
 
-See the file [src/MEGA65/clk.vhd](src/MEGA65/clk.vhd) for how clock synthesis
-is done on the MEGA65.
+See the file [src/Example_Design/clk.vhd](src/Example_Design/clk.vhd) for how
+clock synthesis is done on the MEGA65.
 
 
 ## Constraints
