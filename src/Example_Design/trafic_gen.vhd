@@ -36,7 +36,7 @@ end entity trafic_gen;
 architecture synthesis of trafic_gen is
 
    constant C_DATA_INIT   : std_logic_vector(63 downto 0) := X"CAFEBABEDEADBEEF";
-   constant C_BURST_COUNT : integer := 1;
+   constant C_BURST_COUNT : integer := 4;
    constant C_WORD_COUNT  : integer := C_BURST_COUNT*G_DATA_SIZE/16; -- 16 bits in each word
 
    signal data           : std_logic_vector(63 downto 0);
