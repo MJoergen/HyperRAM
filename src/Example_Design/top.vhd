@@ -14,16 +14,16 @@ entity top is
       hr_rwds     : inout std_logic;
       hr_dq       : inout std_logic_vector(7 downto 0);
 
-      -- Digital Video
-      hdmi_data_p : out std_logic_vector(2 downto 0);
-      hdmi_data_n : out std_logic_vector(2 downto 0);
-      hdmi_clk_p  : out std_logic;
-      hdmi_clk_n  : out std_logic;
-
-      -- Interface for physical keyboard
+      -- MEGA65 keyboard
       kb_io0      : out   std_logic;
       kb_io1      : out   std_logic;
-      kb_io2      : in    std_logic
+      kb_io2      : in    std_logic;
+
+      -- MEGA65 Digital Video (HDMI)
+      hdmi_data_p : out   std_logic_vector(2 downto 0);
+      hdmi_data_n : out   std_logic_vector(2 downto 0);
+      hdmi_clk_p  : out   std_logic;
+      hdmi_clk_n  : out   std_logic
    );
 end entity top;
 
@@ -54,6 +54,8 @@ architecture synthesis of top is
    signal avm_waitrequest   : std_logic;
 
    -- HyperRAM tri-state control signals
+   signal hr_rwds_in        : std_logic;
+   signal hr_dq_in          : std_logic_vector(7 downto 0);
    signal hr_rwds_out       : std_logic;
    signal hr_dq_out         : std_logic_vector(7 downto 0);
    signal hr_rwds_oe        : std_logic;
@@ -99,7 +101,7 @@ begin
 
    i_trafic_gen : entity work.trafic_gen
       generic map (
-         G_ADDRESS_SIZE => 22
+         G_ADDRESS_SIZE => 22 -- 2^22 = 4 MegaWords = 8 MegaBytes
       )
       port map (
          clk_i               => clk_x1,
@@ -144,8 +146,8 @@ begin
          hr_resetn_o         => hr_resetn,
          hr_csn_o            => hr_csn,
          hr_ck_o             => hr_ck,
-         hr_rwds_in_i        => hr_rwds,
-         hr_dq_in_i          => hr_dq,
+         hr_rwds_in_i        => hr_rwds_in,
+         hr_dq_in_i          => hr_dq_in,
          hr_rwds_out_o       => hr_rwds_out,
          hr_dq_out_o         => hr_dq_out,
          hr_rwds_oe_o        => hr_rwds_oe,
@@ -157,8 +159,10 @@ begin
    -- Tri-state buffers for HyperRAM
    ----------------------------------
 
-   hr_rwds <= hr_rwds_out when hr_rwds_oe = '1' else 'Z';
-   hr_dq   <= hr_dq_out   when hr_dq_oe   = '1' else (others => 'Z');
+   hr_rwds    <= hr_rwds_out when hr_rwds_oe = '1' else 'Z';
+   hr_dq      <= hr_dq_out   when hr_dq_oe   = '1' else (others => 'Z');
+   hr_rwds_in <= hr_rwds;
+   hr_dq_in   <= hr_dq;
 
 
    ----------------------------------
@@ -180,6 +184,11 @@ begin
    sys_digits(79 downto 64) <= "0000" & freq_str;
    sys_digits(95 downto 80) <= "0000" & phase_str;
 
+
+   ----------------------------------
+   -- Instantiate MEGA65 platform interface
+   ----------------------------------
+
    i_mega65 : entity work.mega65
       port map (
          sys_clk      => clk_x1,
@@ -188,13 +197,13 @@ begin
          sys_active_i => sys_active,
          sys_error_i  => sys_error,
          sys_digits_i => sys_digits,
+         kb_io0       => kb_io0,
+         kb_io1       => kb_io1,
+         kb_io2       => kb_io2,
          hdmi_data_p  => hdmi_data_p,
          hdmi_data_n  => hdmi_data_n,
          hdmi_clk_p   => hdmi_clk_p,
-         hdmi_clk_n   => hdmi_clk_n,
-         kb_io0       => kb_io0,
-         kb_io1       => kb_io1,
-         kb_io2       => kb_io2
+         hdmi_clk_n   => hdmi_clk_n
       ); -- i_mega65
 
 end architecture synthesis;

@@ -16,6 +16,7 @@ This implementation has support for:
 * variable latency.
 * configuration registers read and write.
 * identification registers read.
+* automatic configuration of latency mode upon reset.
 * 16-bit [Avalon Memory Map interface](doc/Avalon_Interface_Specifications.pdf) including burst mode.
 
 All the source files for the HyperRAM controller are in the
@@ -40,19 +41,28 @@ MEGA65 platform.  The additional source files needed for this are placed in the
 [src/Example_Design](src/Example_Design) directory.
 
 ## Getting started
-The HyperRAM controller has just two interfaces, one for the external HyperRAM
-device and one for the client (user) of the HyperRAM. For the client interface
-I've chosen the [Avalon Memory Map](doc/Avalon_Interface_Specifications.pdf)
-protocol.  This is an industry standard and is easy to use. The interface width
-is 16 bits corresponding to one word of the HyperRAM. The addressing is in
-units of words, not bytes.  The Avalon interface supports burst mode, where you
-can write multiple words in a single HyperRAM transaction. Section 3.5.5 in the
-Avalon Memory Map specification describes burst mode in detail.
+The [HyperRAM controller](src/hyperram/hyperram.vhd) has just two interfaces,
+one for the external HyperRAM device and one for the client (user) of the
+HyperRAM. For the client interface I've chosen the [Avalon Memory
+Map](doc/Avalon_Interface_Specifications.pdf) protocol.  This is an industry
+standard and is easy to use. The interface width is 16 bits corresponding to
+one word of the HyperRAM. The addressing is in units of words, not bytes.  The
+Avalon interface supports burst mode, where you can read or write multiple
+words in a single HyperRAM transaction. Section 3.5.5 in the Avalon Memory Map
+specification describes burst mode in detail.
 
 To see an example of how to use the HyperRAM controller and how to connect it
 to the internal FPGA logic and to the external HyperRAM device. have a look at
 the [Example_Design](src/Example_Design), specifically at the [top level
 file](src/Example_Design/top.vhd).
+
+The HyperRAM configuration and identification registers are memory mapped to the
+following addresses:
+
+* `0x80000000` : Identification Register 0
+* `0x80000001` : Identification Register 1
+* `0x80000800` : Configuration Register 0
+* `0x80000801` : Configuration Register 1
 
 
 

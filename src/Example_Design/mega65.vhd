@@ -20,16 +20,16 @@ entity mega65 is
       sys_error_i  : in  std_logic;
       sys_digits_i : in  std_logic_vector(95 downto 0);
 
+      -- Interface for physical keyboard
+      kb_io0       : out std_logic;
+      kb_io1       : out std_logic;
+      kb_io2       : in  std_logic;
+
       -- Digital Video
       hdmi_data_p  : out std_logic_vector(2 downto 0);
       hdmi_data_n  : out std_logic_vector(2 downto 0);
       hdmi_clk_p   : out std_logic;
-      hdmi_clk_n   : out std_logic;
-
-      -- Interface for physical keyboard
-      kb_io0       : out std_logic;
-      kb_io1       : out std_logic;
-      kb_io2       : in  std_logic
+      hdmi_clk_n   : out std_logic
    );
 end entity mega65;
 
@@ -38,7 +38,6 @@ architecture synthesis of mega65 is
    -- video mode selection: 720p @ 60 Hz
    constant C_VIDEO_MODE : video_modes_t := C_VIDEO_MODE_1280_720_60;
    constant C_FONT_FILE  : string := "font8x8.txt";
-
 
    -- MEGA65 clocks
    signal kbd_clk        : std_logic;

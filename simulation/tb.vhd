@@ -35,6 +35,8 @@ architecture simulation of tb is
    signal sys_ck            : std_logic;
    signal sys_rwds          : std_logic;
    signal sys_dq            : std_logic_vector(7 downto 0);
+   signal sys_rwds_in       : std_logic;
+   signal sys_dq_in         : std_logic_vector(7 downto 0);
    signal sys_rwds_out      : std_logic;
    signal sys_dq_out        : std_logic_vector(7 downto 0);
    signal sys_rwds_oe       : std_logic;
@@ -115,9 +117,6 @@ begin
          start_i             => sys_start,
          active_o            => sys_active,
          error_o             => sys_error,
-         address_o           => open,
-         data_exp_o          => open,
-         data_read_o         => open,
          avm_write_o         => avm_write,
          avm_read_o          => avm_read,
          avm_address_o       => avm_address,
@@ -152,8 +151,8 @@ begin
          hr_resetn_o         => sys_resetn,
          hr_csn_o            => sys_csn,
          hr_ck_o             => sys_ck,
-         hr_rwds_in_i        => sys_rwds,
-         hr_dq_in_i          => sys_dq,
+         hr_rwds_in_i        => sys_rwds_in,
+         hr_dq_in_i          => sys_dq_in,
          hr_rwds_out_o       => sys_rwds_out,
          hr_dq_out_o         => sys_dq_out,
          hr_rwds_oe_o        => sys_rwds_oe,
@@ -161,8 +160,10 @@ begin
       ); -- i_hyperram
 
    -- Tri-state buffers
-   sys_rwds <= sys_rwds_out when sys_rwds_oe = '1' else 'Z';
-   sys_dq   <= sys_dq_out   when sys_dq_oe   = '1' else (others => 'Z');
+   sys_rwds    <= sys_rwds_out when sys_rwds_oe = '1' else 'Z';
+   sys_dq      <= sys_dq_out   when sys_dq_oe   = '1' else (others => 'Z');
+   sys_rwds_in <= sys_rwds;
+   sys_dq_in   <= sys_dq;
 
 
    ---------------------------------------------------------
