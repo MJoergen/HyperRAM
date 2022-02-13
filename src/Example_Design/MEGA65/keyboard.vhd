@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity mega65kbd_to_matrix is
+entity keyboard is
   port (
     cpuclock    : in  std_logic;
     flopled     : in  std_logic;
@@ -11,12 +11,12 @@ entity mega65kbd_to_matrix is
     kio9        : out std_logic; -- data output to keyboard
     kio10       : in  std_logic; -- data input from keyboard
     delete_out  : out std_logic := '1';
-    return_out  : out std_logic := '1';
+    return_out  : out std_logic := '1';   -- Initial register value
     fastkey_out : out std_logic := '1'
   );
-end entity mega65kbd_to_matrix;
+end entity keyboard;
 
-architecture behavioural of mega65kbd_to_matrix is
+architecture synthesis of keyboard is
 
   signal clock_divider : integer range 0 to 255 := 0;
   signal kbd_clock     : std_logic := '0';
@@ -99,5 +99,5 @@ begin  -- behavioural
     end if;
   end process;
 
-end behavioural;
+end architecture synthesis;
 

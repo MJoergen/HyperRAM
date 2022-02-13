@@ -83,7 +83,7 @@ begin
    -- keyboard
    ---------------------------------------------------------------------------------------------
 
-   i_mega65kbd_to_matrix : entity work.mega65kbd_to_matrix
+   i_keyboard : entity work.keyboard
       port map (
          cpuclock       => kbd_clk,
          kio8           => kb_io0,
@@ -92,7 +92,7 @@ begin
          return_out     => kbd_return_out, -- Active low
          flopled        => kbd_error,
          powerled       => kbd_active
-      ); -- i_mega65kbd_to_matrix
+      ); -- i_keyboard
 
 
    i_cdc_start: xpm_cdc_array_single
