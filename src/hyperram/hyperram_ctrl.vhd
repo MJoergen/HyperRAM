@@ -2,10 +2,12 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
--- This is the main state machine of the HyperRAM controller
+-- This is the main state machine of the HyperRAM controller.
 -- The purpose is to implement the HyperBus protocol, i.e.
--- to decode the Avalon MM requests and generate the control
+-- to decode the Avalon Memory Map requests and generate the control
 -- signals for the HyperRAM device.
+--
+-- Bit 31 of avm_address_i is used to indicate register space.
 
 entity hyperram_ctrl is
    generic (
@@ -26,7 +28,7 @@ entity hyperram_ctrl is
       avm_readdatavalid_o : out std_logic;
       avm_waitrequest_o   : out std_logic;
 
-      -- HyperBus
+      -- HyperBus control signals
       hb_rstn_o           : out std_logic;
       hb_ck_ddr_o         : out std_logic_vector(1 downto 0);
       hb_csn_o            : out std_logic;
@@ -80,17 +82,13 @@ begin
    p_fsm : process (clk_i)
    begin
       if rising_edge(clk_i) then
-         hb_rstn_o           <= '1';
          avm_readdatavalid_o <= '0';
-         hb_rwds_oe_o        <= '0';
+         hb_rstn_o           <= '1';
          hb_dq_oe_o          <= '0';
+         hb_rwds_oe_o        <= '0';
 
          case state is
             when INIT_ST =>
-               if avm_write_i = '1' then
-                  avm_waitrequest_o <= '1';
-                  state <= WRITE_ST;
-               end if;
                if avm_read_i = '1' or avm_write_i = '1' then
                   read        <= avm_read_i;
                   config      <= avm_address_i(31);
@@ -112,7 +110,8 @@ begin
                   if avm_address_i(31) = '1' then
                      ca_count <= 3;
                   end if;
-                  state             <= COMMAND_ADDRESS_ST;
+
+                  state <= COMMAND_ADDRESS_ST;
                end if;
 
             when COMMAND_ADDRESS_ST =>
@@ -178,15 +177,20 @@ begin
                hb_rwds_oe_o      <= '1';
                avm_waitrequest_o <= '0';
 
-               if write_clk_count > 0 then
-                  write_clk_count <= write_clk_count - 1;
-                  if write_clk_count = 1 then
-                     recovery_count    <= 4;
-                     hb_dq_oe_o        <= '0';
-                     hb_rwds_oe_o      <= '0';
-                     avm_waitrequest_o <= '1';
-                     state             <= RECOVERY_ST;
+               if avm_write_i = '1' or state = WRITE_ST then
+                  hb_ck_ddr_o <= "10";
+                  if write_clk_count > 0 then
+                     write_clk_count <= write_clk_count - 1;
+                     if write_clk_count = 1 then
+                        recovery_count    <= 4;
+                        hb_dq_oe_o        <= '0';
+                        hb_rwds_oe_o      <= '0';
+                        avm_waitrequest_o <= '1';
+                        state             <= RECOVERY_ST;
+                     end if;
                   end if;
+               else
+                  hb_ck_ddr_o <= "00";
                end if;
 
             when RECOVERY_ST =>
@@ -213,8 +217,7 @@ begin
       end if;
    end process p_fsm;
 
-   hb_dq_ddr_out_o   <= writedata       when state = WRITE_ST else
-                        avm_writedata_i when state = WRITE_BURST_ST else
+   hb_dq_ddr_out_o   <= avm_writedata_i when state = WRITE_BURST_ST else
                         command_address(47 downto 32);
    hb_rwds_ddr_out_o <= not byteenable when state = WRITE_ST else "00";
 

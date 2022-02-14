@@ -11,13 +11,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="163549950fs"></ZoomStartTime>
-      <ZoomEndTime time="165529951fs"></ZoomEndTime>
-      <Cursor1Time time="166460000fs"></Cursor1Time>
+      <ZoomStartTime time="160842916fs"></ZoomStartTime>
+      <ZoomEndTime time="161398917fs"></ZoomEndTime>
+      <Cursor1Time time="161010000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="290"></NameColumnWidth>
-      <ValueColumnWidth column_width="115"></ValueColumnWidth>
+      <ValueColumnWidth column_width="110"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="11" />
    <wvobject type="logic" fp_name="/tb/clk_x1">
@@ -39,10 +39,6 @@
    <wvobject type="logic" fp_name="/tb/sys_start">
       <obj_property name="ElementShortName">sys_start</obj_property>
       <obj_property name="ObjectShortName">sys_start</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb/sys_active">
-      <obj_property name="ElementShortName">sys_active</obj_property>
-      <obj_property name="ObjectShortName">sys_active</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/tb/sys_error">
       <obj_property name="ElementShortName">sys_error</obj_property>
@@ -115,50 +111,13 @@
    <wvobject type="group" fp_name="group75">
       <obj_property name="label">burst_ctrl</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="logic" fp_name="/tb/i_burst_ctrl/start_i">
-         <obj_property name="ElementShortName">start_i</obj_property>
-         <obj_property name="ObjectShortName">start_i</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_burst_ctrl/wait_o">
-         <obj_property name="ElementShortName">wait_o</obj_property>
-         <obj_property name="ObjectShortName">wait_o</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_burst_ctrl/start_o">
-         <obj_property name="ElementShortName">start_o</obj_property>
-         <obj_property name="ObjectShortName">start_o</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_burst_ctrl/wait_i">
-         <obj_property name="ElementShortName">wait_i</obj_property>
-         <obj_property name="ObjectShortName">wait_i</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_burst_ctrl/write_burstcount_o">
-         <obj_property name="ElementShortName">write_burstcount_o[7:0]</obj_property>
-         <obj_property name="ObjectShortName">write_burstcount_o[7:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_burst_ctrl/read_burstcount_o">
-         <obj_property name="ElementShortName">read_burstcount_o[7:0]</obj_property>
-         <obj_property name="ObjectShortName">read_burstcount_o[7:0]</obj_property>
-      </wvobject>
-      <wvobject type="other" fp_name="/tb/i_burst_ctrl/state">
-         <obj_property name="ElementShortName">state</obj_property>
-         <obj_property name="ObjectShortName">state</obj_property>
-      </wvobject>
    </wvobject>
    <wvobject type="group" fp_name="group163">
       <obj_property name="label">trafic_gen</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject type="logic" fp_name="/tb/i_trafic_gen/start_i">
          <obj_property name="ElementShortName">start_i</obj_property>
          <obj_property name="ObjectShortName">start_i</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_trafic_gen/write_burstcount_i">
-         <obj_property name="ElementShortName">write_burstcount_i[7:0]</obj_property>
-         <obj_property name="ObjectShortName">write_burstcount_i[7:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_trafic_gen/read_burstcount_i">
-         <obj_property name="ElementShortName">read_burstcount_i[7:0]</obj_property>
-         <obj_property name="ObjectShortName">read_burstcount_i[7:0]</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb/i_trafic_gen/avm_write_o">
          <obj_property name="ElementShortName">avm_write_o</obj_property>
@@ -208,45 +167,142 @@
          <obj_property name="ElementShortName">data_read_o[15:0]</obj_property>
          <obj_property name="ObjectShortName">data_read_o[15:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_trafic_gen/active_o">
-         <obj_property name="ElementShortName">active_o</obj_property>
-         <obj_property name="ObjectShortName">active_o</obj_property>
-      </wvobject>
       <wvobject type="logic" fp_name="/tb/i_trafic_gen/error_o">
          <obj_property name="ElementShortName">error_o</obj_property>
          <obj_property name="ObjectShortName">error_o</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_trafic_gen/data">
-         <obj_property name="ElementShortName">data[63:0]</obj_property>
-         <obj_property name="ObjectShortName">data[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group90">
+      <obj_property name="label">hyperram_ctrl</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/tb/i_hyperram/i_hyperram_ctrl/avm_write_i">
+         <obj_property name="ElementShortName">avm_write_i</obj_property>
+         <obj_property name="ObjectShortName">avm_write_i</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_trafic_gen/burstcount">
-         <obj_property name="ElementShortName">burstcount[7:0]</obj_property>
-         <obj_property name="ObjectShortName">burstcount[7:0]</obj_property>
+      <wvobject type="logic" fp_name="/tb/i_hyperram/i_hyperram_ctrl/avm_read_i">
+         <obj_property name="ElementShortName">avm_read_i</obj_property>
+         <obj_property name="ObjectShortName">avm_read_i</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_trafic_gen/read_burstcount">
-         <obj_property name="ElementShortName">read_burstcount[7:0]</obj_property>
-         <obj_property name="ObjectShortName">read_burstcount[7:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/i_hyperram/i_hyperram_ctrl/avm_address_i">
+         <obj_property name="ElementShortName">avm_address_i[31:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_address_i[31:0]</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_trafic_gen/wordcount">
-         <obj_property name="ElementShortName">wordcount</obj_property>
-         <obj_property name="ObjectShortName">wordcount</obj_property>
+      <wvobject type="array" fp_name="/tb/i_hyperram/i_hyperram_ctrl/avm_writedata_i">
+         <obj_property name="ElementShortName">avm_writedata_i[15:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_writedata_i[15:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_trafic_gen/new_address">
-         <obj_property name="ElementShortName">new_address[2:0]</obj_property>
-         <obj_property name="ObjectShortName">new_address[2:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/i_hyperram/i_hyperram_ctrl/avm_byteenable_i">
+         <obj_property name="ElementShortName">avm_byteenable_i[1:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_byteenable_i[1:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_trafic_gen/new_data">
-         <obj_property name="ElementShortName">new_data[63:0]</obj_property>
-         <obj_property name="ObjectShortName">new_data[63:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/i_hyperram/i_hyperram_ctrl/avm_burstcount_i">
+         <obj_property name="ElementShortName">avm_burstcount_i[7:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_burstcount_i[7:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_trafic_gen/new_burstcount">
-         <obj_property name="ElementShortName">new_burstcount[7:0]</obj_property>
-         <obj_property name="ObjectShortName">new_burstcount[7:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/i_hyperram/i_hyperram_ctrl/avm_readdata_o">
+         <obj_property name="ElementShortName">avm_readdata_o[15:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_readdata_o[15:0]</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_trafic_gen/state">
+      <wvobject type="logic" fp_name="/tb/i_hyperram/i_hyperram_ctrl/avm_readdatavalid_o">
+         <obj_property name="ElementShortName">avm_readdatavalid_o</obj_property>
+         <obj_property name="ObjectShortName">avm_readdatavalid_o</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_hyperram/i_hyperram_ctrl/avm_waitrequest_o">
+         <obj_property name="ElementShortName">avm_waitrequest_o</obj_property>
+         <obj_property name="ObjectShortName">avm_waitrequest_o</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_hyperram/i_hyperram_ctrl/hb_rstn_o">
+         <obj_property name="ElementShortName">hb_rstn_o</obj_property>
+         <obj_property name="ObjectShortName">hb_rstn_o</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/i_hyperram/i_hyperram_ctrl/hb_ck_ddr_o">
+         <obj_property name="ElementShortName">hb_ck_ddr_o[1:0]</obj_property>
+         <obj_property name="ObjectShortName">hb_ck_ddr_o[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_hyperram/i_hyperram_ctrl/hb_csn_o">
+         <obj_property name="ElementShortName">hb_csn_o</obj_property>
+         <obj_property name="ObjectShortName">hb_csn_o</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/i_hyperram/i_hyperram_ctrl/hb_dq_ddr_in_i">
+         <obj_property name="ElementShortName">hb_dq_ddr_in_i[15:0]</obj_property>
+         <obj_property name="ObjectShortName">hb_dq_ddr_in_i[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/i_hyperram/i_hyperram_ctrl/hb_dq_ddr_out_o">
+         <obj_property name="ElementShortName">hb_dq_ddr_out_o[15:0]</obj_property>
+         <obj_property name="ObjectShortName">hb_dq_ddr_out_o[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_hyperram/i_hyperram_ctrl/hb_dq_oe_o">
+         <obj_property name="ElementShortName">hb_dq_oe_o</obj_property>
+         <obj_property name="ObjectShortName">hb_dq_oe_o</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_hyperram/i_hyperram_ctrl/hb_dq_ie_i">
+         <obj_property name="ElementShortName">hb_dq_ie_i</obj_property>
+         <obj_property name="ObjectShortName">hb_dq_ie_i</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/i_hyperram/i_hyperram_ctrl/hb_rwds_ddr_out_o">
+         <obj_property name="ElementShortName">hb_rwds_ddr_out_o[1:0]</obj_property>
+         <obj_property name="ObjectShortName">hb_rwds_ddr_out_o[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_hyperram/i_hyperram_ctrl/hb_rwds_oe_o">
+         <obj_property name="ElementShortName">hb_rwds_oe_o</obj_property>
+         <obj_property name="ObjectShortName">hb_rwds_oe_o</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_hyperram/i_hyperram_ctrl/hb_rwds_in_i">
+         <obj_property name="ElementShortName">hb_rwds_in_i</obj_property>
+         <obj_property name="ObjectShortName">hb_rwds_in_i</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/i_hyperram/i_hyperram_ctrl/state">
          <obj_property name="ElementShortName">state</obj_property>
          <obj_property name="ObjectShortName">state</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/i_hyperram/i_hyperram_ctrl/writedata">
+         <obj_property name="ElementShortName">writedata[15:0]</obj_property>
+         <obj_property name="ObjectShortName">writedata[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/i_hyperram/i_hyperram_ctrl/byteenable">
+         <obj_property name="ElementShortName">byteenable[1:0]</obj_property>
+         <obj_property name="ObjectShortName">byteenable[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_hyperram/i_hyperram_ctrl/read">
+         <obj_property name="ElementShortName">read</obj_property>
+         <obj_property name="ObjectShortName">read</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_hyperram/i_hyperram_ctrl/config">
+         <obj_property name="ElementShortName">config</obj_property>
+         <obj_property name="ObjectShortName">config</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/i_hyperram/i_hyperram_ctrl/burst_count">
+         <obj_property name="ElementShortName">burst_count</obj_property>
+         <obj_property name="ObjectShortName">burst_count</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/i_hyperram/i_hyperram_ctrl/command_address">
+         <obj_property name="ElementShortName">command_address[47:0]</obj_property>
+         <obj_property name="ObjectShortName">command_address[47:0]</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/i_hyperram/i_hyperram_ctrl/ca_count">
+         <obj_property name="ElementShortName">ca_count</obj_property>
+         <obj_property name="ObjectShortName">ca_count</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/i_hyperram/i_hyperram_ctrl/latency_count">
+         <obj_property name="ElementShortName">latency_count</obj_property>
+         <obj_property name="ObjectShortName">latency_count</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/i_hyperram/i_hyperram_ctrl/read_clk_count">
+         <obj_property name="ElementShortName">read_clk_count</obj_property>
+         <obj_property name="ObjectShortName">read_clk_count</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/i_hyperram/i_hyperram_ctrl/read_return_count">
+         <obj_property name="ElementShortName">read_return_count</obj_property>
+         <obj_property name="ObjectShortName">read_return_count</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/i_hyperram/i_hyperram_ctrl/write_clk_count">
+         <obj_property name="ElementShortName">write_clk_count</obj_property>
+         <obj_property name="ObjectShortName">write_clk_count</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/i_hyperram/i_hyperram_ctrl/recovery_count">
+         <obj_property name="ElementShortName">recovery_count</obj_property>
+         <obj_property name="ObjectShortName">recovery_count</obj_property>
       </wvobject>
    </wvobject>
 </wave_config>
