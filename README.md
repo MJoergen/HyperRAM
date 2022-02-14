@@ -68,8 +68,11 @@ the same Avalon Memory Map interface via the following addresses:
 
 ### Avalon Memory Map interface
 Here is a brief summary of the signals involved in the Avalon Memory Map
-interface.  For full details, refer to the
+interface.  For full details, refer to Section 3 of the
 [specification](doc/Avalon_Interface_Specifications.pdf).
+The HyperRAM controller uses "Pipelined Read Transfer with Variable Latency",
+see section 3.5.4 and Figure 12, and supports burst mode, see section 3.5.5.
+It does not use the "waitrequestAllowance" property.
 
 Signal | Description
 -----: | :---------
