@@ -66,6 +66,22 @@ the same Avalon Memory Map interface via the following addresses:
 * `0x80000800` : Configuration Register 0  (Read-write)
 * `0x80000801` : Configuration Register 1  (Read-write)
 
+### Avalon Memory Map interface
+Here is a brief summary of the signals involved in the Avalon Memory Map
+interface.  For full details, refer to the
+[specification](doc/Avalon_Interface_Specifications.pdf).
+
+Signal | Description
+-----: | :---------
+`write`         | Asserted by client when sending data to the device.
+`read`          | Asserted by client when requesting data from the device.
+`address`       | The address (in units of 16-bit words).
+`writedata`     | The data to send to the device.
+`byteenable`    | 1-bit for each byte of data to the device.
+`burstcount`    | Number of words to transfer.
+`readdata`      | Data receive from the device.
+`readdatavalid` | Asserted when data from the device is valid.
+`waitrequest`   | Asserted by the device when it is busy.
 
 ## Further reading
 The following links provide additional information:
