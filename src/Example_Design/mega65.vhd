@@ -18,7 +18,7 @@ entity mega65 is
       sys_start_o  : out std_logic;
       sys_active_i : in  std_logic;
       sys_error_i  : in  std_logic;
-      sys_digits_i : in  std_logic_vector(95 downto 0);
+      sys_digits_i : in  std_logic_vector(111 downto 0);
 
       -- Interface for physical keyboard
       kb_io0       : out std_logic;
@@ -58,7 +58,7 @@ architecture synthesis of mega65 is
    signal video_red      : std_logic_vector(7 downto 0);
    signal video_green    : std_logic_vector(7 downto 0);
    signal video_blue     : std_logic_vector(7 downto 0);
-   signal video_digits   : std_logic_vector(95 downto 0);
+   signal video_digits   : std_logic_vector(111 downto 0);
    signal video_data     : slv_9_0_t(0 to 2);              -- parallel HDMI symbol stream x 3 channels
 
 begin
@@ -127,7 +127,7 @@ begin
 
    i_cdc_video: xpm_cdc_array_single
       generic map (
-         WIDTH => 96
+         WIDTH => 112
       )
       port map (
          src_clk  => sys_clk,
@@ -141,7 +141,7 @@ begin
       generic map
       (
          G_FONT_FILE   => C_FONT_FILE,
-         G_DIGITS_SIZE => 96,
+         G_DIGITS_SIZE => 112,
          G_VIDEO_MODE  => C_VIDEO_MODE
       )
       port map

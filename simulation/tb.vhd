@@ -17,12 +17,7 @@ architecture simulation of tb is
    signal rst               : std_logic;
 
    signal sys_start         : std_logic;
-   signal sys_valid         : std_logic;
-   signal sys_active        : std_logic;
    signal sys_error         : std_logic;
-
-   signal write_burstcount  : std_logic_vector(7 downto 0);
-   signal read_burstcount   : std_logic_vector(7 downto 0);
 
    signal avm_write         : std_logic;
    signal avm_read          : std_logic;
@@ -108,23 +103,6 @@ begin
 
 
    --------------------------------------------------------
-   -- Instantiate burst control
-   --------------------------------------------------------
-
-   i_burst_ctrl : entity work.burst_ctrl
-      port map (
-         clk_i              => clk_x1,
-         rst_i              => rst,
-         start_i            => sys_start,
-         wait_o             => open,
-         start_o            => sys_valid,
-         wait_i             => sys_active,
-         write_burstcount_o => write_burstcount,
-         read_burstcount_o  => read_burstcount
-      ); -- i_burst_ctrl
-
-
-   --------------------------------------------------------
    -- Instantiate trafic generator
    --------------------------------------------------------
 
@@ -136,10 +114,7 @@ begin
       port map (
          clk_i               => clk_x1,
          rst_i               => rst,
-         start_i             => sys_valid,
-         write_burstcount_i  => write_burstcount,
-         read_burstcount_i   => read_burstcount,
-         active_o            => sys_active,
+         start_i             => sys_start,
          error_o             => sys_error,
          avm_write_o         => avm_write,
          avm_read_o          => avm_read,

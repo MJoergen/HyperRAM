@@ -15,9 +15,9 @@ entity trafic_gen is
       clk_i               : in  std_logic;
       rst_i               : in  std_logic;
       start_i             : in  std_logic;
-      write_burstcount_i  : in  std_logic_vector(7 downto 0);
-      read_burstcount_i   : in  std_logic_vector(7 downto 0);
+      wait_o              : out std_logic;
 
+      -- Connect to HyperRAM controller
       avm_write_o         : out std_logic;
       avm_read_o          : out std_logic;
       avm_address_o       : out std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
@@ -27,166 +27,71 @@ entity trafic_gen is
       avm_readdata_i      : in  std_logic_vector(G_DATA_SIZE-1 downto 0);
       avm_readdatavalid_i : in  std_logic;
       avm_waitrequest_i   : in  std_logic;
-      -- Debug output (HDMI and LED)
+
+      -- Debug output
+      write_burstcount_o  : out std_logic_vector(7 downto 0);
+      read_burstcount_o   : out std_logic_vector(7 downto 0);
       address_o           : out std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
       data_exp_o          : out std_logic_vector(15 downto 0);
       data_read_o         : out std_logic_vector(15 downto 0);
-      active_o            : out std_logic;
       error_o             : out std_logic
    );
 end entity trafic_gen;
 
 architecture synthesis of trafic_gen is
 
-   constant C_DATA_INIT   : std_logic_vector(63 downto 0) := X"CAFEBABEDEADBEEF";
-
-   signal data             : std_logic_vector(63 downto 0);
-   signal burstcount       : std_logic_vector(7 downto 0);
-   signal read_burstcount  : std_logic_vector(7 downto 0);
-   signal wordcount        : integer;
-   signal new_address      : std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
-   signal new_data         : std_logic_vector(63 downto 0);
-   signal new_burstcount   : std_logic_vector(7 downto 0);
-
-   type state_t is (
-      INIT_ST,
-      WRITING_ST,
-      READING_ST,
-      VERIFYING_ST,
-      STOPPED_ST
-   );
-
-   signal state : state_t := INIT_ST;
+   signal avm_start : std_logic;
+   signal avm_wait  : std_logic;
 
 begin
 
-   -- The pseudo-random data is generated using a 64-bit maximal-period Galois LFSR,
-   -- see http://users.ece.cmu.edu/~koopman/lfsr/64.txt
-   new_data       <= (data(62 downto 0) & "0") xor x"000000000000001b" when data(63) = '1' else
-                     (data(62 downto 0) & "0");
-   new_address    <= avm_address_o when unsigned(avm_burstcount_o) > 1 else
-                     std_logic_vector(unsigned(avm_address_o) + wordcount);
-   new_burstcount <= std_logic_vector(unsigned(avm_burstcount_o) - 1) when unsigned(avm_burstcount_o) > 1 else
-                     burstcount;
+   --------------------------------------------------------
+   -- Instantiate burst control
+   --------------------------------------------------------
 
-   p_fsm : process (clk_i)
-   begin
-      if rising_edge(clk_i) then
-         if avm_waitrequest_i = '0' then
-            avm_write_o <= '0';
-            avm_read_o  <= '0';
-         end if;
+   i_burst_ctrl : entity work.burst_ctrl
+      port map (
+         clk_i              => clk_i,
+         rst_i              => rst_i,
+         start_i            => start_i,
+         wait_o             => wait_o,
+         start_o            => avm_start,
+         wait_i             => avm_wait,
+         write_burstcount_o => write_burstcount_o,
+         read_burstcount_o  => read_burstcount_o
+      ); -- i_burst_ctrl
 
-         case state is
-            when INIT_ST =>
-               if start_i = '1' then
-                  active_o         <= '1';
-                  error_o          <= '0';
-                  data             <= C_DATA_INIT;
-                  avm_write_o      <= '1';
-                  avm_read_o       <= '0';
-                  avm_address_o    <= (others => '0');
-                  avm_byteenable_o <= (others => '1');
-                  avm_burstcount_o <= write_burstcount_i;
-                  burstcount       <= write_burstcount_i;
-                  read_burstcount  <= read_burstcount_i;
-                  wordcount        <= to_integer(unsigned(write_burstcount_i))*G_DATA_SIZE/16;
-                  state            <= WRITING_ST;
-               end if;
 
-            when WRITING_ST =>
-               if avm_waitrequest_i = '0' then
-                  avm_write_o      <= '1';
-                  avm_read_o       <= '0';
-                  avm_address_o    <= new_address;
-                  avm_byteenable_o <= (others => '1');
-                  avm_burstcount_o <= new_burstcount;
+   --------------------------------------------------------
+   -- Instantiate Avalon Master
+   --------------------------------------------------------
 
-                  data <= new_data;
-
-                  if signed(avm_address_o) = -wordcount and unsigned(avm_burstcount_o) = 1 then
-                     data          <= C_DATA_INIT;
-                     avm_write_o   <= '0';
-                     avm_address_o <= (others => '0');
-                     avm_read_o    <= '1';
-                     avm_burstcount_o <= read_burstcount;
-                     burstcount       <= read_burstcount;
-                     wordcount        <= to_integer(unsigned(read_burstcount))*G_DATA_SIZE/16;
-                     address_o     <= (others => '0');
-                     data_read_o   <= (others => '0');
-                     data_exp_o    <= (others => '0');
-                     state         <= READING_ST;
-                  end if;
-               end if;
-
-            when READING_ST =>
-               if avm_waitrequest_i = '0' then
-                  state <= VERIFYING_ST;
-               end if;
-
-            when VERIFYING_ST =>
-               if avm_readdatavalid_i = '1' then
-                  data_read_o <= avm_readdata_i;
-                  data_exp_o  <= data(G_DATA_SIZE-1 downto 0);
-
-                  if avm_readdata_i /= data(G_DATA_SIZE-1 downto 0) then
-                     report "ERROR: Expected " & to_hstring(data(G_DATA_SIZE-1 downto 0)) & ", read " & to_hstring(avm_readdata_i);
-                     active_o   <= '0';
-                     error_o    <= '1';
-                     avm_read_o <= '0';
-                     state      <= STOPPED_ST;
-                  elsif signed(avm_address_o) = -wordcount and unsigned(avm_burstcount_o) = 1 then
-                     active_o   <= '0';
-                     error_o    <= '0';
-                     data       <= C_DATA_INIT;
-                     avm_read_o <= '0';
-                     state      <= STOPPED_ST;
-                  else
-                     data             <= new_data;
-                     avm_burstcount_o <= new_burstcount;
-                     avm_address_o    <= new_address;
-                     if unsigned(avm_burstcount_o) = 1 then
-                        avm_read_o    <= '1';
-                        address_o     <= new_address;
-                        data_read_o   <= (others => '0');
-                        data_exp_o    <= (others => '0');
-                        state         <= READING_ST;
-                     end if;
-                  end if;
-               end if;
-
-            when STOPPED_ST =>
-               if start_i = '1' then
-                  active_o         <= '1';
-                  error_o          <= '0';
-                  data             <= C_DATA_INIT;
-                  avm_write_o      <= '1';
-                  avm_read_o       <= '0';
-                  avm_address_o    <= (others => '0');
-                  avm_byteenable_o <= (others => '1');
-                  avm_burstcount_o <= write_burstcount_i;
-                  burstcount       <= write_burstcount_i;
-                  read_burstcount  <= read_burstcount_i;
-                  wordcount        <= to_integer(unsigned(write_burstcount_i))*G_DATA_SIZE/16;
-                  state            <= WRITING_ST;
-               end if;
-
-         end case;
-
-         if rst_i = '1' then
-            avm_write_o <= '0';
-            avm_read_o  <= '0';
-            active_o    <= '0';
-            error_o     <= '0';
-            address_o   <= (others => '0');
-            data_read_o <= (others => '0');
-            data_exp_o  <= (others => '0');
-            state       <= INIT_ST;
-         end if;
-      end if;
-   end process p_fsm;
-
-   avm_writedata_o <= data(G_DATA_SIZE-1 downto 0);
+   i_avm_master : entity work.avm_master
+      generic map (
+         G_DATA_SIZE    => G_DATA_SIZE,
+         G_ADDRESS_SIZE => G_ADDRESS_SIZE
+      )
+      port map (
+         clk_i               => clk_i,
+         rst_i               => rst_i,
+         start_i             => avm_start,
+         wait_o              => avm_wait,
+         write_burstcount_i  => write_burstcount_o,
+         read_burstcount_i   => read_burstcount_o,
+         error_o             => error_o,
+         address_o           => address_o,
+         data_exp_o          => data_exp_o,
+         data_read_o         => data_read_o,
+         avm_write_o         => avm_write_o,
+         avm_read_o          => avm_read_o,
+         avm_address_o       => avm_address_o,
+         avm_writedata_o     => avm_writedata_o,
+         avm_byteenable_o    => avm_byteenable_o,
+         avm_burstcount_o    => avm_burstcount_o,
+         avm_readdata_i      => avm_readdata_i,
+         avm_readdatavalid_i => avm_readdatavalid_i,
+         avm_waitrequest_i   => avm_waitrequest_i
+      ); -- i_avm_master
 
 end architecture synthesis;
 
