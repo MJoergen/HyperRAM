@@ -48,6 +48,7 @@ architecture synthesis of hyperram_ctrl is
       LATENCY_ST,
       READ_ST,
       WRITE_ST,
+      WRITE_BURST_ST,
       RECOVERY_ST
    );
 
@@ -170,7 +171,8 @@ begin
                   end if;
                end if;
 
-            when WRITE_ST =>
+            when WRITE_ST | WRITE_BURST_ST =>
+               state             <= WRITE_BURST_ST;
                writedata         <= avm_writedata_i;
                hb_dq_oe_o        <= '1';
                hb_rwds_oe_o      <= '1';
@@ -211,7 +213,9 @@ begin
       end if;
    end process p_fsm;
 
-   hb_dq_ddr_out_o   <= writedata      when state = WRITE_ST else command_address(47 downto 32);
+   hb_dq_ddr_out_o   <= writedata       when state = WRITE_ST else
+                        avm_writedata_i when state = WRITE_BURST_ST else
+                        command_address(47 downto 32);
    hb_rwds_ddr_out_o <= not byteenable when state = WRITE_ST else "00";
 
 end architecture synthesis;
