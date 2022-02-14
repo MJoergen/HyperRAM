@@ -115,10 +115,10 @@ begin
       port map (
          clk_i              => clk_x1,
          rst_i              => rst,
-         valid_i            => sys_start,
-         ready_o            => open,
-         valid_o            => sys_valid,
-         ready_i            => not sys_active,
+         start_i            => sys_start,
+         wait_o             => open,
+         start_o            => sys_valid,
+         wait_i             => sys_active,
          write_burstcount_o => write_burstcount,
          read_burstcount_o  => read_burstcount
       ); -- i_burst_ctrl

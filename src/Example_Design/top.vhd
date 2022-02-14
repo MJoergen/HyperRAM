@@ -108,8 +108,8 @@ begin
          clk_i              => clk_x1,
          rst_i              => rst,
          start_i            => sys_start,
-         valid_o            => sys_valid,
-         active_i           => sys_active,
+         start_o            => sys_valid,
+         wait_i             => sys_active,
          write_burstcount_o => write_burstcount,
          read_burstcount_o  => read_burstcount
       ); -- i_burst_ctrl
