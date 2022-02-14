@@ -11,13 +11,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="160842916fs"></ZoomStartTime>
-      <ZoomEndTime time="161398917fs"></ZoomEndTime>
-      <Cursor1Time time="161010000fs"></Cursor1Time>
+      <ZoomStartTime time="156721665fs"></ZoomStartTime>
+      <ZoomEndTime time="163641666fs"></ZoomEndTime>
+      <Cursor1Time time="174321665fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="290"></NameColumnWidth>
-      <ValueColumnWidth column_width="110"></ValueColumnWidth>
+      <ValueColumnWidth column_width="105"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="11" />
    <wvobject type="logic" fp_name="/tb/clk_x1">
@@ -108,10 +108,6 @@
          <obj_property name="ObjectShortName">sys_dq[7:0]</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject type="group" fp_name="group75">
-      <obj_property name="label">burst_ctrl</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
    <wvobject type="group" fp_name="group163">
       <obj_property name="label">trafic_gen</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -172,10 +168,42 @@
          <obj_property name="ObjectShortName">error_o</obj_property>
       </wvobject>
    </wvobject>
+   <wvobject type="group" fp_name="group150">
+      <obj_property name="label">burst_ctrl</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/tb/i_trafic_gen/i_burst_ctrl/start_i">
+         <obj_property name="ElementShortName">start_i</obj_property>
+         <obj_property name="ObjectShortName">start_i</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_trafic_gen/i_burst_ctrl/wait_o">
+         <obj_property name="ElementShortName">wait_o</obj_property>
+         <obj_property name="ObjectShortName">wait_o</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_trafic_gen/i_burst_ctrl/start_o">
+         <obj_property name="ElementShortName">start_o</obj_property>
+         <obj_property name="ObjectShortName">start_o</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_trafic_gen/i_burst_ctrl/wait_i">
+         <obj_property name="ElementShortName">wait_i</obj_property>
+         <obj_property name="ObjectShortName">wait_i</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/i_trafic_gen/i_burst_ctrl/write_burstcount_o">
+         <obj_property name="ElementShortName">write_burstcount_o[7:0]</obj_property>
+         <obj_property name="ObjectShortName">write_burstcount_o[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/i_trafic_gen/i_burst_ctrl/read_burstcount_o">
+         <obj_property name="ElementShortName">read_burstcount_o[7:0]</obj_property>
+         <obj_property name="ObjectShortName">read_burstcount_o[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/i_trafic_gen/i_burst_ctrl/state">
+         <obj_property name="ElementShortName">state</obj_property>
+         <obj_property name="ObjectShortName">state</obj_property>
+      </wvobject>
+   </wvobject>
    <wvobject type="group" fp_name="group90">
       <obj_property name="label">hyperram_ctrl</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject type="logic" fp_name="/tb/i_hyperram/i_hyperram_ctrl/avm_write_i">
          <obj_property name="ElementShortName">avm_write_i</obj_property>
          <obj_property name="ObjectShortName">avm_write_i</obj_property>

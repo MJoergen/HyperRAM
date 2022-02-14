@@ -112,6 +112,7 @@ begin
          rst_i               => rst,
          start_i             => sys_start,
          error_o             => sys_error,
+         wait_o              => sys_active,
          write_burstcount_o  => sys_write_burstcount,
          read_burstcount_o   => sys_read_burstcount,
          address_o           => sys_address,

@@ -109,7 +109,7 @@ begin
    i_trafic_gen : entity work.trafic_gen
       generic map (
          G_DATA_SIZE    => 16,
-         G_ADDRESS_SIZE => 3
+         G_ADDRESS_SIZE => 4
       )
       port map (
          clk_i               => clk_x1,
@@ -118,7 +118,7 @@ begin
          error_o             => sys_error,
          avm_write_o         => avm_write,
          avm_read_o          => avm_read,
-         avm_address_o       => avm_address(2 downto 0),
+         avm_address_o       => avm_address(3 downto 0),
          avm_writedata_o     => avm_writedata,
          avm_byteenable_o    => avm_byteenable,
          avm_burstcount_o    => avm_burstcount,

@@ -17,6 +17,8 @@ end entity burst_ctrl;
 
 architecture synthesis of burst_ctrl is
 
+   constant C_MAX_BURST : std_logic_vector(7 downto 0) := X"08";
+
    type state_t is (
       IDLE_ST,
       BUSY_ST
@@ -42,14 +44,14 @@ begin
                end if;
 
             when BUSY_ST =>
-               if wait_i = '0' then
+               if wait_i = '0' and start_o = '0' then
                   start_o <= '1';
 
-                  if write_burstcount_o /= X"04" then
+                  if write_burstcount_o /= C_MAX_BURST then
                      write_burstcount_o <= write_burstcount_o(6 downto 0) & "0";
                   else
                      write_burstcount_o <= X"01";
-                     if read_burstcount_o /= X"04" then
+                     if read_burstcount_o /= C_MAX_BURST then
                         read_burstcount_o <= read_burstcount_o(6 downto 0) & "0";
                      else
                         read_burstcount_o <= X"01";
