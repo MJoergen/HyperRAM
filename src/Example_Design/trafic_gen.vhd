@@ -15,6 +15,9 @@ entity trafic_gen is
       clk_i               : in  std_logic;
       rst_i               : in  std_logic;
       start_i             : in  std_logic;
+      write_burstcount_i  : in  std_logic_vector(7 downto 0);
+      read_burstcount_i   : in  std_logic_vector(7 downto 0);
+
       avm_write_o         : out std_logic;
       avm_read_o          : out std_logic;
       avm_address_o       : out std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
@@ -36,10 +39,10 @@ end entity trafic_gen;
 architecture synthesis of trafic_gen is
 
    constant C_DATA_INIT   : std_logic_vector(63 downto 0) := X"CAFEBABEDEADBEEF";
-   constant C_BURST_COUNT : integer := 4;
-   constant C_WORD_COUNT  : integer := C_BURST_COUNT*G_DATA_SIZE/16; -- 16 bits in each word
 
    signal data           : std_logic_vector(63 downto 0);
+   signal burstcount     : std_logic_vector(7 downto 0);
+   signal wordcount      : integer;
    signal new_address    : std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
    signal new_data       : std_logic_vector(63 downto 0);
    signal new_burstcount : std_logic_vector(7 downto 0);
@@ -61,9 +64,9 @@ begin
    new_data       <= (data(62 downto 0) & "0") xor x"000000000000001b" when data(63) = '1' else
                      (data(62 downto 0) & "0");
    new_address    <= avm_address_o when unsigned(avm_burstcount_o) > 1 else
-                     std_logic_vector(unsigned(avm_address_o) + C_WORD_COUNT);
+                     std_logic_vector(unsigned(avm_address_o) + wordcount);
    new_burstcount <= std_logic_vector(unsigned(avm_burstcount_o) - 1) when unsigned(avm_burstcount_o) > 1 else
-                     std_logic_vector(to_unsigned(C_BURST_COUNT, 8));
+                     burstcount;
 
    p_fsm : process (clk_i)
    begin
@@ -83,7 +86,9 @@ begin
                   avm_read_o       <= '0';
                   avm_address_o    <= (others => '0');
                   avm_byteenable_o <= (others => '1');
-                  avm_burstcount_o <= std_logic_vector(to_unsigned(C_BURST_COUNT, 8));
+                  avm_burstcount_o <= write_burstcount_i;
+                  burstcount       <= write_burstcount_i;
+                  wordcount        <= to_integer(unsigned(write_burstcount_i))*G_DATA_SIZE/16;
                   state            <= WRITING_ST;
                end if;
 
@@ -97,11 +102,14 @@ begin
 
                   data <= new_data;
 
-                  if signed(avm_address_o) = -C_WORD_COUNT and unsigned(avm_burstcount_o) = 1 then
+                  if signed(avm_address_o) = -wordcount and unsigned(avm_burstcount_o) = 1 then
                      data          <= C_DATA_INIT;
                      avm_write_o   <= '0';
                      avm_address_o <= (others => '0');
                      avm_read_o    <= '1';
+                     avm_burstcount_o <= read_burstcount_i;
+                     burstcount       <= read_burstcount_i;
+                     wordcount        <= to_integer(unsigned(read_burstcount_i))*G_DATA_SIZE/16;
                      address_o     <= (others => '0');
                      data_read_o   <= (others => '0');
                      data_exp_o    <= (others => '0');
@@ -125,7 +133,7 @@ begin
                      error_o    <= '1';
                      avm_read_o <= '0';
                      state      <= STOPPED_ST;
-                  elsif signed(avm_address_o) = -C_WORD_COUNT and unsigned(avm_burstcount_o) = 1 then
+                  elsif signed(avm_address_o) = -wordcount and unsigned(avm_burstcount_o) = 1 then
                      report "Test stopped";
                      active_o   <= '0';
                      error_o    <= '0';
@@ -155,7 +163,9 @@ begin
                   avm_read_o       <= '0';
                   avm_address_o    <= (others => '0');
                   avm_byteenable_o <= (others => '1');
-                  avm_burstcount_o <= std_logic_vector(to_unsigned(C_BURST_COUNT, 8));
+                  avm_burstcount_o <= write_burstcount_i;
+                  burstcount       <= write_burstcount_i;
+                  wordcount        <= to_integer(unsigned(write_burstcount_i))*G_DATA_SIZE/16;
                   state            <= WRITING_ST;
                end if;
 

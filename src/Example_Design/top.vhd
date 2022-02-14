@@ -63,6 +63,7 @@ architecture synthesis of top is
 
    -- Control and Status for trafic generator
    signal sys_start         : std_logic;
+   signal sys_valid         : std_logic;
    signal sys_active        : std_logic;
    signal sys_error         : std_logic;
    signal sys_address       : std_logic_vector(21 downto 0);
@@ -71,6 +72,9 @@ architecture synthesis of top is
 
    -- Interface to MEGA65 video
    signal sys_digits        : std_logic_vector(95 downto 0);
+
+   signal write_burstcount  : std_logic_vector(7 downto 0);
+   signal read_burstcount   : std_logic_vector(7 downto 0);
 
 begin
 
@@ -96,6 +100,22 @@ begin
 
 
    --------------------------------------------------------
+   -- Instantiate burst control
+   --------------------------------------------------------
+
+   i_burst_ctrl : entity work.burst_ctrl
+      port map (
+         clk_i              => clk_x1,
+         rst_i              => rst,
+         start_i            => sys_start,
+         valid_o            => sys_valid,
+         active_i           => sys_active,
+         write_burstcount_o => write_burstcount,
+         read_burstcount_o  => read_burstcount
+      ); -- i_burst_ctrl
+
+
+   --------------------------------------------------------
    -- Instantiate trafic generator
    --------------------------------------------------------
 
@@ -107,7 +127,9 @@ begin
       port map (
          clk_i               => clk_x1,
          rst_i               => rst,
-         start_i             => sys_start,
+         start_i             => sys_valid,
+         write_burstcount_i  => write_burstcount,
+         read_burstcount_i   => read_burstcount,
          active_o            => sys_active,
          error_o             => sys_error,
          address_o           => sys_address,
