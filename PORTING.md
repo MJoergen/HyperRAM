@@ -3,7 +3,14 @@
 This page describes steps you need to take in order to incorporate this
 HyperRAM controller into your design.
 
-There are three key points to consider:
+The Example Design uses the Artix 7 FPGA from Xilinx.  However, the controller
+has been written in pure RTL (i.e. as portable as possible), making use of only
+rising edge flip flops and no other IP blocks. It should therefore be a
+relatively easy task to port this project to other FPGAs, even other vendors as
+well, e.g. Lattice or Intel.
+
+When porting the HyperRAM controller to your own project, there are three key
+points to consider:
 
 * Tri-state buffering
 * Clocking
@@ -44,7 +51,7 @@ The HyperRAM implementation requires a total of three clocks:
 * `clk_x2_del_i` : This runs at 200 Mhz and must be synchronous to `clk_i` with
   a specific phase shift.
 
-All three clocks should be generated from the same MMCM.
+All three clocks should be generated from the same MMCM/PLL.
 
 The reason for the phase-shifted clock is to ensure correct timing when
 sampling the input date `DQ` from the HyperRAM. For more information, see
