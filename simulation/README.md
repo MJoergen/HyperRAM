@@ -38,7 +38,9 @@ correct timing parameters.
 ## Running simulation
 
 To perform the simulation test just start up Vivado, load the project file
-[top.xpr](top.xpr), and select "Run Simulation".
+[top.xpr](top.xpr), and select "Run Simulation". Then in the "Tcl Console" type "`run 200us`".
+This will complete the entire simulation and display the waveform. The interesting part
+happens between times `150us` and `200us`.
 
 This generates the following waveform:
 ![waveform](../doc/waveform.png)
