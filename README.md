@@ -18,6 +18,7 @@ This implementation has support for:
 * identification registers read.
 * automatic configuration of latency mode upon reset.
 * 16-bit [Avalon Memory Map interface](doc/Avalon_Interface_Specifications.pdf) including burst mode.
+* Written for VHDL-2008.
 
 All the source files for the HyperRAM controller are in the
 [src/hyperram](src/hyperram) directory, and all files needed for simulation are

@@ -1,3 +1,6 @@
+-- This inserts a small delay into a bidirectional wire.
+-- Used for simulation only.
+--
 -- Copyright: 2/28/01, Ben Cohen, Rev A.
 
 library ieee;

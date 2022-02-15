@@ -1,10 +1,13 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
-
 -- This module is a simple kind of RAM test.
 -- It fills the HyperRAM with pseudo-random data,
 -- and verifies the data can be read back again.
+-- It exercises the HyperRAM using various burst modes.
+--
+-- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity trafic_gen is
    generic (
@@ -103,6 +106,12 @@ begin
       ); -- i_avm_master
 
 
+   --------------------------------------------------------
+   -- Insert occasional breaks into Avalon stream.
+   -- This is OPTIONAL, and added only to increase test
+   -- coverage of the HyperRAM controller.
+   --------------------------------------------------------
+
    i_avm_pause : entity work.avm_pause
       generic map (
          G_PAUSE        => 3,
@@ -130,7 +139,7 @@ begin
          m_avm_readdata_i      => avm_readdata_i,
          m_avm_readdatavalid_i => avm_readdatavalid_i,
          m_avm_waitrequest_i   => avm_waitrequest_i
-      );
+      ); -- i_avm_pause
 
 end architecture synthesis;
 

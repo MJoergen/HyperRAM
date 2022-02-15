@@ -1,11 +1,13 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
-
 -- This is the HyperRAM "configurator".
 -- It performs two functions:
 -- * Wait until the HyperRAM device is operational after reset.
 -- * Perform a write to configuration register 0 to set latency mode.
+--
+-- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity hyperram_config is
    generic (

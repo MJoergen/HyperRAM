@@ -1,3 +1,7 @@
+-- This is the top-level file for the MEGA65 platform (revision 3).
+--
+-- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;

@@ -1,3 +1,9 @@
+-- This is a wrapper for all the MEGA65 related files (keyboard and video).
+-- Its purpose is to simplify the top-level MEGA65 file by wrapping away
+-- anything that is not directly related to the HyperRAM.
+--
+-- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -79,9 +85,9 @@ begin
       ); -- i_clk_mega65
 
 
-   ---------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------
    -- keyboard
-   ---------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------
 
    i_keyboard : entity work.keyboard
       port map (
@@ -121,9 +127,9 @@ begin
       ); -- i_cdc_keyboard
 
 
-   ---------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------
    -- video
-   ---------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------
 
    i_cdc_video: xpm_cdc_array_single
       generic map (
@@ -148,7 +154,7 @@ begin
       (
          rst_i         => video_rst,
          clk_i         => video_clk,
-         digits_i      => video_digits,
+         digits_i      => video_digits,   -- From HyperRAM trafic generator
          video_vs_o    => video_vs,
          video_hs_o    => video_hs,
          video_de_o    => video_de,

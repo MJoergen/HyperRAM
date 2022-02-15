@@ -1,13 +1,15 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
-
 -- This is the main state machine of the HyperRAM controller.
 -- The purpose is to implement the HyperBus protocol, i.e.
 -- to decode the Avalon Memory Map requests and generate the control
 -- signals for the HyperRAM device.
 --
 -- Bit 31 of avm_address_i is used to indicate register space.
+--
+-- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity hyperram_ctrl is
    generic (

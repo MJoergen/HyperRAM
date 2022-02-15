@@ -1,3 +1,11 @@
+-- This generates a sequence of commands with varying values
+-- of write_burstcount and read_burstcount.
+-- Signals start_i and wait_o are connected "upstream", in this case
+-- to the keyboard LEDs, while start_o and wait_i are connected "downstream",
+-- in this case to the avm_master entity.
+--
+-- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -6,8 +14,10 @@ entity burst_ctrl is
    port (
       clk_i              : in  std_logic;
       rst_i              : in  std_logic;
+      -- Connect "upstream", i.e. to keyboard and LED
       start_i            : in  std_logic;
       wait_o             : out std_logic;
+      -- Connect "downstream", i.e. to avm_master
       start_o            : out std_logic;
       wait_i             : in  std_logic;
       write_burstcount_o : out std_logic_vector(7 downto 0);
@@ -75,3 +85,4 @@ begin
    wait_o <= '0' when state = IDLE_ST else '1';
 
 end architecture synthesis;
+

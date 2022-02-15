@@ -1,11 +1,13 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
-
 -- This is the HyperRAM I/O connections
 -- The additional clock clk_x2_i is used to drive the DQ/RWDS output and to
 -- sample the DQ/RWDS input.
 -- The additional clock clk_x2_del_i is used to drive the CK output.
+--
+-- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity hyperram_io is
    port (

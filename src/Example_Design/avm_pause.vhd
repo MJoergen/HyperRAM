@@ -1,12 +1,12 @@
+-- This module inserts empty wait cycles into an Avalon Memory Map stream.
+-- The throughput is 1 - 1/G_PAUSE.
+-- So a value of 4 results in a 75% throughput.
+--
+-- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
--- This module inserts empty wait cycles into an Avalon Memory Map stream.
--- The frequency of empty wait cycles is controlled by G_PAUSE:
--- * Setting it to 0 disables the empty cycles.
--- * Setting it to 10 inserts empty cycles every tenth cycle, i.e. 90 % throughput.
--- * Setting it to -10 inserts empty cycles except every tenth cycle, i.e. 10 % throughput.
 
 entity avm_pause is
    generic (
@@ -38,7 +38,7 @@ entity avm_pause is
    );
 end entity avm_pause;
 
-architecture simulation of avm_pause is
+architecture synthesis of avm_pause is
 
    signal cnt : integer range 0 to G_PAUSE;
    signal allow : std_logic;
@@ -70,5 +70,5 @@ begin
    s_avm_readdatavalid_o <= m_avm_readdatavalid_i;
    s_avm_waitrequest_o   <= m_avm_waitrequest_i or not allow;
 
-end architecture simulation;
+end architecture synthesis;
 

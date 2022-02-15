@@ -1,3 +1,9 @@
+-- Main testbench for the HyperRAM controller.
+-- This closely mimics the MEGA65 top level file, except that
+-- clocks are generated directly, instead of via MMCM.
+--
+-- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;

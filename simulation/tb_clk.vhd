@@ -1,3 +1,7 @@
+-- Generate clocks needed for the HyperRAM controller.
+--
+-- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
+
 library ieee;
 use ieee.std_logic_1164.all;
 

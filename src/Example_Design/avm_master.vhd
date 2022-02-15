@@ -1,10 +1,14 @@
+-- This module is a simple kind of RAM test.
+--
+-- It generates first a sequence of WRITE operations (writing pseudo-random data),
+-- and then a corresponding sequence of READ operations, verifying that the
+-- correct values are read back again.
+--
+-- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
--- This module is a simple kind of RAM test.
--- It fills the HyperRAM with pseudo-random data,
--- and verifies the data can be read back again.
 
 entity avm_master is
    generic (

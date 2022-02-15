@@ -1,7 +1,3 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
-
 -- This is the wrapper file for the complete HyperRAM controller.
 
 -- Bit 31 of avm_address_i is used to indicate register space.
@@ -9,12 +5,18 @@ use ieee.numeric_std.all;
 -- The datawidth is fixed at 16 bits.
 -- The address is word-based, i.e. units of 2 bytes.
 
--- This module requires two clocks:
+-- This module requires three clocks:
 -- clk_x1_i     : 100 MHz : This is the main clock used for the Avalon MM
 --                          interface as well as controlling the HyperRAM
 --                          device.
 -- clk_x2_i     :_200 MHz : Used for I/O to HyperRAM device.
 -- clk_x2_del_i :_200 MHz : Used for I/O to HyperRAM device.
+--
+-- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity hyperram is
    port (
