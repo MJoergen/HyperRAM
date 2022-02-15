@@ -42,12 +42,14 @@ end entity avm_master;
 
 architecture synthesis of avm_master is
 
-   constant C_DATA_INIT   : std_logic_vector(63 downto 0) := X"CAFEBABEDEADBEEF";
+   constant C_DATA_INIT    : std_logic_vector(63 downto 0) := X"CAFEBABEDEADBEEF";
+
+   signal data_init        : std_logic_vector(63 downto 0);
 
    signal data             : std_logic_vector(63 downto 0);
    signal burstcount       : std_logic_vector(7 downto 0);
    signal read_burstcount  : std_logic_vector(7 downto 0);
-   signal wordcount        : integer;
+   signal wordcount        : integer range 0 to 255;
    signal new_address      : std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
    signal new_data         : std_logic_vector(63 downto 0);
    signal new_burstcount   : std_logic_vector(7 downto 0);
@@ -56,8 +58,7 @@ architecture synthesis of avm_master is
       INIT_ST,
       WRITING_ST,
       READING_ST,
-      VERIFYING_ST,
-      STOPPED_ST
+      VERIFYING_ST
    );
 
    signal state : state_t := INIT_ST;
@@ -86,7 +87,16 @@ begin
                if start_i = '1' then
                   wait_o           <= '1';
                   error_o          <= '0';
-                  data             <= C_DATA_INIT;
+                  data             <= C_DATA_INIT xor (
+                                      write_burstcount_i & read_burstcount_i &
+                                      write_burstcount_i & read_burstcount_i &
+                                      write_burstcount_i & read_burstcount_i &
+                                      write_burstcount_i & read_burstcount_i);
+                  data_init        <= C_DATA_INIT xor (
+                                      write_burstcount_i & read_burstcount_i &
+                                      write_burstcount_i & read_burstcount_i &
+                                      write_burstcount_i & read_burstcount_i &
+                                      write_burstcount_i & read_burstcount_i);
                   avm_write_o      <= '1';
                   avm_read_o       <= '0';
                   avm_address_o    <= (others => '0');
@@ -109,7 +119,7 @@ begin
                   data <= new_data;
 
                   if signed(avm_address_o) = -wordcount and unsigned(avm_burstcount_o) = 1 then
-                     data          <= C_DATA_INIT;
+                     data          <= data_init;
                      avm_write_o   <= '0';
                      avm_address_o <= (others => '0');
                      avm_read_o    <= '1';
@@ -134,17 +144,17 @@ begin
                   data_exp_o  <= data(G_DATA_SIZE-1 downto 0);
 
                   if avm_readdata_i /= data(G_DATA_SIZE-1 downto 0) then
-                     report "ERROR: Expected " & to_hstring(data(G_DATA_SIZE-1 downto 0)) & ", read " & to_hstring(avm_readdata_i);
+                     report "ERROR: Expected " & to_hstring(data(G_DATA_SIZE-1 downto 0)) & ", read " & to_hstring(avm_readdata_i)
+                        severity failure;
                      wait_o     <= '0';
                      error_o    <= '1';
                      avm_read_o <= '0';
-                     state      <= STOPPED_ST;
+                     state      <= INIT_ST;
                   elsif signed(avm_address_o) = -wordcount and unsigned(avm_burstcount_o) = 1 then
                      wait_o     <= '0';
                      error_o    <= '0';
-                     data       <= C_DATA_INIT;
                      avm_read_o <= '0';
-                     state      <= STOPPED_ST;
+                     state      <= INIT_ST;
                   else
                      data             <= new_data;
                      avm_burstcount_o <= new_burstcount;
@@ -157,22 +167,6 @@ begin
                         state         <= READING_ST;
                      end if;
                   end if;
-               end if;
-
-            when STOPPED_ST =>
-               if start_i = '1' then
-                  wait_o           <= '1';
-                  error_o          <= '0';
-                  data             <= C_DATA_INIT;
-                  avm_write_o      <= '1';
-                  avm_read_o       <= '0';
-                  avm_address_o    <= (others => '0');
-                  avm_byteenable_o <= (others => '1');
-                  avm_burstcount_o <= write_burstcount_i;
-                  burstcount       <= write_burstcount_i;
-                  read_burstcount  <= read_burstcount_i;
-                  wordcount        <= to_integer(unsigned(write_burstcount_i))*G_DATA_SIZE/16;
-                  state            <= WRITING_ST;
                end if;
 
          end case;
