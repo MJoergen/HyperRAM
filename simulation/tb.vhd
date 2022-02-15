@@ -24,6 +24,7 @@ architecture simulation of tb is
 
    signal sys_start         : std_logic;
    signal sys_error         : std_logic;
+   signal sys_active        : std_logic;
 
    signal avm_write         : std_logic;
    signal avm_read          : std_logic;
@@ -122,6 +123,7 @@ begin
          rst_i               => rst,
          start_i             => sys_start,
          error_o             => sys_error,
+         wait_o              => sys_active,
          avm_write_o         => avm_write,
          avm_read_o          => avm_read,
          avm_address_o       => avm_address(3 downto 0),
