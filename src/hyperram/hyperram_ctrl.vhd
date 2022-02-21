@@ -207,7 +207,7 @@ begin
          end case;
 
          if rst_i = '1' then
-            avm_waitrequest_o   <= '0';
+            avm_waitrequest_o   <= '1';
             avm_readdatavalid_o <= '0';
             state        <= INIT_ST;
             hb_rstn_o    <= '0';
