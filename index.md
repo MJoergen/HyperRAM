@@ -2,32 +2,36 @@
 
 HyperRAM is quite a beast! On the one hand, it offers advantages to hardware designers such as
 low pin count, low power consumption and easy control. At least compared to modern DDR alternatives.
-On the other hand, there are tons of nitty gritty details you need to know to create a stable
-and realiable HyperRAM controller. Complex constraints and nasty phase shifts just to name
-two of them.
+On the other hand, there are tons of nitty gritty details you need to know and take care of to
+create a stable and realiable HyperRAM controller. Complex constraints and nasty phase shifts
+just to name two of them.
 
-* 
-It is hard to find a decent OpenSource 
-his repository contains a portable OpenSource HyperRAM controller for FPGAs written in VHDL. I'm writing my own implementation because I've looked at several other implementations, and they all seemed lacking in various regards (features, stability, portability, etc.)
+![HyperRAM image](hyperram_img.jpg)
 
-The HyperRAM controller in this repository is a complete rewrite from scratch, and is provided with a MIT license.
+Therefore you do not want to reinvent the wheel and go through the joy and pain of implementing
+a HyperRAM controller from scratch. Search no longer! You have found what you are looking
+for: The [MJoergen/HyperRAM](https://github.com/MJoergen/HyperRAM) controller has the following
+advantages:
 
-Learn more by reading the documentation in this repository or by browsing the companion website: https://mjoergen.github.io/HyperRAM/
-Features
+* Easy to use
+* Well documented
+* Field proven stability
+* Portable
+* Very permissive [MIT license](https://github.com/MJoergen/HyperRAM/blob/main/LICENSE) that also allows commercial use
+
+The controller is written in modern **VHDL-2008** and you can of course use it without
+any modifications in your **Verilog** Designs.
+
+### Features
 
 This implementation has support for:
 
-    Maximum HyperRAM clock speed of 100 MHz.
-    Variable latency.
-    Configuration registers read and write
-    Identification registers read
-    Automatic configuration of latency mode upon reset.
-    16-bit Avalon Memory Map interface including burst mode.
-    Written for VHDL-2008
-
-You can use the [editor on GitHub](https://github.com/MJoergen/HyperRAM/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
-
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+* Maximum HyperRAM clock speed of 100 MHz
+* Variable latency
+* Configuration registers read and write
+* Identification registers read
+* Automatic configuration of latency mode upon reset
+* 16-bit Avalon Memory Map interface including burst mode
 
 ### Markdown
 
