@@ -41,10 +41,17 @@ The [MJoergen/HyperRAM](https://github.com/MJoergen/HyperRAM) GitHub repository 
 a detailed documentation of how to get started including a reference implementation /
 example design for the [MEGA65](https://www.mega65.org).
 
+If you just need a quick overview of the interface to check, if this design is for
+you, then scroll down to the "Interface" section.
+
+Otherwise, here is the best way to get started with the HyperRAM controller:
+
+1. Make sure that
+
 ### Interface
 
-Here is a sneak preview in VHDL of how the HyperRAM controller's interface looks like.
-Scroll down for a quick explanation of the signals and read more
+Here is a sneak preview in VHDL of how the HyperRAM controller's interface looks like
+including a quick explanation of the Avalon Memory Map interface.
 
 ```vhdl
 entity hyperram is
@@ -78,6 +85,34 @@ entity hyperram is
    );
 end entity hyperram;
 ```
+
+#### Avalon Memory Map interface
+
+Here is a brief summary of the signals involved in the Avalon Memory Map
+interface. For your convenience, the repository contains the full
+[specification](https://github.com/MJoergen/HyperRAM/blob/main/doc/Avalon_Interface_Specifications.pdf)
+as a downloadable PDF. But don't worry: You do not need to read and understand
+all 71 pages of the specification.
+
+Basically, you just need to work with these signals:
+
+Signal          | Description
+--------------: | :---------
+`write`         | Asserted by client for one clock cycle when writing data to the HyperRAM
+`read`          | Asserted by client for one clock cycle when reading data from the HyperRAM
+`address`       | Address (in units of 16-bit words)
+`writedata`     | Data to write
+`byteenable`    | 1-bit for each byte of data to the HyperRAM
+`burstcount`    | Number of words to transfer
+`readdata`      | Data received from the HyperRAM
+`readdatavalid` | Asserted when data from the HyperRAM is valid
+`waitrequest`   | Asserted by the device when it is busy
+
+If you want to learn more: The HyperRAM controller uses "Pipelined Read Transfer with Variable Latency",
+see section 3.5.4 and Figure 12 of the
+[specification](https://github.com/MJoergen/HyperRAM/blob/main/doc/Avalon_Interface_Specifications.pdf),
+and supports burst mode, see section 3.5.5. It does not use the "waitrequestAllowance" property.
+
 ### About me & contact
 
 I am Michael Jørgensen ([LinkedIn](https://www.linkedin.com/in/michaeljoergensen/)), an experienced hardware, software
