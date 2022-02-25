@@ -1,12 +1,14 @@
 # HyperRAM
 
-This repository is my attempt at a portable HyperRAM controller.  I'm writing
+This repository a portable OpenSource HyperRAM controller for FPGAs. I'm writing
 my own implementation because I've looked at several other implementations, and
 they all seemed lacking in various regards (features, stability, portability,
 etc.)
 
 The HyperRAM controller in this repository is a complete rewrite from scratch,
 and is provided with a [MIT license](LICENSE).
+
+Learn more by reading the documentation in this repository or by browsing the companion website: https://mjoergen.github.io/HyperRAM/
 
 ## Features
 
