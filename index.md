@@ -57,7 +57,7 @@ The addressing is in units of words, not bytes.
 To see an example of how to use the HyperRAM controller and how to connect it
 to the internal FPGA logic and to the external HyperRAM device, have a look at
 the [Example_Design](https://github.com/MJoergen/HyperRAM/tree/main/src/Example_Design),
-specifically at the [top levelfile](https://github.com/MJoergen/HyperRAM/blob/main/src/Example_Design/top.vhd)
+specifically at the [top level file](https://github.com/MJoergen/HyperRAM/blob/main/src/Example_Design/top.vhd)
 and the [trafic generator](https://github.com/MJoergen/HyperRAM/blob/main/src/Example_Design/trafic_gen.vhd).
 
 The HyperRAM controller is written in a portable way. Here is further reading, if you
