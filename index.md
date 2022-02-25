@@ -37,8 +37,14 @@ you can easily port it to other environments such as Intel and Quartus.
 
 ### Getting started
 
+The [MJoergen/HyperRAM](https://github.com/MJoergen/HyperRAM) GitHub repository contains
+a detailed documentation of how to get started including a reference implementation /
+example design for the [MEGA65](https://www.mega65.org).
 
 ### Interface
+
+Here is a sneak preview in VHDL of how the HyperRAM controller's interface looks like.
+Scroll down for a quick explanation of the signals and read more
 
 ```vhdl
 entity hyperram is
@@ -76,10 +82,12 @@ end entity hyperram;
 
 I am Michael Jørgensen ([LinkedIn](https://www.linkedin.com/in/michaeljoergensen/)), an experienced hardware, software
 and firmware developer from Denmark. My primary professional focus is with embedded applications in telecommunications.
-In my spare time I like to contribute to the OpenSource community,
+In my spare time I like to contribute to the OpenSource community
+(e.g. this HyperRAM controller,[QNICE-FPGA](http://qnice-fpga.com/), ...),
 [help people to get started in FPGA development](https://github.com/MJoergen/nexys4ddr/tree/master/dyoc)
-and engage in Retro Computing by contributing to various [MEGA65](https://www.mega65.org)
-[cores and frameworks](https://sy2002.github.io/m65cores/)
+and engage in Retro Computing by contributing to various
+[cores and frameworks](https://sy2002.github.io/m65cores/) for the ultimate retro-fun machine
+[MEGA65](https://www.mega65.org).
 
 If you have questions about the HyperRAM controller, want to share suggestions or need some help, please
 [open a GitHub Issue in the main repo](https://github.com/MJoergen/HyperRAM/issues) or contact me at
