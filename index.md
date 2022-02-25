@@ -147,5 +147,4 @@ and engage in Retro Computing by contributing to various
 [MEGA65](https://www.mega65.org).
 
 If you have questions about the HyperRAM controller, want to share suggestions or need some help, please
-[open a GitHub Issue in the main repo](https://github.com/MJoergen/HyperRAM/issues) or contact me at
-`michael.finn.jorgensen at gmail.com`.
+[open a GitHub Issue in the main repo](https://github.com/MJoergen/HyperRAM/issues).
