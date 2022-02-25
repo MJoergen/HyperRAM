@@ -22,9 +22,11 @@ advantages:
 The controller is written in modern **VHDL-2008** and you can of course use it without
 any modifications in your **Verilog** Designs.
 
-### Features
+It has been written and tested on a Xilinx Artix-7 FPGA using Vivado. Due to the portable
+nature of the controller in conjunction with the well documented code and constraints file
+you can easily port it to other environments such as Intel and Quartus.
 
-This implementation has support for:
+### Features
 
 * Maximum HyperRAM clock speed of 100 MHz
 * Variable latency
@@ -33,34 +35,52 @@ This implementation has support for:
 * Automatic configuration of latency mode upon reset
 * 16-bit Avalon Memory Map interface including burst mode
 
-### Markdown
+### Getting started
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
-```markdown
-Syntax highlighted code block
+### Interface
 
-# Header 1
-## Header 2
-### Header 3
+```vhdl
+entity hyperram is
+   port (
+      clk_x1_i            : in  std_logic; -- Main clock
+      clk_x2_i            : in  std_logic; -- Physical I/O only
+      clk_x2_del_i        : in  std_logic; -- Double frequency, phase shifted
+      rst_i               : in  std_logic; -- Synchronous reset
 
-- Bulleted
-- List
+      -- Avalon Memory Map
+      avm_write_i         : in  std_logic;
+      avm_read_i          : in  std_logic;
+      avm_address_i       : in  std_logic_vector(31 downto 0);
+      avm_writedata_i     : in  std_logic_vector(15 downto 0);
+      avm_byteenable_i    : in  std_logic_vector(1 downto 0);
+      avm_burstcount_i    : in  std_logic_vector(7 downto 0);
+      avm_readdata_o      : out std_logic_vector(15 downto 0);
+      avm_readdatavalid_o : out std_logic;
+      avm_waitrequest_o   : out std_logic;
 
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+      -- HyperRAM device interface
+      hr_resetn_o         : out std_logic;
+      hr_csn_o            : out std_logic;
+      hr_ck_o             : out std_logic;
+      hr_rwds_in_i        : in  std_logic;
+      hr_rwds_out_o       : out std_logic;
+      hr_rwds_oe_o        : out std_logic;   -- Output enable for RWDS
+      hr_dq_in_i          : in  std_logic_vector(7 downto 0);
+      hr_dq_out_o         : out std_logic_vector(7 downto 0);
+      hr_dq_oe_o          : out std_logic    -- Output enable for DQ
+   );
+end entity hyperram;
 ```
+### About me & contact
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+I am Michael Jørgensen ([LinkedIn](https://www.linkedin.com/in/michaeljoergensen/)), an experienced hardware, software
+and firmware developer from Denmark. My primary professional focus is with embedded applications in telecommunications.
+In my spare time I like to contribute to the OpenSource community,
+[help people to get started in FPGA development](https://github.com/MJoergen/nexys4ddr/tree/master/dyoc)
+and engage in Retro Computing by contributing to various [MEGA65](https://www.mega65.org)
+[cores and frameworks](https://sy2002.github.io/m65cores/)
 
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/MJoergen/HyperRAM/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+If you have questions about the HyperRAM controller, want to share suggestions or need some help, please
+[open a GitHub Issue in the main repo](https://github.com/MJoergen/HyperRAM/issues) or contact me at
+`michael.finn.jorgensen at gmail.com`.
