@@ -79,14 +79,14 @@ It does not use the "waitrequestAllowance" property.
 
 Signal          | Description
 --------------: | :---------
-`write`         | Asserted by client when sending data to the device
-`read`          | Asserted by client when requesting data from the device
-`address`       | The address (in units of 16-bit words)
-`writedata`     | The data to send to the device
-`byteenable`    | 1-bit for each byte of data to the device
+`write`         | Asserted by client for one clock cycle when writing data to the HyperRAM
+`read`          | Asserted by client for one clock cycle when reading data from the HyperRAM
+`address`       | Address (in units of 16-bit words)
+`writedata`     | Data to write
+`byteenable`    | 1-bit for each byte of data to the HyperRAM
 `burstcount`    | Number of words to transfer
-`readdata`      | Data receive from the device
-`readdatavalid` | Asserted when data from the device is valid
+`readdata`      | Data received from the HyperRAM
+`readdatavalid` | Asserted when data from the HyperRAM is valid
 `waitrequest`   | Asserted by the device when it is busy
 
 ## Further reading
@@ -97,4 +97,3 @@ The following links provide additional information:
 * [Porting guideline](PORTING.md)
 * [Detailed design description](src/hyperram/README.md)
 * [Simulation](simulation/README.md)
-
