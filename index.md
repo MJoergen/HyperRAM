@@ -140,7 +140,7 @@ and firmware developer from Denmark.
 My primary professional focus is with embedded applications in telecommunications.
 
 In my spare time I like to contribute to the OpenSource community
-(e.g. this HyperRAM controller,[QNICE-FPGA](http://qnice-fpga.com/), ...),
+(e.g. this HyperRAM controller, [QNICE-FPGA](http://qnice-fpga.com/), ...),
 [help people to get started in FPGA development](https://github.com/MJoergen/nexys4ddr/tree/master/dyoc)
 and engage in Retro Computing by contributing to various
 [cores and frameworks](https://sy2002.github.io/m65cores/) for the ultimate retro-fun machine
