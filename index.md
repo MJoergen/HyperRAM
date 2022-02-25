@@ -49,7 +49,7 @@ Otherwise, here is the best way to get started with the HyperRAM controller:
 The [HyperRAM controller](https://github.com/MJoergen/HyperRAM/blob/main/src/hyperram/hyperram.vhd)
 has just two interfaces, one for the external HyperRAM device and one for the client (user) of the
 HyperRAM. For the client interface I've chosen the
-[Avalon MemoryMap]((https://github.com/MJoergen/HyperRAM/blob/main/doc/Avalon_Interface_Specifications.pdf)
+[Avalon MemoryMap](https://github.com/MJoergen/HyperRAM/blob/main/doc/Avalon_Interface_Specifications.pdf)
 protocol. This is an industry standard and is easy to use. The interface width
 is 16 bits corresponding to one word of the HyperRAM.
 The addressing is in units of words, not bytes.
