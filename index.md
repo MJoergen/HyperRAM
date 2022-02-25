@@ -121,7 +121,7 @@ Signal                | Description
 `avm_read_i`          | Asserted by client for one clock cycle when reading data from the HyperRAM
 `avm_address_i`       | Address (in units of 16-bit words)
 `avm_writedata_i`     | Data to write
-`avm_byteenable_i`    | 1-bit for each byte of data to the HyperRAM
+`avm_byteenable_i`    | 1-bit for each byte of `avm_writedata_i` to the HyperRAM
 `avm_burstcount_i`    | Number of words to transfer
 `avm_readdata_o`      | Data received from the HyperRAM
 `avm_readdatavalid_o` | Asserted when data from the HyperRAM is valid
