@@ -86,7 +86,7 @@ entity hyperram is
 end entity hyperram;
 ```
 
-#### Avalon Memory Map interface
+**Avalon Memory Map interface**
 
 Here is a brief summary of the signals involved in the Avalon Memory Map
 interface. For your convenience, the repository contains the full
@@ -96,27 +96,30 @@ all 71 pages of the specification.
 
 Basically, you just need to work with these signals:
 
-Signal          | Description
---------------: | :---------
-`write`         | Asserted by client for one clock cycle when writing data to the HyperRAM
-`read`          | Asserted by client for one clock cycle when reading data from the HyperRAM
-`address`       | Address (in units of 16-bit words)
-`writedata`     | Data to write
-`byteenable`    | 1-bit for each byte of data to the HyperRAM
-`burstcount`    | Number of words to transfer
-`readdata`      | Data received from the HyperRAM
-`readdatavalid` | Asserted when data from the HyperRAM is valid
-`waitrequest`   | Asserted by the device when it is busy
+Signal                | Description
+--------------------: | :--------------------------------------------------------------------------------------
+`avm_write_i`         | Asserted by client for one clock cycle when writing data to the HyperRAM
+`avm_read_i`          | Asserted by client for one clock cycle when reading data from the HyperRAM
+`avm_address_i`       | Address (in units of 16-bit words)
+`avm_writedata_i`     | Data to write
+`avm_byteenable_i`    | 1-bit for each byte of data to the HyperRAM
+`avm_burstcount_i`    | Number of words to transfer
+`avm_readdata_o`      | Data received from the HyperRAM
+`avm_readdatavalid_o` | Asserted when data from the HyperRAM is valid
+`avm_waitrequest_o`   | Asserted by the device when it is busy
 
 If you want to learn more: The HyperRAM controller uses "Pipelined Read Transfer with Variable Latency",
 see section 3.5.4 and Figure 12 of the
 [specification](https://github.com/MJoergen/HyperRAM/blob/main/doc/Avalon_Interface_Specifications.pdf),
 and supports burst mode, see section 3.5.5. It does not use the "waitrequestAllowance" property.
 
-### About me & contact
+## About me & contact
 
 I am Michael Jørgensen ([LinkedIn](https://www.linkedin.com/in/michaeljoergensen/)), an experienced hardware, software
-and firmware developer from Denmark. My primary professional focus is with embedded applications in telecommunications.
+and firmware developer from Denmark.
+
+My primary professional focus is with embedded applications in telecommunications.
+
 In my spare time I like to contribute to the OpenSource community
 (e.g. this HyperRAM controller,[QNICE-FPGA](http://qnice-fpga.com/), ...),
 [help people to get started in FPGA development](https://github.com/MJoergen/nexys4ddr/tree/master/dyoc)
