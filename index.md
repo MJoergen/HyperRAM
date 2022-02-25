@@ -41,12 +41,31 @@ The [MJoergen/HyperRAM](https://github.com/MJoergen/HyperRAM) GitHub repository 
 a detailed documentation of how to get started including a reference implementation /
 example design for the [MEGA65](https://www.mega65.org).
 
-If you just need a quick overview of the interface to check, if this design is for
-you, then scroll down to the "Interface" section.
+If you just need a quick overview of the HyperRAM controller's interface to check, if
+this design is for you, then scroll down to the "Interface" section.
 
 Otherwise, here is the best way to get started with the HyperRAM controller:
 
-1. Make sure that
+The [HyperRAM controller](https://github.com/MJoergen/HyperRAM/blob/main/src/hyperram/hyperram.vhd)
+has just two interfaces, one for the external HyperRAM device and one for the client (user) of the
+HyperRAM. For the client interface I've chosen the
+[Avalon MemoryMap]((https://github.com/MJoergen/HyperRAM/blob/main/doc/Avalon_Interface_Specifications.pdf)
+protocol. This is an industry standard and is easy to use. The interface width
+is 16 bits corresponding to one word of the HyperRAM.
+The addressing is in units of words, not bytes.
+
+To see an example of how to use the HyperRAM controller and how to connect it
+to the internal FPGA logic and to the external HyperRAM device, have a look at
+the [Example_Design](https://github.com/MJoergen/HyperRAM/tree/main/src/Example_Design),
+specifically at the [top levelfile](https://github.com/MJoergen/HyperRAM/blob/main/src/Example_Design/top.vhd)
+and the [trafic generator](https://github.com/MJoergen/HyperRAM/blob/main/src/Example_Design/trafic_gen.vhd).
+
+The HyperRAM controller is written in a portable way. Here is further reading, if you
+want to understand more and/or port the controller to your specific design:
+
+* [Porting guideline](https://github.com/MJoergen/HyperRAM/blob/main/PORTING.md)
+* [Detailed design description](https://github.com/MJoergen/HyperRAM/blob/main/src/hyperram/README.md)
+* [Simulation](https://github.com/MJoergen/HyperRAM/tree/main/simulation)
 
 ### Interface
 
