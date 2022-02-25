@@ -17,7 +17,7 @@ advantages:
 * Well documented
 * Field proven stability
 * Portable
-* Very permissive [MIT license](https://github.com/MJoergen/HyperRAM/blob/main/LICENSE) that also allows commercial use
+* OpenSource: Very permissive [MIT license](https://github.com/MJoergen/HyperRAM/blob/main/LICENSE) that also allows commercial use
 
 The controller is written in modern **VHDL-2008** and you can of course use it without
 any modifications in your **Verilog** Designs.
