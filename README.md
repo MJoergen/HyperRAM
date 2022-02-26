@@ -83,7 +83,7 @@ Signal          | Description
 `read`          | Asserted by client for one clock cycle when reading data from the HyperRAM
 `address`       | Address (in units of 16-bit words)
 `writedata`     | Data to write
-`byteenable`    | 1-bit for each byte of data to the HyperRAM
+`byteenable`    | 1-bit for each byte of `writedata` to the HyperRAM
 `burstcount`    | Number of words to transfer
 `readdata`      | Data received from the HyperRAM
 `readdatavalid` | Asserted when data from the HyperRAM is valid
