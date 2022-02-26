@@ -42,7 +42,7 @@ above mentioned process. There are two output signals indicating progress:
 
 ## HyperRAM controller
 This is the Device-Under-Test, and is described more detailed in
-[src/hyperram](../hyperram/README.md)
+[src/hyperram](../hyperram/README.md).
 
 
 ## MEGA65 support module (keyboard and video)
@@ -56,7 +56,7 @@ simple.
 
 The top-level file contains no logic of its own, and only instantiates other modules.
 
-On thing to note is that the top-level contains the two constants:
+One thing to note is that the top-level contains the two constants:
 
 * `C_HYPERRAM_FREQ_MHZ` : This controls the HyperRAM device clock speed. The
   maximum value supported by the MEGA65 platform is 100 MHz.
@@ -65,4 +65,7 @@ On thing to note is that the top-level contains the two constants:
   value chosen here is obtained by trial-and-error, where empirically an
   interval of working values was determined and the centre of this interval was
   chosen.
+
+These two parameters are used to control the clock synthesis in
+[clk.vhd](clk.vhd). You can just leave them at their default values.
 
