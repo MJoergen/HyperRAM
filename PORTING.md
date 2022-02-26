@@ -55,7 +55,7 @@ All three clocks should be generated from the same MMCM/PLL.
 
 The reason for the phase-shifted clock is to ensure correct timing when
 sampling the input date `DQ` from the HyperRAM. For more information, see
-[Detailed design description](src/hyperram/README.md#hyperram_io.vhd)
+[Detailed design description](src/hyperram/README.md#hyperram_io.vhd).
 
 The specific value of the phase shift for `clk_x2_del_i` is board and device
 dependent. To determine the value to use probably requires some hand tuning,
