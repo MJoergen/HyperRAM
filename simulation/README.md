@@ -10,6 +10,8 @@ In the [testbench top level file](tb.vhd#L10) the constants `C_HYPERRAM_FREQ_MHZ
 and `C_HYPERRAM_PHASE` can be defined, just as in the [hardware top level
 file](../src/Example_Design/top.vhd#L40). In this way, the testbench provides the same
 tuning parameters as the hardware version.
+Read more [here](../src/hyperram#hyperram_iovhd) about the necessity to phase shift
+HyperRAM device relative to the FPGA.
 
 One extra feature of the testbench is the artificial insertion of board delay.
 It is expected that the physical hardware will introduce a non-trivial amount
