@@ -58,7 +58,11 @@ To see an example of how to use the HyperRAM controller and how to connect it
 to the internal FPGA logic and to the external HyperRAM device, have a look at
 the [Example_Design](src/Example_Design), specifically at the [top level
 file](src/Example_Design/top.vhd) and the [trafic
-generator](src/Example_Design/trafic_gen.vhd)
+generator](src/Example_Design/trafic_gen.vhd).
+
+Make sure that you are aware of the necessity of
+[Tri-State-Buffering](PORTING.md#tri-state-buffering). It is good design practice
+to infer the tri-state buffers from the top-level file. 
 
 The HyperRAM configuration and identification registers can be accessed through
 the same Avalon Memory Map interface via the following addresses:
