@@ -1,6 +1,10 @@
 # Overview of HyperRAM controller
 
-I've split the HyperRAM controller implementation into three parts:
+I've split the HyperRAM controller implementation into three parts, but it is
+only the entity `hyperram` from the wrapper file ([hyperram.vhd](hyperram.vhd))
+that you need to use when working with the controller.
+
+The three parts are:
 
 * The state machine ([hyperram\_ctrl.vhd](hyperram_ctrl.vhd)), running in a
   single clock domain, same as HyperRAM device, i.e. 100 MHz.
@@ -13,9 +17,6 @@ I've split the HyperRAM controller implementation into three parts:
 
 The above three entities are described in more detail further down in this
 file.
-
-The three entities are instantiated and connected in a wrapper
-file ([hyperram.vhd](hyperram.vhd)).
 
 ## `hyperram_config.vhd`
 
