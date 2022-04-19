@@ -76,17 +76,20 @@ variations in design placement within the FPGA. Incorrect or sub-optimal
 placement can lead to large routing delays inside the FPGA that can interfere
 with the HyperRAM timing.  Therefore it is necessary to constrain the design so
 that the HyperRAM controller is placed as close to the I/O pads as possible.
-I've found it sufficient to control the placement of the output register for
-the `CK` signal to the HyperRAM, i.e. the register `hr_ck_o_reg` in the file
-`hyperram_io.vhd`.
+I've found it convenient to use `pblocks`.
 
-On the MEGA65 the `CK` signal is connected to pin D22, which is in the upper
-left corner of the FPGA. The closest I/O pad is at X=0 and Y=205 (see below for
-further details). Therefore, for the MEGA65 I've added the following
-constraint:
+On the MEGA65 the HyperRAM signals are located in the upper left corner of the
+FPGA, i.e. from X0Y200 to X0Y224. To make room for the HyperRAM controller,
+it is constrained to a small region close to these I/O pads. I've chosen the
+region X0Y200 to X7Y224, seen in lines 62-67 in the file top.xdc:
 
 ```
-set_property LOC SLICE_X0Y205 [get_cells -hier hr_ck_o_reg]
+# Place HyperRAM close to I/O pins
+startgroup
+create_pblock pblock_i_hyperram
+resize_pblock pblock_i_hyperram -add {SLICE_X0Y200:SLICE_X7Y224}
+add_cells_to_pblock pblock_i_hyperram [get_cells [list i_hyperram]]
+endgroup
 ```
 
 With this single constraint Vivado consistently places the HyperRAM controller
@@ -98,8 +101,8 @@ successfull with that approach.
 
 ### Locating the I/O pad
 
-To determine the correct constraint to use I first located the I/O pin D22 in
-the device view in Vivado:
+To determine the correct constraint to use I first located the I/O pin D22 (for
+the top-level signal `CK`) in the device view in Vivado:
 
 ![device view](doc/device_view.png)
 
@@ -107,5 +110,6 @@ Then selecting the pin and viewing the pin properties gives this result:
 
 ![pin properties](doc/iopad.png)
 
-From the line "Tile:" we directly see the value X=0 and Y=205.
+From the line "Tile:" we directly see the value X=0 and Y=205. Then just repeat
+with the other top-level ports connected to the HyperRAM device.
 
