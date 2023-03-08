@@ -81,11 +81,11 @@ architecture synthesis of top is
    signal sys_active           : std_logic;
    signal sys_error            : std_logic;
    signal sys_address          : std_logic_vector(20 downto 0);
-   signal sys_data_exp         : std_logic_vector(15 downto 0);
-   signal sys_data_read        : std_logic_vector(15 downto 0);
+   signal sys_data_exp         : std_logic_vector(31 downto 0);
+   signal sys_data_read        : std_logic_vector(31 downto 0);
 
    -- Interface to MEGA65 video
-   signal sys_digits           : std_logic_vector(111 downto 0);
+   signal sys_digits           : std_logic_vector(127 downto 0);
 
 begin
 
@@ -151,7 +151,7 @@ begin
          rst_i                 => rst,
          s_avm_write_i         => avm_write,
          s_avm_read_i          => avm_read,
-         s_avm_address_i       => avm_address,
+         s_avm_address_i       => avm_address(20 downto 0),
          s_avm_writedata_i     => avm_writedata,
          s_avm_byteenable_i    => avm_byteenable,
          s_avm_burstcount_i    => avm_burstcount,
@@ -160,7 +160,7 @@ begin
          s_avm_waitrequest_o   => avm_waitrequest,
          m_avm_write_o         => dec_write,
          m_avm_read_o          => dec_read,
-         m_avm_address_o       => dec_address,
+         m_avm_address_o       => dec_address(21 downto 0),
          m_avm_writedata_o     => dec_writedata,
          m_avm_byteenable_o    => dec_byteenable,
          m_avm_burstcount_o    => dec_burstcount,
@@ -222,13 +222,12 @@ begin
    phase_str( 7 downto 4) <= std_logic_vector(to_unsigned((integer(C_HYPERRAM_PHASE)/10)  mod 10, 4));
    phase_str( 3 downto 0) <= std_logic_vector(to_unsigned((integer(C_HYPERRAM_PHASE)/1)   mod 10, 4));
 
-   sys_digits(15 downto  0)   <= sys_data_read;
-   sys_digits(31 downto 16)   <= sys_data_exp;
-   sys_digits(47 downto 32)   <= sys_address(15 downto 0);
-   sys_digits(63 downto 48)   <= X"00" & "000" & sys_address(20 downto 16);
-   sys_digits(79 downto 64)   <= "0000" & freq_str;
-   sys_digits(95 downto 80)   <= "0000" & phase_str;
-   sys_digits(111 downto 96)  <= X"0000";
+   sys_digits( 31 downto  0) <= sys_data_read;
+   sys_digits( 47 downto 32) <= sys_address(15 downto 0);
+   sys_digits( 63 downto 48) <= X"00" & "000" & sys_address(20 downto 16);
+   sys_digits( 79 downto 64) <= "0000" & freq_str;
+   sys_digits( 95 downto 80) <= "0000" & phase_str;
+   sys_digits(127 downto 96) <= sys_data_exp;
 
 
    ----------------------------------
