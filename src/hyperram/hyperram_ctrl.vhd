@@ -175,6 +175,7 @@ begin
             when WRITE_ST | WRITE_BURST_ST =>
                state             <= WRITE_BURST_ST;
                writedata         <= avm_writedata_i;
+               byteenable        <= avm_byteenable_i;
                hb_dq_oe_o        <= '1';
                hb_rwds_oe_o      <= '1';
                avm_waitrequest_o <= '0';
@@ -221,7 +222,7 @@ begin
 
    hb_dq_ddr_out_o   <= avm_writedata_i when state = WRITE_BURST_ST else
                         command_address(47 downto 32);
-   hb_rwds_ddr_out_o <= not byteenable when state = WRITE_ST else "00";
+   hb_rwds_ddr_out_o <= not byteenable when state = WRITE_ST or state = WRITE_BURST_ST else "00";
 
 end architecture synthesis;
 

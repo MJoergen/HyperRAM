@@ -205,7 +205,7 @@ begin
                error_o <= '1';
             end if;
          end if;
-         if rst_i = '1' then
+         if rst_i = '1' or start_i = '1' then
             error_o <= '0';
          end if;
       end if;
