@@ -43,7 +43,6 @@ end entity avm_master3;
 architecture synthesis of avm_master3 is
 
    constant C_WRITE_SIZE : integer := 1;
-   constant C_ALL_ONES   : std_logic_vector(G_DATA_SIZE/8-1 downto 0) := (others => '1');
 
    -- Combinatorial signals
    signal rand_update_s : std_logic;
@@ -59,11 +58,13 @@ architecture synthesis of avm_master3 is
    signal byteenable_s  : std_logic_vector(G_DATA_SIZE/8-1 downto 0);
    signal write_s       : std_logic_vector(C_WRITE_SIZE-1 downto 0);
 
-   type t_state is (IDLE_ST, WORKING_ST, READING_ST, DONE_ST);
+   type t_state is (IDLE_ST, INIT_ST, WORKING_ST, READING_ST);
 
    signal state         : t_state := IDLE_ST;
    signal count         : std_logic_vector(G_ADDRESS_SIZE+2 downto 0);
    signal mem_data      : std_logic_vector(G_DATA_SIZE-1 downto 0);
+
+   signal wr_en         : std_logic_vector(G_DATA_SIZE/8-1 downto 0);
 
 begin
 
@@ -86,16 +87,32 @@ begin
    begin
       if rising_edge(clk_i) then
          if m_avm_waitrequest_i = '0' then
-            m_avm_write_o      <= '0';
-            m_avm_read_o       <= '0';
+            m_avm_write_o <= '0';
+            m_avm_read_o  <= '0';
          end if;
 
          case state is
             when IDLE_ST =>
                if start_i = '1' then
-                  wait_o <= '1';
-                  state  <= WORKING_ST;
                   report "Starting";
+                  wait_o             <= '1';
+                  m_avm_write_o      <= '1';
+                  m_avm_read_o       <= '0';
+                  m_avm_address_o    <= (others => '0');
+                  m_avm_writedata_o  <= (others => '1');
+                  m_avm_byteenable_o <= (others => '1');
+                  m_avm_burstcount_o <= X"01";
+                  state              <= INIT_ST;
+               end if;
+
+            when INIT_ST =>
+               if m_avm_waitrequest_i = '0' then
+                  if and(m_avm_address_o) then
+                     state <= WORKING_ST;
+                  else
+                     m_avm_write_o   <= '1';
+                     m_avm_address_o <= m_avm_address_o + 1;
+                  end if;
                end if;
 
             when WORKING_ST | READING_ST =>
@@ -124,13 +141,11 @@ begin
                   if count + 1 = 0 then
                      m_avm_write_o <= '0';
                      m_avm_read_o  <= '0';
-                     state         <= DONE_ST;
+                     wait_o        <= '0';
+                     state         <= IDLE_ST;
                      report "Done";
                   end if;
                end if;
-
-            when DONE_ST =>
-               wait_o <= '0';
 
             when others =>
                null;
@@ -151,25 +166,27 @@ begin
       end if;
    end process p_master;
 
-   p_mem : process (clk_i)
-      -- This defines a type containing an array of bytes
-      type mem_t is array (0 to 2**G_ADDRESS_SIZE-1) of std_logic_vector(G_DATA_SIZE-1 downto 0);
-      variable mem : mem_t := (others => (others => '1'));
-   begin
-      if rising_edge(clk_i) then
-         if m_avm_write_o = '1' and m_avm_waitrequest_i = '0' then
-            for b in 0 to G_DATA_SIZE/8-1 loop
-               if m_avm_byteenable_o(b) = '1' then
-                  mem(to_integer(m_avm_address_o))(8*b+7 downto 8*b) := m_avm_writedata_o(8*b+7 downto 8*b);
-               end if;
-            end loop;
-         end if;
+   wr_en <= m_avm_byteenable_o when m_avm_write_o = '1' and m_avm_waitrequest_i = '0'
+            else (others => '0');
 
-         if m_avm_read_o = '1' and m_avm_waitrequest_i = '0' then
-            mem_data <= mem(to_integer(m_avm_address_o));
-         end if;
-      end if;
-   end process p_mem;
+   i_blockram_with_byte_enable : entity work.blockram_with_byte_enable
+      generic map (
+         G_ADDR_SIZE   => G_ADDRESS_SIZE,
+         G_COLUMN_SIZE => 8,
+         G_NUM_COLUMNS => G_DATA_SIZE/8
+      )
+      port map (
+         a_clk_i     => clk_i,
+         a_addr_i    => m_avm_address_o,
+         a_wr_data_i => m_avm_writedata_o,
+         a_wr_en_i   => wr_en,
+         a_rd_data_o => mem_data,
+         b_clk_i     => '0',
+         b_addr_i    => (others => '0'),
+         b_wr_data_i => (others => '0'),
+         b_wr_en_i   => (others => '0'),
+         b_rd_data_o => open
+      ); -- i_blockram_with_byte_enable
 
    p_verifier : process (clk_i)
    begin
@@ -189,7 +206,7 @@ begin
             end if;
          end if;
          if rst_i = '1' then
-            error_o <= '1';
+            error_o <= '0';
          end if;
       end if;
    end process p_verifier;
