@@ -80,7 +80,7 @@ architecture synthesis of top is
    signal sys_valid            : std_logic;
    signal sys_active           : std_logic;
    signal sys_error            : std_logic;
-   signal sys_address          : std_logic_vector(20 downto 0);
+   signal sys_address          : std_logic_vector(20 downto 0) := (others => '0');
    signal sys_data_exp         : std_logic_vector(31 downto 0);
    signal sys_data_read        : std_logic_vector(31 downto 0);
 
@@ -117,7 +117,7 @@ begin
    i_trafic_gen : entity work.trafic_gen
       generic map (
          G_DATA_SIZE    => 32,
-         G_ADDRESS_SIZE => 21
+         G_ADDRESS_SIZE => 15
       )
       port map (
          clk_i               => clk_x1,
@@ -125,12 +125,12 @@ begin
          start_i             => sys_start,
          error_o             => sys_error,
          wait_o              => sys_active,
-         address_o           => sys_address,
+         address_o           => sys_address(14 downto 0),
          data_exp_o          => sys_data_exp,
          data_read_o         => sys_data_read,
          avm_write_o         => avm_write,
          avm_read_o          => avm_read,
-         avm_address_o       => avm_address(20 downto 0),
+         avm_address_o       => avm_address(14 downto 0),
          avm_writedata_o     => avm_writedata,
          avm_byteenable_o    => avm_byteenable,
          avm_burstcount_o    => avm_burstcount,

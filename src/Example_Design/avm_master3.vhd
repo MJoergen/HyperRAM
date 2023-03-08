@@ -175,11 +175,21 @@ begin
    begin
       if rising_edge(clk_i) then
          if m_avm_readdatavalid_i = '1' then
-            assert m_avm_readdata_i = mem_data
-               report "ERROR at Address " & to_hstring(m_avm_address_o) &
-               ". Expected " & to_hstring(mem_data) &
-               ", read " & to_hstring(m_avm_readdata_i)
-               severity failure;
+            address_o   <= m_avm_address_o;
+            data_exp_o  <= mem_data;
+            data_read_o <= m_avm_readdata_i;
+            if m_avm_readdata_i /= mem_data then
+               assert false
+                  report "ERROR at Address " & to_hstring(m_avm_address_o) &
+                  ". Expected " & to_hstring(mem_data) &
+                  ", read " & to_hstring(m_avm_readdata_i)
+                  severity failure;
+
+               error_o <= '1';
+            end if;
+         end if;
+         if rst_i = '1' then
+            error_o <= '1';
          end if;
       end if;
    end process p_verifier;
