@@ -32,19 +32,15 @@ entity trafic_gen is
       avm_waitrequest_i   : in  std_logic;
 
       -- Debug output
-      write_burstcount_o  : out std_logic_vector(7 downto 0);
-      read_burstcount_o   : out std_logic_vector(7 downto 0);
       address_o           : out std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
-      data_exp_o          : out std_logic_vector(15 downto 0);
-      data_read_o         : out std_logic_vector(15 downto 0);
+      data_exp_o          : out std_logic_vector(G_DATA_SIZE-1 downto 0);
+      data_read_o         : out std_logic_vector(G_DATA_SIZE-1 downto 0);
       error_o             : out std_logic
    );
 end entity trafic_gen;
 
 architecture synthesis of trafic_gen is
 
-   signal avm_start         : std_logic;
-   signal avm_wait          : std_logic;
    signal avm_write         : std_logic;
    signal avm_read          : std_logic;
    signal avm_address       : std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
@@ -58,52 +54,33 @@ architecture synthesis of trafic_gen is
 begin
 
    --------------------------------------------------------
-   -- Instantiate burst control
-   --------------------------------------------------------
-
-   i_burst_ctrl : entity work.burst_ctrl
-      port map (
-         clk_i              => clk_i,
-         rst_i              => rst_i,
-         start_i            => start_i,
-         wait_o             => wait_o,
-         start_o            => avm_start,
-         wait_i             => avm_wait,
-         write_burstcount_o => write_burstcount_o,
-         read_burstcount_o  => read_burstcount_o
-      ); -- i_burst_ctrl
-
-
-   --------------------------------------------------------
    -- Instantiate Avalon Master
    --------------------------------------------------------
 
-   i_avm_master : entity work.avm_master
+   i_avm_master3 : entity work.avm_master3
       generic map (
          G_DATA_SIZE    => G_DATA_SIZE,
          G_ADDRESS_SIZE => G_ADDRESS_SIZE
       )
       port map (
-         clk_i               => clk_i,
-         rst_i               => rst_i,
-         start_i             => avm_start,
-         wait_o              => avm_wait,
-         write_burstcount_i  => write_burstcount_o,
-         read_burstcount_i   => read_burstcount_o,
-         error_o             => error_o,
-         address_o           => address_o,
-         data_exp_o          => data_exp_o,
-         data_read_o         => data_read_o,
-         avm_write_o         => avm_write,
-         avm_read_o          => avm_read,
-         avm_address_o       => avm_address,
-         avm_writedata_o     => avm_writedata,
-         avm_byteenable_o    => avm_byteenable,
-         avm_burstcount_o    => avm_burstcount,
-         avm_readdata_i      => avm_readdata,
-         avm_readdatavalid_i => avm_readdatavalid,
-         avm_waitrequest_i   => avm_waitrequest
-      ); -- i_avm_master
+         clk_i                 => clk_i,
+         rst_i                 => rst_i,
+         start_i               => start_i,
+         wait_o                => wait_o,
+         error_o               => error_o,
+         address_o             => address_o,
+         data_exp_o            => data_exp_o,
+         data_read_o           => data_read_o,
+         m_avm_write_o         => avm_write,
+         m_avm_read_o          => avm_read,
+         m_avm_address_o       => avm_address,
+         m_avm_writedata_o     => avm_writedata,
+         m_avm_byteenable_o    => avm_byteenable,
+         m_avm_burstcount_o    => avm_burstcount,
+         m_avm_readdata_i      => avm_readdata,
+         m_avm_readdatavalid_i => avm_readdatavalid,
+         m_avm_waitrequest_i   => avm_waitrequest
+      ); -- i_avm_master3
 
 
    --------------------------------------------------------
