@@ -29,12 +29,22 @@ architecture simulation of tb is
    signal avm_write         : std_logic;
    signal avm_read          : std_logic;
    signal avm_address       : std_logic_vector(31 downto 0) := (others => '0');
-   signal avm_writedata     : std_logic_vector(15 downto 0);
-   signal avm_byteenable    : std_logic_vector(1 downto 0);
+   signal avm_writedata     : std_logic_vector(31 downto 0);
+   signal avm_byteenable    : std_logic_vector(3 downto 0);
    signal avm_burstcount    : std_logic_vector(7 downto 0);
-   signal avm_readdata      : std_logic_vector(15 downto 0);
+   signal avm_readdata      : std_logic_vector(31 downto 0);
    signal avm_readdatavalid : std_logic;
    signal avm_waitrequest   : std_logic;
+
+   signal dec_write         : std_logic;
+   signal dec_read          : std_logic;
+   signal dec_address       : std_logic_vector(31 downto 0) := (others => '0');
+   signal dec_writedata     : std_logic_vector(15 downto 0);
+   signal dec_byteenable    : std_logic_vector(1 downto 0);
+   signal dec_burstcount    : std_logic_vector(7 downto 0);
+   signal dec_readdata      : std_logic_vector(15 downto 0);
+   signal dec_readdatavalid : std_logic;
+   signal dec_waitrequest   : std_logic;
 
    signal sys_resetn        : std_logic;
    signal sys_csn           : std_logic;
@@ -115,8 +125,8 @@ begin
 
    i_trafic_gen : entity work.trafic_gen
       generic map (
-         G_DATA_SIZE    => 16,
-         G_ADDRESS_SIZE => 4
+         G_DATA_SIZE    => 32,
+         G_ADDRESS_SIZE => 5
       )
       port map (
          clk_i               => clk_x1,
@@ -126,7 +136,7 @@ begin
          wait_o              => sys_active,
          avm_write_o         => avm_write,
          avm_read_o          => avm_read,
-         avm_address_o       => avm_address(3 downto 0),
+         avm_address_o       => avm_address(4 downto 0),
          avm_writedata_o     => avm_writedata,
          avm_byteenable_o    => avm_byteenable,
          avm_burstcount_o    => avm_burstcount,
@@ -134,6 +144,36 @@ begin
          avm_readdatavalid_i => avm_readdatavalid,
          avm_waitrequest_i   => avm_waitrequest
       ); -- i_trafic_gen
+
+   i_avm_decrease : entity work.avm_decrease
+      generic map (
+         G_SLAVE_ADDRESS_SIZE  => 5,
+         G_SLAVE_DATA_SIZE     => 32,
+         G_MASTER_ADDRESS_SIZE => 6,
+         G_MASTER_DATA_SIZE    => 16
+      )
+      port map (
+         clk_i                 => clk_x1,
+         rst_i                 => rst,
+         s_avm_write_i         => avm_write,
+         s_avm_read_i          => avm_read,
+         s_avm_address_i       => avm_address(4 downto 0),
+         s_avm_writedata_i     => avm_writedata,
+         s_avm_byteenable_i    => avm_byteenable,
+         s_avm_burstcount_i    => avm_burstcount,
+         s_avm_readdata_o      => avm_readdata,
+         s_avm_readdatavalid_o => avm_readdatavalid,
+         s_avm_waitrequest_o   => avm_waitrequest,
+         m_avm_write_o         => dec_write,
+         m_avm_read_o          => dec_read,
+         m_avm_address_o       => dec_address(5 downto 0),
+         m_avm_writedata_o     => dec_writedata,
+         m_avm_byteenable_o    => dec_byteenable,
+         m_avm_burstcount_o    => dec_burstcount,
+         m_avm_readdata_i      => dec_readdata,
+         m_avm_readdatavalid_i => dec_readdatavalid,
+         m_avm_waitrequest_i   => dec_waitrequest
+      ); -- i_avm_decrease
 
 
    --------------------------------------------------------
@@ -146,15 +186,15 @@ begin
          clk_x2_i            => clk_x2,
          clk_x2_del_i        => clk_x2_del,
          rst_i               => rst,
-         avm_write_i         => avm_write,
-         avm_read_i          => avm_read,
-         avm_address_i       => avm_address,
-         avm_writedata_i     => avm_writedata,
-         avm_byteenable_i    => avm_byteenable,
-         avm_burstcount_i    => avm_burstcount,
-         avm_readdata_o      => avm_readdata,
-         avm_readdatavalid_o => avm_readdatavalid,
-         avm_waitrequest_o   => avm_waitrequest,
+         avm_write_i         => dec_write,
+         avm_read_i          => dec_read,
+         avm_address_i       => dec_address,
+         avm_writedata_i     => dec_writedata,
+         avm_byteenable_i    => dec_byteenable,
+         avm_burstcount_i    => dec_burstcount,
+         avm_readdata_o      => dec_readdata,
+         avm_readdatavalid_o => dec_readdatavalid,
+         avm_waitrequest_o   => dec_waitrequest,
          hr_resetn_o         => sys_resetn,
          hr_csn_o            => sys_csn,
          hr_ck_o             => sys_ck,

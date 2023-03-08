@@ -50,12 +50,22 @@ architecture synthesis of top is
    signal avm_write            : std_logic;
    signal avm_read             : std_logic;
    signal avm_address          : std_logic_vector(31 downto 0) := (others => '0');
-   signal avm_writedata        : std_logic_vector(15 downto 0);
-   signal avm_byteenable       : std_logic_vector(1 downto 0);
+   signal avm_writedata        : std_logic_vector(31 downto 0);
+   signal avm_byteenable       : std_logic_vector(3 downto 0);
    signal avm_burstcount       : std_logic_vector(7 downto 0);
-   signal avm_readdata         : std_logic_vector(15 downto 0);
+   signal avm_readdata         : std_logic_vector(31 downto 0);
    signal avm_readdatavalid    : std_logic;
    signal avm_waitrequest      : std_logic;
+
+   signal dec_write            : std_logic;
+   signal dec_read             : std_logic;
+   signal dec_address          : std_logic_vector(31 downto 0) := (others => '0');
+   signal dec_writedata        : std_logic_vector(15 downto 0);
+   signal dec_byteenable       : std_logic_vector(1 downto 0);
+   signal dec_burstcount       : std_logic_vector(7 downto 0);
+   signal dec_readdata         : std_logic_vector(15 downto 0);
+   signal dec_readdatavalid    : std_logic;
+   signal dec_waitrequest      : std_logic;
 
    -- HyperRAM tri-state control signals
    signal hr_rwds_in           : std_logic;
@@ -70,14 +80,12 @@ architecture synthesis of top is
    signal sys_valid            : std_logic;
    signal sys_active           : std_logic;
    signal sys_error            : std_logic;
-   signal sys_address          : std_logic_vector(21 downto 0);
-   signal sys_data_exp         : std_logic_vector(15 downto 0);
-   signal sys_data_read        : std_logic_vector(15 downto 0);
-   signal sys_write_burstcount : std_logic_vector(7 downto 0);
-   signal sys_read_burstcount  : std_logic_vector(7 downto 0);
+   signal sys_address          : std_logic_vector(20 downto 0) := (others => '0');
+   signal sys_data_exp         : std_logic_vector(31 downto 0);
+   signal sys_data_read        : std_logic_vector(31 downto 0);
 
    -- Interface to MEGA65 video
-   signal sys_digits           : std_logic_vector(111 downto 0);
+   signal sys_digits           : std_logic_vector(127 downto 0);
 
 begin
 
@@ -108,8 +116,8 @@ begin
 
    i_trafic_gen : entity work.trafic_gen
       generic map (
-         G_DATA_SIZE    => 16,
-         G_ADDRESS_SIZE => 22
+         G_DATA_SIZE    => 32,
+         G_ADDRESS_SIZE => 15
       )
       port map (
          clk_i               => clk_x1,
@@ -117,14 +125,12 @@ begin
          start_i             => sys_start,
          error_o             => sys_error,
          wait_o              => sys_active,
-         write_burstcount_o  => sys_write_burstcount,
-         read_burstcount_o   => sys_read_burstcount,
-         address_o           => sys_address,
+         address_o           => sys_address(14 downto 0),
          data_exp_o          => sys_data_exp,
          data_read_o         => sys_data_read,
          avm_write_o         => avm_write,
          avm_read_o          => avm_read,
-         avm_address_o       => avm_address(21 downto 0),
+         avm_address_o       => avm_address(14 downto 0),
          avm_writedata_o     => avm_writedata,
          avm_byteenable_o    => avm_byteenable,
          avm_burstcount_o    => avm_burstcount,
@@ -133,6 +139,35 @@ begin
          avm_waitrequest_i   => avm_waitrequest
       ); -- i_trafic_gen
 
+   i_avm_decrease : entity work.avm_decrease
+      generic map (
+         G_SLAVE_ADDRESS_SIZE  => 21,
+         G_SLAVE_DATA_SIZE     => 32,
+         G_MASTER_ADDRESS_SIZE => 22,
+         G_MASTER_DATA_SIZE    => 16
+      )
+      port map (
+         clk_i                 => clk_x1,
+         rst_i                 => rst,
+         s_avm_write_i         => avm_write,
+         s_avm_read_i          => avm_read,
+         s_avm_address_i       => avm_address(20 downto 0),
+         s_avm_writedata_i     => avm_writedata,
+         s_avm_byteenable_i    => avm_byteenable,
+         s_avm_burstcount_i    => avm_burstcount,
+         s_avm_readdata_o      => avm_readdata,
+         s_avm_readdatavalid_o => avm_readdatavalid,
+         s_avm_waitrequest_o   => avm_waitrequest,
+         m_avm_write_o         => dec_write,
+         m_avm_read_o          => dec_read,
+         m_avm_address_o       => dec_address(21 downto 0),
+         m_avm_writedata_o     => dec_writedata,
+         m_avm_byteenable_o    => dec_byteenable,
+         m_avm_burstcount_o    => dec_burstcount,
+         m_avm_readdata_i      => dec_readdata,
+         m_avm_readdatavalid_i => dec_readdatavalid,
+         m_avm_waitrequest_i   => dec_waitrequest
+      ); -- i_avm_decrease
 
    --------------------------------------------------------
    -- Instantiate HyperRAM interface
@@ -144,15 +179,15 @@ begin
          clk_x2_i            => clk_x2,
          clk_x2_del_i        => clk_x2_del,
          rst_i               => rst,
-         avm_write_i         => avm_write,
-         avm_read_i          => avm_read,
-         avm_address_i       => avm_address,
-         avm_writedata_i     => avm_writedata,
-         avm_byteenable_i    => avm_byteenable,
-         avm_burstcount_i    => avm_burstcount,
-         avm_readdata_o      => avm_readdata,
-         avm_readdatavalid_o => avm_readdatavalid,
-         avm_waitrequest_o   => avm_waitrequest,
+         avm_write_i         => dec_write,
+         avm_read_i          => dec_read,
+         avm_address_i       => dec_address,
+         avm_writedata_i     => dec_writedata,
+         avm_byteenable_i    => dec_byteenable,
+         avm_burstcount_i    => dec_burstcount,
+         avm_readdata_o      => dec_readdata,
+         avm_readdatavalid_o => dec_readdatavalid,
+         avm_waitrequest_o   => dec_waitrequest,
          hr_resetn_o         => hr_resetn,
          hr_csn_o            => hr_csn,
          hr_ck_o             => hr_ck,
@@ -187,14 +222,12 @@ begin
    phase_str( 7 downto 4) <= std_logic_vector(to_unsigned((integer(C_HYPERRAM_PHASE)/10)  mod 10, 4));
    phase_str( 3 downto 0) <= std_logic_vector(to_unsigned((integer(C_HYPERRAM_PHASE)/1)   mod 10, 4));
 
-   sys_digits(15 downto  0)   <= sys_data_read;
-   sys_digits(31 downto 16)   <= sys_data_exp;
-   sys_digits(47 downto 32)   <= sys_address(15 downto 0);
-   sys_digits(63 downto 48)   <= X"00" & "00" & sys_address(21 downto 16);
-   sys_digits(79 downto 64)   <= "0000" & freq_str;
-   sys_digits(95 downto 80)   <= "0000" & phase_str;
-   sys_digits(103 downto 96)  <= sys_read_burstcount;
-   sys_digits(111 downto 104) <= sys_write_burstcount;
+   sys_digits( 31 downto  0) <= sys_data_read;
+   sys_digits( 47 downto 32) <= sys_address(15 downto 0);
+   sys_digits( 63 downto 48) <= X"00" & "000" & sys_address(20 downto 16);
+   sys_digits( 79 downto 64) <= "0000" & freq_str;
+   sys_digits( 95 downto 80) <= "0000" & phase_str;
+   sys_digits(127 downto 96) <= sys_data_exp;
 
 
    ----------------------------------
