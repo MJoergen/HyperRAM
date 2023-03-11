@@ -33,6 +33,10 @@ end entity top;
 
 architecture synthesis of top is
 
+   constant C_SYS_ADDRESS_SIZE : integer := 16;
+   constant C_ADDRESS_SIZE     : integer := 22;
+   constant C_DATA_SIZE        : integer := 16;
+
    -- HyperRAM clocks
    signal clk_x1               : std_logic; -- HyperRAM clock
    signal clk_x2               : std_logic; -- Double speed clock
@@ -46,41 +50,12 @@ architecture synthesis of top is
    signal freq_str             : std_logic_vector(11 downto 0);
    signal phase_str            : std_logic_vector(11 downto 0);
 
-   -- Avalon Memory Map interface to HyperRAM Controller
-   signal avm_write            : std_logic;
-   signal avm_read             : std_logic;
-   signal avm_address          : std_logic_vector(31 downto 0) := (others => '0');
-   signal avm_writedata        : std_logic_vector(31 downto 0);
-   signal avm_byteenable       : std_logic_vector(3 downto 0);
-   signal avm_burstcount       : std_logic_vector(7 downto 0);
-   signal avm_readdata         : std_logic_vector(31 downto 0);
-   signal avm_readdatavalid    : std_logic;
-   signal avm_waitrequest      : std_logic;
-
-   signal dec_write            : std_logic;
-   signal dec_read             : std_logic;
-   signal dec_address          : std_logic_vector(31 downto 0) := (others => '0');
-   signal dec_writedata        : std_logic_vector(15 downto 0);
-   signal dec_byteenable       : std_logic_vector(1 downto 0);
-   signal dec_burstcount       : std_logic_vector(7 downto 0);
-   signal dec_readdata         : std_logic_vector(15 downto 0);
-   signal dec_readdatavalid    : std_logic;
-   signal dec_waitrequest      : std_logic;
-
-   -- HyperRAM tri-state control signals
-   signal hr_rwds_in           : std_logic;
-   signal hr_dq_in             : std_logic_vector(7 downto 0);
-   signal hr_rwds_out          : std_logic;
-   signal hr_dq_out            : std_logic_vector(7 downto 0);
-   signal hr_rwds_oe           : std_logic;
-   signal hr_dq_oe             : std_logic;
-
    -- Control and Status for trafic generator
    signal sys_start            : std_logic;
    signal sys_valid            : std_logic;
    signal sys_active           : std_logic;
    signal sys_error            : std_logic;
-   signal sys_address          : std_logic_vector(20 downto 0) := (others => '0');
+   signal sys_address          : std_logic_vector(31 downto 0);
    signal sys_data_exp         : std_logic_vector(31 downto 0);
    signal sys_data_read        : std_logic_vector(31 downto 0);
 
@@ -111,104 +86,32 @@ begin
 
 
    --------------------------------------------------------
-   -- Instantiate trafic generator
+   -- Instantiate core test generator
    --------------------------------------------------------
 
-   i_trafic_gen : entity work.trafic_gen
+   i_core : entity work.core
       generic map (
-         G_DATA_SIZE    => 32,
-         G_ADDRESS_SIZE => 15
+         G_SYS_ADDRESS_SIZE => C_SYS_ADDRESS_SIZE,
+         G_ADDRESS_SIZE     => C_ADDRESS_SIZE,
+         G_DATA_SIZE        => C_DATA_SIZE
       )
       port map (
-         clk_i               => clk_x1,
-         rst_i               => rst,
-         start_i             => sys_start,
-         error_o             => sys_error,
-         wait_o              => sys_active,
-         address_o           => sys_address(14 downto 0),
-         data_exp_o          => sys_data_exp,
-         data_read_o         => sys_data_read,
-         avm_write_o         => avm_write,
-         avm_read_o          => avm_read,
-         avm_address_o       => avm_address(14 downto 0),
-         avm_writedata_o     => avm_writedata,
-         avm_byteenable_o    => avm_byteenable,
-         avm_burstcount_o    => avm_burstcount,
-         avm_readdata_i      => avm_readdata,
-         avm_readdatavalid_i => avm_readdatavalid,
-         avm_waitrequest_i   => avm_waitrequest
-      ); -- i_trafic_gen
-
-   i_avm_decrease : entity work.avm_decrease
-      generic map (
-         G_SLAVE_ADDRESS_SIZE  => 21,
-         G_SLAVE_DATA_SIZE     => 32,
-         G_MASTER_ADDRESS_SIZE => 22,
-         G_MASTER_DATA_SIZE    => 16
-      )
-      port map (
-         clk_i                 => clk_x1,
-         rst_i                 => rst,
-         s_avm_write_i         => avm_write,
-         s_avm_read_i          => avm_read,
-         s_avm_address_i       => avm_address(20 downto 0),
-         s_avm_writedata_i     => avm_writedata,
-         s_avm_byteenable_i    => avm_byteenable,
-         s_avm_burstcount_i    => avm_burstcount,
-         s_avm_readdata_o      => avm_readdata,
-         s_avm_readdatavalid_o => avm_readdatavalid,
-         s_avm_waitrequest_o   => avm_waitrequest,
-         m_avm_write_o         => dec_write,
-         m_avm_read_o          => dec_read,
-         m_avm_address_o       => dec_address(21 downto 0),
-         m_avm_writedata_o     => dec_writedata,
-         m_avm_byteenable_o    => dec_byteenable,
-         m_avm_burstcount_o    => dec_burstcount,
-         m_avm_readdata_i      => dec_readdata,
-         m_avm_readdatavalid_i => dec_readdatavalid,
-         m_avm_waitrequest_i   => dec_waitrequest
-      ); -- i_avm_decrease
-
-   --------------------------------------------------------
-   -- Instantiate HyperRAM interface
-   --------------------------------------------------------
-
-   i_hyperram : entity work.hyperram
-      port map (
-         clk_x1_i            => clk_x1,
-         clk_x2_i            => clk_x2,
-         clk_x2_del_i        => clk_x2_del,
-         rst_i               => rst,
-         avm_write_i         => dec_write,
-         avm_read_i          => dec_read,
-         avm_address_i       => dec_address,
-         avm_writedata_i     => dec_writedata,
-         avm_byteenable_i    => dec_byteenable,
-         avm_burstcount_i    => dec_burstcount,
-         avm_readdata_o      => dec_readdata,
-         avm_readdatavalid_o => dec_readdatavalid,
-         avm_waitrequest_o   => dec_waitrequest,
-         hr_resetn_o         => hr_resetn,
-         hr_csn_o            => hr_csn,
-         hr_ck_o             => hr_ck,
-         hr_rwds_in_i        => hr_rwds_in,
-         hr_dq_in_i          => hr_dq_in,
-         hr_rwds_out_o       => hr_rwds_out,
-         hr_dq_out_o         => hr_dq_out,
-         hr_rwds_oe_o        => hr_rwds_oe,
-         hr_dq_oe_o          => hr_dq_oe
-      ); -- i_hyperram
-
-
-   ----------------------------------
-   -- Tri-state buffers for HyperRAM
-   ----------------------------------
-
-   hr_rwds    <= hr_rwds_out when hr_rwds_oe = '1' else 'Z';
-   hr_dq      <= hr_dq_out   when hr_dq_oe   = '1' else (others => 'Z');
-   hr_rwds_in <= hr_rwds;
-   hr_dq_in   <= hr_dq;
-
+         clk_x1_i     => clk_x1,
+         clk_x2_i     => clk_x2,
+         clk_x2_del_i => clk_x2_del,
+         rst_i        => rst,
+         start_i      => sys_start,
+         error_o      => sys_error,
+         active_o     => sys_active,
+         address_o    => sys_address,
+         data_exp_o   => sys_data_exp,
+         data_read_o  => sys_data_read,
+         hr_resetn_o  => hr_resetn,
+         hr_csn_o     => hr_csn,
+         hr_ck_o      => hr_ck,
+         hr_rwds_io   => hr_rwds,
+         hr_dq_io     => hr_dq
+      ); -- i_core
 
    ----------------------------------
    -- Generate debug output for video

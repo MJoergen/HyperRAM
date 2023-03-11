@@ -63,7 +63,7 @@ create_generated_clock -name clk_x1     [get_pins i_clk/i_clk_hyperram/CLKOUT3]
 startgroup
 create_pblock pblock_i_hyperram
 resize_pblock pblock_i_hyperram -add {SLICE_X0Y200:SLICE_X7Y224}
-add_cells_to_pblock pblock_i_hyperram [get_cells [list i_hyperram]]
+add_cells_to_pblock pblock_i_hyperram [get_cells [list i_core/i_hyperram]]
 endgroup
 
 ########### MEGA65 timing ################

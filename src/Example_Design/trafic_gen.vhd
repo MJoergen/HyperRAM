@@ -67,10 +67,6 @@ begin
          rst_i                 => rst_i,
          start_i               => start_i,
          wait_o                => wait_o,
-         error_o               => error_o,
-         address_o             => address_o,
-         data_exp_o            => data_exp_o,
-         data_read_o           => data_read_o,
          m_avm_write_o         => avm_write,
          m_avm_read_o          => avm_read,
          m_avm_address_o       => avm_address,
@@ -82,6 +78,28 @@ begin
          m_avm_waitrequest_i   => avm_waitrequest
       ); -- i_avm_master3
 
+   i_avm_verifier : entity work.avm_verifier
+      generic map (
+         G_DATA_SIZE    => G_DATA_SIZE,
+         G_ADDRESS_SIZE => G_ADDRESS_SIZE
+      )
+      port map (
+         clk_i               => clk_i,
+         rst_i               => rst_i or start_i,
+         avm_write_i         => avm_write,
+         avm_read_i          => avm_read,
+         avm_address_i       => avm_address,
+         avm_writedata_i     => avm_writedata,
+         avm_byteenable_i    => avm_byteenable,
+         avm_burstcount_i    => avm_burstcount,
+         avm_readdata_i      => avm_readdata,
+         avm_readdatavalid_i => avm_readdatavalid,
+         avm_waitrequest_i   => avm_waitrequest,
+         error_o             => error_o,
+         address_o           => address_o,
+         data_exp_o          => data_exp_o,
+         data_read_o         => data_read_o
+      );
 
    --------------------------------------------------------
    -- Insert occasional breaks into Avalon stream.
