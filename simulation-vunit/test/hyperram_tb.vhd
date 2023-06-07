@@ -111,7 +111,7 @@ begin
    -- Generate clock and reset
    ---------------------------------------------------------
 
-   i_tb_clk : entity work.tb_clk
+   i_clk : entity work.clk
       generic map (
          G_HYPERRAM_FREQ_MHZ => C_HYPERRAM_FREQ_MHZ,
          G_HYPERRAM_PHASE    => C_HYPERRAM_PHASE
@@ -121,7 +121,7 @@ begin
          clk_x2_o     => clk_x2,
          clk_x2_del_o => clk_x2_del,
          rst_o        => rst
-      ); -- i_tb_clk
+      ); -- i_clk
 
    --------------------------------------------------------
    -- Instantiate HyperRAM interface

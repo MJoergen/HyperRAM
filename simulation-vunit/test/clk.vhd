@@ -5,7 +5,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity tb_clk is
+entity clk is
    generic (
       G_HYPERRAM_FREQ_MHZ : integer;
       G_HYPERRAM_PHASE    : real
@@ -16,9 +16,9 @@ entity tb_clk is
       clk_x2_del_o : out std_logic;
       rst_o        : out std_logic
    );
-end entity tb_clk;
+end entity clk;
 
-architecture simulation of tb_clk is
+architecture simulation of clk is
 
    constant C_CLK_PERIOD : time := (1000/G_HYPERRAM_FREQ_MHZ) * 1 ns;
 
