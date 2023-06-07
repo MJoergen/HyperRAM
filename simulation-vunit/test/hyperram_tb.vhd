@@ -32,11 +32,11 @@ architecture bench of hyperram_tb is
    constant AVALON_BUS : bus_master_t := new_bus(data_length => 16, address_length => 32);
 
    shared variable rnd_stimuli, rnd_expected : RandomPType;
-	
+
    constant C_HYPERRAM_FREQ_MHZ : integer := 100;
    constant C_HYPERRAM_PHASE    : real := 162.000;
-   constant C_DELAY         : time := 1 ns;
-   constant G_DATA_SIZE        : integer := 16;
+   constant C_DELAY             : time := 1 ns;
+   constant G_DATA_SIZE         : integer := 16;
 
    signal clk_x1            : std_logic;
    signal clk_x2            : std_logic;
@@ -90,7 +90,7 @@ begin
    ---------------------------------------------------------
    -- Avalon master, generate transactions for hyperram controller
    ---------------------------------------------------------
-   
+
     avalon_mm_master_inst : entity vunit_lib.avalon_master
         generic map (
             BUS_HANDLE => AVALON_BUS
@@ -106,7 +106,8 @@ begin
             read          => avm_read,
             readdata      => avm_readdata,
             readdatavalid => avm_readdatavalid
-        );
+        ); -- avalon_mm_master_inst
+
    ---------------------------------------------------------
    -- Generate clock and reset
    ---------------------------------------------------------
@@ -213,6 +214,11 @@ begin
          RESETNeg => hr_resetn
       ); -- i_s27kl0642
 
+
+   ---------------------------------------------------------
+   -- Main test process
+   ---------------------------------------------------------
+
     main : process is
         variable read_bus_d : std_logic_vector(G_DATA_SIZE-1 downto 0);        -- ncycles counts how many vectors were applied
         variable ncycles : natural;
@@ -229,7 +235,7 @@ begin
                 wait for 1 us;
                 for write_count in 0 to 1023 loop
                     avm_rnd_addr <= (rnd_stimuli.RandSlv(0, 2**23, avm_rnd_addr'length));
-					avm_rnd_data <= (rnd_stimuli.RandSlv(0, 2**15, avm_rnd_data'length));
+                    avm_rnd_data <= (rnd_stimuli.RandSlv(0, 2**15, avm_rnd_data'length));
                     wait for 10 ns;
                     write_bus(net, AVALON_BUS, avm_rnd_addr, avm_rnd_data);
                     wait for 300 ns;
@@ -237,7 +243,7 @@ begin
 
                 for read_count in 0 to 1023 loop
                     avm_rnd_addr <= (rnd_expected.RandSlv(0, 2**23, avm_rnd_addr'length));
-					avm_rnd_data <= (rnd_expected.RandSlv(0, 2**15, avm_rnd_data'length));
+                    avm_rnd_data <= (rnd_expected.RandSlv(0, 2**15, avm_rnd_data'length));
                     wait for 10 ns;
                     read_bus(net, AVALON_BUS, avm_rnd_addr, read_bus_d);
                     check_equal(read_bus_d, avm_rnd_data);
@@ -250,12 +256,12 @@ begin
                 wait for 1 us;
                 for i in 0 to 8191 loop
                    avm_rnd_addr <= (rnd_stimuli.RandSlv(0, 2**23, avm_rnd_addr'length));
-				   avm_rnd_data <= (rnd_stimuli.RandSlv(0, 2**15, avm_rnd_data'length));
+                   avm_rnd_data <= (rnd_stimuli.RandSlv(0, 2**15, avm_rnd_data'length));
                    wait for 10 ns;
                     write_bus(net, AVALON_BUS, avm_rnd_addr, avm_rnd_data);
                    wait for 10 ns;
-					read_bus(net, AVALON_BUS, avm_rnd_addr, read_bus_d);
-					check_equal(read_bus_d, avm_rnd_data);
+                   read_bus(net, AVALON_BUS, avm_rnd_addr, read_bus_d);
+                   check_equal(read_bus_d, avm_rnd_data);
                     wait for 200 ns;
                    nCycles := nCycles + 1;
                 end loop;
@@ -266,3 +272,4 @@ begin
     end process;
 
 end architecture bench;
+
