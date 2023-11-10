@@ -9,7 +9,7 @@ use ieee.numeric_std.all;
 entity top is
    port (
       clk         : in    std_logic;                  -- 100 MHz clock
-      reset_n     : in    std_logic;                  -- CPU reset button (active low)
+      reset       : in    std_logic;                  -- CPU reset button (active high)
 
       -- HyperRAM device interface
       hr_resetn   : out   std_logic;
@@ -77,7 +77,7 @@ begin
       port map
       (
          sys_clk_i    => clk,
-         sys_rstn_i   => reset_n,
+         sys_rstn_i   => not reset,
          clk_x1_o     => clk_x1,
          clk_x2_o     => clk_x2,
          clk_x2_del_o => clk_x2_del,
