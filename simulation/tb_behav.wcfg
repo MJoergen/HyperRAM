@@ -7,22 +7,24 @@
          <top_modules>
             <top_module name="glbl" />
             <top_module name="tb" />
+            <top_module name="vcomponents" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="82.500000 us"></ZoomStartTime>
-      <ZoomEndTime time="447.599790 us"></ZoomEndTime>
-      <Cursor1Time time="500.000000 us"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="489.729040 us"></ZoomEndTime>
+      <Cursor1Time time="301.000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="286"></NameColumnWidth>
-      <ValueColumnWidth column_width="104"></ValueColumnWidth>
+      <ValueColumnWidth column_width="100"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="5" />
    <wvobject type="group" fp_name="group577">
       <obj_property name="label">core</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject type="logic" fp_name="/tb/i_core/clk_x1_i">
          <obj_property name="ElementShortName">clk_x1_i</obj_property>
          <obj_property name="ObjectShortName">clk_x1_i</obj_property>
@@ -384,57 +386,5 @@
       <obj_property name="label">blockram_with_byte_enable</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/tb/i_core/i_trafic_gen/i_avm_verifier/i_blockram_with_byte_enable/a_clk_i">
-         <obj_property name="ElementShortName">a_clk_i</obj_property>
-         <obj_property name="ObjectShortName">a_clk_i</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core/i_trafic_gen/i_avm_verifier/i_blockram_with_byte_enable/a_addr_i">
-         <obj_property name="ElementShortName">a_addr_i[7:0]</obj_property>
-         <obj_property name="ObjectShortName">a_addr_i[7:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core/i_trafic_gen/i_avm_verifier/i_blockram_with_byte_enable/a_wr_data_i">
-         <obj_property name="ElementShortName">a_wr_data_i[15:0]</obj_property>
-         <obj_property name="ObjectShortName">a_wr_data_i[15:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core/i_trafic_gen/i_avm_verifier/i_blockram_with_byte_enable/a_wr_en_i">
-         <obj_property name="ElementShortName">a_wr_en_i[1:0]</obj_property>
-         <obj_property name="ObjectShortName">a_wr_en_i[1:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core/i_trafic_gen/i_avm_verifier/i_blockram_with_byte_enable/a_rd_data_o">
-         <obj_property name="ElementShortName">a_rd_data_o[15:0]</obj_property>
-         <obj_property name="ObjectShortName">a_rd_data_o[15:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core/i_trafic_gen/i_avm_verifier/i_blockram_with_byte_enable/b_clk_i">
-         <obj_property name="ElementShortName">b_clk_i</obj_property>
-         <obj_property name="ObjectShortName">b_clk_i</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core/i_trafic_gen/i_avm_verifier/i_blockram_with_byte_enable/b_addr_i">
-         <obj_property name="ElementShortName">b_addr_i[7:0]</obj_property>
-         <obj_property name="ObjectShortName">b_addr_i[7:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core/i_trafic_gen/i_avm_verifier/i_blockram_with_byte_enable/b_wr_data_i">
-         <obj_property name="ElementShortName">b_wr_data_i[15:0]</obj_property>
-         <obj_property name="ObjectShortName">b_wr_data_i[15:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core/i_trafic_gen/i_avm_verifier/i_blockram_with_byte_enable/b_wr_en_i">
-         <obj_property name="ElementShortName">b_wr_en_i[1:0]</obj_property>
-         <obj_property name="ObjectShortName">b_wr_en_i[1:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core/i_trafic_gen/i_avm_verifier/i_blockram_with_byte_enable/b_rd_data_o">
-         <obj_property name="ElementShortName">b_rd_data_o[15:0]</obj_property>
-         <obj_property name="ObjectShortName">b_rd_data_o[15:0]</obj_property>
-      </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core/i_trafic_gen/i_avm_verifier/i_blockram_with_byte_enable/G_ADDR_SIZE">
-         <obj_property name="ElementShortName">G_ADDR_SIZE</obj_property>
-         <obj_property name="ObjectShortName">G_ADDR_SIZE</obj_property>
-      </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core/i_trafic_gen/i_avm_verifier/i_blockram_with_byte_enable/G_COLUMN_SIZE">
-         <obj_property name="ElementShortName">G_COLUMN_SIZE</obj_property>
-         <obj_property name="ObjectShortName">G_COLUMN_SIZE</obj_property>
-      </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core/i_trafic_gen/i_avm_verifier/i_blockram_with_byte_enable/G_NUM_COLUMNS">
-         <obj_property name="ElementShortName">G_NUM_COLUMNS</obj_property>
-         <obj_property name="ObjectShortName">G_NUM_COLUMNS</obj_property>
-      </wvobject>
    </wvobject>
 </wave_config>

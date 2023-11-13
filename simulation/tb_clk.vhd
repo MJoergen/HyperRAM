@@ -22,44 +22,27 @@ architecture simulation of tb_clk is
 
    constant C_CLK_PERIOD : time := (1000/G_HYPERRAM_FREQ_MHZ) * 1 ns;
 
+   signal sys_clk  : std_logic := '1';
+   signal sys_rstn : std_logic := '0';
+
 begin
 
-   p_clk_x1 : process
-   begin
-      clk_x1_o <= '1';
-      wait for C_CLK_PERIOD/2;
-      clk_x1_o <= '0';
-      wait for C_CLK_PERIOD/2;
-   end process p_clk_x1;
+   sys_clk  <= not sys_clk after C_CLK_PERIOD/2;
+   sys_rstn <= '0', '1' after 100 * C_CLK_PERIOD;
 
-   p_clk_x2 : process
-   begin
-      clk_x2_o <= '1';
-      wait for C_CLK_PERIOD/4;
-      clk_x2_o <= '0';
-      wait for C_CLK_PERIOD/4;
-   end process p_clk_x2;
-
-   p_clk_x2_del : process
-   begin
-      wait for C_CLK_PERIOD/2*(G_HYPERRAM_PHASE/360.0);
-      while true loop
-         clk_x2_del_o <= '1';
-         wait for C_CLK_PERIOD/4;
-         clk_x2_del_o <= '0';
-         wait for C_CLK_PERIOD/4;
-      end loop;
-      wait;
-   end process p_clk_x2_del;
-
-   p_rst : process
-   begin
-      rst_o <= '1';
-      wait for 10*C_CLK_PERIOD;
-      wait until clk_x1_o = '1';
-      rst_o <= '0';
-      wait;
-   end process p_rst;
+   clk_inst : entity work.clk
+      generic map (
+         G_HYPERRAM_FREQ_MHZ => G_HYPERRAM_FREQ_MHZ,
+         G_HYPERRAM_PHASE    => G_HYPERRAM_PHASE
+      )
+      port map (
+         sys_clk_i    => sys_clk,
+         sys_rstn_i   => sys_rstn,
+         clk_x1_o     => clk_x1_o,
+         clk_x2_o     => clk_x2_o,
+         clk_x2_del_o => clk_x2_del_o,
+         rst_o        => rst_o
+      );
 
 end architecture simulation;
 
