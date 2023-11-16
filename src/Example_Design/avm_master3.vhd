@@ -53,7 +53,7 @@ architecture synthesis of avm_master3 is
    signal byteenable_s  : std_logic_vector(G_DATA_SIZE/8-1 downto 0);
    signal write_s       : std_logic_vector(C_WRITE_SIZE-1 downto 0);
 
-   type t_state is (IDLE_ST, INIT_ST, WORKING_ST, READING_ST);
+   type t_state is (IDLE_ST, INIT_ST, WORKING_ST, READING_ST, DONE_ST);
 
    signal state         : t_state := IDLE_ST;
    signal count         : std_logic_vector(G_ADDRESS_SIZE+2 downto 0);
@@ -143,9 +143,14 @@ begin
                      m_avm_write_o <= '0';
                      m_avm_read_o  <= '0';
                      wait_o        <= '0';
-                     state         <= IDLE_ST;
+                     state         <= DONE_ST;
                      report "Done";
                   end if;
+               end if;
+
+            when DONE_ST =>
+               if start_i = '0' then
+                  state <= IDLE_ST;
                end if;
 
             when others =>

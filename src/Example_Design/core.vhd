@@ -13,25 +13,29 @@ entity core is
       G_DATA_SIZE        : integer
    );
    port (
-      clk_x1_i     : in    std_logic; -- Main clock
-      clk_x2_i     : in    std_logic; -- Physical I/O only
-      clk_x2_del_i : in    std_logic; -- Double frequency, phase shifted
-      rst_i        : in    std_logic; -- Synchronous reset
+      clk_x1_i      : in    std_logic; -- Main clock
+      clk_x2_i      : in    std_logic; -- Physical I/O only
+      clk_x2_del_i  : in    std_logic; -- Double frequency, phase shifted
+      rst_i         : in    std_logic; -- Synchronous reset
 
       -- Control and Status for trafic generator
-      start_i      : in    std_logic;
-      active_o     : out   std_logic;
-      error_o      : out   std_logic;
-      address_o    : out   std_logic_vector(31 downto 0) := (others => '0');
-      data_exp_o   : out   std_logic_vector(31 downto 0) := (others => '0');
-      data_read_o  : out   std_logic_vector(31 downto 0) := (others => '0');
+      start_i       : in    std_logic;
+      active_o      : out   std_logic;
+      error_o       : out   std_logic;
+      address_o     : out   std_logic_vector(31 downto 0) := (others => '0');
+      data_exp_o    : out   std_logic_vector(31 downto 0) := (others => '0');
+      data_read_o   : out   std_logic_vector(31 downto 0) := (others => '0');
+
+      -- Statistics
+      count_long_o  : out   unsigned(31 downto 0);
+      count_short_o : out   unsigned(31 downto 0);
 
       -- HyperRAM device interface
-      hr_resetn_o  : out   std_logic;
-      hr_csn_o     : out   std_logic;
-      hr_ck_o      : out   std_logic;
-      hr_rwds_io   : inout std_logic;
-      hr_dq_io     : inout std_logic_vector(7 downto 0)
+      hr_resetn_o   : out   std_logic;
+      hr_csn_o      : out   std_logic;
+      hr_ck_o       : out   std_logic;
+      hr_rwds_io    : inout std_logic;
+      hr_dq_io      : inout std_logic_vector(7 downto 0)
    );
 end entity core;
 
@@ -66,7 +70,29 @@ architecture synthesis of core is
    signal hr_rwds_oe           : std_logic;
    signal hr_dq_oe             : std_logic;
 
+   signal start_d              : std_logic;
+   signal start_long           : unsigned(31 downto 0);
+   signal start_short          : unsigned(31 downto 0);
+   signal count_long           : unsigned(31 downto 0);
+   signal count_short          : unsigned(31 downto 0);
+
 begin
+
+   count_long_o  <= count_long  - start_long;
+   count_short_o <= count_short - start_short;
+
+   p_start : process (clk_x1_i)
+   begin
+      if rising_edge(clk_x1_i) then
+         start_d <= start_i;
+
+         if start_d = '0' and start_i = '1' then
+            start_long  <= count_long;
+            start_short <= count_short;
+         end if;
+      end if;
+   end process p_start;
+
 
    --------------------------------------------------------
    -- Instantiate trafic generator
@@ -159,6 +185,8 @@ begin
          avm_readdata_o      => dec_readdata,
          avm_readdatavalid_o => dec_readdatavalid,
          avm_waitrequest_o   => dec_waitrequest,
+         count_long_o        => count_long,
+         count_short_o       => count_short,
          hr_resetn_o         => hr_resetn_o,
          hr_csn_o            => hr_csn_o,
          hr_ck_o             => hr_ck_o,

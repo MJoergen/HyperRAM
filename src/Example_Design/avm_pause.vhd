@@ -10,7 +10,7 @@ use ieee.numeric_std.all;
 
 entity avm_pause is
    generic (
-      G_PAUSE        : integer;
+      G_PAUSE        : natural;
       G_ADDRESS_SIZE : integer; -- Number of bits
       G_DATA_SIZE    : integer  -- Number of bits
    );
@@ -40,7 +40,7 @@ end entity avm_pause;
 
 architecture synthesis of avm_pause is
 
-   signal cnt : integer range 0 to G_PAUSE;
+   signal cnt : natural range 0 to G_PAUSE;
    signal allow : std_logic;
 
 begin

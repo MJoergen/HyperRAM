@@ -39,6 +39,10 @@ entity hyperram is
       avm_readdatavalid_o : out std_logic;
       avm_waitrequest_o   : out std_logic;
 
+      -- Statistics
+      count_long_o        : out unsigned(31 downto 0);
+      count_short_o       : out unsigned(31 downto 0);
+
       -- HyperRAM device interface
       hr_resetn_o         : out std_logic;
       hr_csn_o            : out std_logic;
@@ -189,6 +193,8 @@ begin
          avm_readdata_o       => cfg_readdata,
          avm_readdatavalid_o  => cfg_readdatavalid,
          avm_waitrequest_o    => cfg_waitrequest,
+         count_long_o         => count_long_o,
+         count_short_o        => count_short_o,
          hb_rstn_o            => ctrl_rstn,
          hb_ck_ddr_o          => ctrl_ck_ddr,
          hb_csn_o             => ctrl_csn,

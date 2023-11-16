@@ -16,6 +16,10 @@ architecture simulation of tb is
    constant C_HYPERRAM_FREQ_MHZ : integer := 100;
    constant C_HYPERRAM_PHASE    : real := 162.000;
    constant C_DELAY         : time := 1 ns;
+   constant C_CLK_PERIOD        : time := (1000/C_HYPERRAM_FREQ_MHZ) * 1 ns;
+
+   signal sys_clk           : std_logic := '1';
+   signal sys_rstn          : std_logic := '0';
 
    signal clk_x1            : std_logic;
    signal clk_x2            : std_logic;
@@ -23,6 +27,10 @@ architecture simulation of tb is
    signal rst               : std_logic;
 
    signal tb_start          : std_logic;
+
+   -- Statistics
+   signal count_long        : unsigned(31 downto 0);
+   signal count_short       : unsigned(31 downto 0);
 
    signal sys_resetn        : std_logic;
    signal sys_csn           : std_logic;
@@ -68,17 +76,22 @@ begin
    -- Generate clock and reset
    ---------------------------------------------------------
 
-   i_tb_clk : entity work.tb_clk
+   sys_clk  <= not sys_clk after C_CLK_PERIOD/2;
+   sys_rstn <= '0', '1' after 100 * C_CLK_PERIOD;
+
+   clk_inst : entity work.clk
       generic map (
          G_HYPERRAM_FREQ_MHZ => C_HYPERRAM_FREQ_MHZ,
          G_HYPERRAM_PHASE    => C_HYPERRAM_PHASE
       )
       port map (
+         sys_clk_i    => sys_clk,
+         sys_rstn_i   => sys_rstn,
          clk_x1_o     => clk_x1,
          clk_x2_o     => clk_x2,
          clk_x2_del_o => clk_x2_del,
          rst_o        => rst
-      ); -- i_tb_clk
+      ); -- clk_inst
 
 
    --------------------------------------------------------
@@ -108,16 +121,18 @@ begin
          G_DATA_SIZE        => 16
       )
       port map (
-         clk_x1_i     => clk_x1,
-         clk_x2_i     => clk_x2,
-         clk_x2_del_i => clk_x2_del,
-         rst_i        => rst,
-         start_i      => tb_start,
-         hr_resetn_o  => sys_resetn,
-         hr_csn_o     => sys_csn,
-         hr_ck_o      => sys_ck,
-         hr_rwds_io   => sys_rwds,
-         hr_dq_io     => sys_dq
+         clk_x1_i      => clk_x1,
+         clk_x2_i      => clk_x2,
+         clk_x2_del_i  => clk_x2_del,
+         rst_i         => rst,
+         start_i       => tb_start,
+         count_long_o  => count_long,
+         count_short_o => count_short,
+         hr_resetn_o   => sys_resetn,
+         hr_csn_o      => sys_csn,
+         hr_ck_o       => sys_ck,
+         hr_rwds_io    => sys_rwds,
+         hr_dq_io      => sys_dq
       ); -- i_core
 
 
