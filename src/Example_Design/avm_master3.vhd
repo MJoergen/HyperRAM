@@ -99,6 +99,7 @@ begin
                   m_avm_writedata_o  <= (others => '1');
                   m_avm_byteenable_o <= (others => '1');
                   m_avm_burstcount_o <= X"01";
+                  count              <= (others => '0');
                   state              <= INIT_ST;
                   if C_SIM then
                      state <= WORKING_ST;

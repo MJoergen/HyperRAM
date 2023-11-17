@@ -187,7 +187,7 @@ begin
    i_mega65 : entity work.mega65
       port map (
          sys_clk      => clk_x1,
-         sys_reset_n  => not rst,
+         sys_reset_n  => '1',
          sys_up_o     => sys_up,
          sys_left_o   => sys_left,
          sys_start_o  => sys_start,

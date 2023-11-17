@@ -58,6 +58,8 @@ architecture synthesis of top is
    -- Control and Status for trafic generator
    signal sys_up               : std_logic;
    signal sys_left             : std_logic;
+   signal sys_up_d             : std_logic;
+   signal sys_left_d           : std_logic;
    signal sys_start            : std_logic;
    signal sys_valid            : std_logic;
    signal sys_active           : std_logic;
@@ -140,8 +142,29 @@ begin
          hr_dq_io      => hr_dq
       ); -- i_core
 
-   ps_en       <= sys_up or sys_left;
-   ps_incdec   <= sys_up;
+   p_ps : process (clk_x1)
+   begin
+      if rising_edge(clk_x1) then
+         ps_en     <= '0';
+         ps_incdec <= '0';
+
+         sys_up_d   <= sys_up;
+         sys_left_d <= sys_left;
+
+         -- "UP" key just pressed
+         if sys_up_d = '0' and sys_up = '1' then
+            ps_en     <= '1';
+            ps_incdec <= '1';
+         end if;
+
+         -- "LEFT" key just pressed
+         if sys_left_d = '0' and sys_left = '1' then
+            ps_en     <= '1';
+            ps_incdec <= '0';
+         end if;
+      end if;
+   end process p_ps;
+
 
    ----------------------------------
    -- Generate debug output for video
@@ -164,7 +187,7 @@ begin
    i_mega65 : entity work.mega65
       port map (
          sys_clk      => clk_x1,
-         sys_reset_n  => not rst,
+         sys_reset_n  => '1',
          sys_up_o     => sys_up,
          sys_left_o   => sys_left,
          sys_start_o  => sys_start,
