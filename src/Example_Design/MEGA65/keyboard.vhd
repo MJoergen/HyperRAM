@@ -10,6 +10,8 @@ entity keyboard is
     kio8        : out std_logic; -- clock to keyboard
     kio9        : out std_logic; -- data output to keyboard
     kio10       : in  std_logic; -- data input from keyboard
+    up_out      : out std_logic := '1';
+    left_out    : out std_logic := '1';
     delete_out  : out std_logic := '1';
     return_out  : out std_logic := '1';   -- Initial register value
     fastkey_out : out std_logic := '1'
@@ -25,6 +27,8 @@ architecture synthesis of keyboard is
 
   signal output_vector : std_logic_vector(127 downto 0);
 
+  signal upkey         : std_logic := '1';
+  signal leftkey       : std_logic := '1';
   signal deletekey     : std_logic := '1';
   signal returnkey     : std_logic := '1';
   signal fastkey       : std_logic := '1';
@@ -41,6 +45,8 @@ begin  -- behavioural
       -- a sync pulse, and clock in the key states, while clocking out the
       -- LED states.
 
+      up_out      <= upkey;
+      left_out    <= leftkey;
       delete_out  <= deletekey;
       return_out  <= returnkey;
       fastkey_out <= fastkey;
@@ -55,6 +61,12 @@ begin  -- behavioural
 
         if kbd_clock='1' and phase < 128 then
           -- Receive keys with dedicated lines
+          if phase = 73 then
+            upkey <= kio10;
+          end if;
+          if phase = 74 then
+            leftkey <= kio10;
+          end if;
           if phase = 76 then
             deletekey <= kio10;
           end if;

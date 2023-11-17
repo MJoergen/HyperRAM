@@ -21,6 +21,8 @@ entity mega65 is
       sys_reset_n  : in  std_logic;                  -- CPU reset button
 
       -- From HyperRAM trafic generator
+      sys_up_o     : out std_logic;
+      sys_left_o   : out std_logic;
       sys_start_o  : out std_logic;
       sys_active_i : in  std_logic;
       sys_error_i  : in  std_logic;
@@ -54,6 +56,8 @@ architecture synthesis of mega65 is
    signal rst            : std_logic;
    signal video_rst      : std_logic;
 
+   signal kbd_up_out     : std_logic;
+   signal kbd_left_out   : std_logic;
    signal kbd_return_out : std_logic;
    signal kbd_active     : std_logic;
    signal kbd_error      : std_logic;
@@ -95,6 +99,8 @@ begin
          kio8           => kb_io0,
          kio9           => kb_io1,
          kio10          => kb_io2,
+         up_out         => kbd_up_out,     -- Active low
+         left_out       => kbd_left_out,   -- Active low
          return_out     => kbd_return_out, -- Active low
          flopled        => kbd_error,
          powerled       => kbd_active
@@ -103,13 +109,17 @@ begin
 
    i_cdc_start: xpm_cdc_array_single
       generic map (
-         WIDTH => 1
+         WIDTH => 3
       )
       port map (
          src_clk     => kbd_clk,
-         src_in(0)   => not kbd_return_out,
+         src_in(0)   => not kbd_up_out,
+         src_in(1)   => not kbd_left_out,
+         src_in(2)   => not kbd_return_out,
          dest_clk    => sys_clk,
-         dest_out(0) => sys_start_o
+         dest_out(0) => sys_up_o,
+         dest_out(1) => sys_left_o,
+         dest_out(2) => sys_start_o
       ); -- i_cdc_start
 
 

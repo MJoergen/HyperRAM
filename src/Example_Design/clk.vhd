@@ -1,9 +1,14 @@
 -- This is the HyperRAM clock synthesis.
 --
+-- The current phase shift is in units of 1000/56 = 17.86 ps (assuming a fVCO period of
+-- 1000 ps, i.e. 1000 MHz).  For a complete 200 MHz clock cycle (period of 5 ns), a total
+-- of 5000/17.86 = 280 shifts are required.
+
 -- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -22,6 +27,12 @@ entity clk is
       clk_x2_o     : out std_logic;   -- 200 MHz
       clk_x2_del_o : out std_logic;   -- 200 MHz phase shifted
       clk_x1_o     : out std_logic;   -- 100 MHz
+      ps_clk_i     : in  std_logic;
+      ps_en_i      : in  std_logic;
+      ps_incdec_i  : in  std_logic;
+      ps_done_o    : out std_logic;
+      ps_count_o   : out std_logic_vector(9 downto 0); -- Phase shift in units of 17.86 ps
+      ps_degrees_o : out std_logic_vector(9 downto 0); -- Phase shift in degrees
       rst_o        : out std_logic
    );
 end entity clk;
@@ -35,7 +46,32 @@ architecture synthesis of clk is
    signal clk_x1_mmcm     : std_logic;
    signal locked          : std_logic;
 
+   -- Set the initial value based in the generic
+   signal ps_count        : integer range 0 to 279 := integer(G_HYPERRAM_PHASE / 360.0 * 280.0);
+
+   signal ps_count_9      : integer range 0 to 279*9;
+   signal ps_degrees_8_2  : integer range 0 to 359*8*8;
+   signal ps_degrees_8_4  : integer range 0 to 359*8*8*8*8;
+   signal phase_degrees   : integer range 0 to 359;
+
 begin
+
+   -- The following calculation calculates phase_degrees = ps_count*9/7
+   ps_count_9     <= ps_count*8 + ps_count;
+   ps_degrees_8_2 <= ps_count_9*(8) +
+                     ps_count_9;
+   ps_degrees_8_4 <= ps_degrees_8_2*(8*8) +
+                     ps_degrees_8_2;
+   phase_degrees  <= (ps_degrees_8_4 + (8*8*8*8)/2) / (8*8*8*8);
+
+   p_output_regs : process (ps_clk_i)
+   begin
+      if rising_edge(ps_clk_i) then
+         ps_degrees_o  <= std_logic_vector(to_unsigned(phase_degrees, 10));
+         ps_count_o    <= std_logic_vector(to_unsigned(ps_count, 10));
+      end if;
+   end process p_output_regs;
+
 
    -- generate HyperRAM clock.
    -- VCO frequency range for Artix 7 speed grade -1 : 600 MHz - 1200 MHz
@@ -59,7 +95,7 @@ begin
          CLKOUT2_DIVIDE       => 5,          -- 200 MHz
          CLKOUT2_PHASE        => G_HYPERRAM_PHASE,
          CLKOUT2_DUTY_CYCLE   => 0.500,
-         CLKOUT2_USE_FINE_PS  => FALSE,
+         CLKOUT2_USE_FINE_PS  => TRUE,
          CLKOUT3_DIVIDE       => 10,         -- 100 MHz
          CLKOUT3_PHASE        => 0.000,
          CLKOUT3_DUTY_CYCLE   => 0.500,
@@ -86,10 +122,10 @@ begin
          DRDY                => open,
          DWE                 => '0',
          -- Ports for dynamic phase shift
-         PSCLK               => '0',
-         PSEN                => '0',
-         PSINCDEC            => '0',
-         PSDONE              => open,
+         PSCLK               => ps_clk_i,
+         PSEN                => ps_en_i,
+         PSINCDEC            => ps_incdec_i,
+         PSDONE              => ps_done_o,
          -- Other control and status signals
          LOCKED              => locked,
          CLKINSTOPPED        => open,
@@ -97,6 +133,27 @@ begin
          PWRDWN              => '0',
          RST                 => not sys_rstn_i
       ); -- i_clk_hyperram
+
+   p_phase_shift : process (ps_clk_i)
+   begin
+      if rising_edge(ps_clk_i) then
+         if ps_en_i = '1' then
+            if ps_incdec_i = '1' then
+               if ps_count < 279 then
+                  ps_count <= ps_count + 1;
+               else
+                  ps_count <= 0;
+               end if;
+            else
+               if ps_count > 0 then
+                  ps_count <= ps_count - 1;
+               else
+                  ps_count <= 279;
+               end if;
+            end if;
+         end if;
+      end if;
+   end process p_phase_shift;
 
 
    -------------------------------------

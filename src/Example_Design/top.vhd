@@ -42,6 +42,13 @@ architecture synthesis of top is
    signal clk_x2               : std_logic; -- Double speed clock
    signal clk_x2_del           : std_logic; -- Double speed clock, phase shifted
 
+   -- Incremental phase shift
+   signal ps_en                : std_logic;
+   signal ps_incdec            : std_logic;
+   signal ps_done              : std_logic;
+   signal ps_count             : std_logic_vector(9 downto 0);
+   signal ps_degrees           : std_logic_vector(9 downto 0);
+
    -- synchronized reset
    signal rst                  : std_logic;
 
@@ -49,6 +56,8 @@ architecture synthesis of top is
    constant C_HYPERRAM_PHASE       : real := 162.000;
 
    -- Control and Status for trafic generator
+   signal sys_up               : std_logic;
+   signal sys_left             : std_logic;
    signal sys_start            : std_logic;
    signal sys_valid            : std_logic;
    signal sys_active           : std_logic;
@@ -91,6 +100,12 @@ begin
          clk_x1_o     => clk_x1,
          clk_x2_o     => clk_x2,
          clk_x2_del_o => clk_x2_del,
+         ps_clk_i     => clk_x1,
+         ps_en_i      => ps_en,
+         ps_incdec_i  => ps_incdec,
+         ps_done_o    => ps_done,
+         ps_count_o   => ps_count,
+         ps_degrees_o => ps_degrees,
          rst_o        => rst
       ); -- i_clk
 
@@ -125,6 +140,9 @@ begin
          hr_dq_io      => hr_dq
       ); -- i_core
 
+   ps_en       <= sys_up or sys_left;
+   ps_incdec   <= sys_up;
+
    ----------------------------------
    -- Generate debug output for video
    ----------------------------------
@@ -133,10 +151,11 @@ begin
    sys_digits( 47 downto  32) <= sys_address(15 downto 0);
    sys_digits( 63 downto  48) <= X"00" & "000" & sys_address(20 downto 16);
    sys_digits( 79 downto  64) <= int2bcd(C_HYPERRAM_FREQ_MHZ);
-   sys_digits( 95 downto  80) <= int2bcd(integer(C_HYPERRAM_PHASE));
+   sys_digits( 95 downto  80) <= int2bcd(to_integer(unsigned(ps_degrees)));
    sys_digits(127 downto  96) <= sys_data_exp;
    sys_digits(159 downto 128) <= std_logic_vector(sys_count_long);
    sys_digits(191 downto 160) <= std_logic_vector(sys_count_short);
+
 
    ----------------------------------
    -- Instantiate MEGA65 platform interface
@@ -146,6 +165,8 @@ begin
       port map (
          sys_clk      => clk_x1,
          sys_reset_n  => not rst,
+         sys_up_o     => sys_up,
+         sys_left_o   => sys_left,
          sys_start_o  => sys_start,
          sys_active_i => sys_active,
          sys_error_i  => sys_error,
