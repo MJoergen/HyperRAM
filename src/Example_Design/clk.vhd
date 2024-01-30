@@ -22,37 +22,37 @@ entity clk is
       G_HYPERRAM_PHASE    : real      -- Must be a multiple of 45/5 = 9
    );
    port (
-      sys_clk_i    : in  std_logic;   -- expects 100 MHz
-      sys_rstn_i   : in  std_logic;   -- Asynchronous, asserted low
-      clk_x2_o     : out std_logic;   -- 200 MHz
-      clk_x2_del_o : out std_logic;   -- 200 MHz phase shifted
-      clk_x1_o     : out std_logic;   -- 100 MHz
-      ps_clk_i     : in  std_logic;
-      ps_en_i      : in  std_logic;
-      ps_incdec_i  : in  std_logic;
-      ps_done_o    : out std_logic;
-      ps_count_o   : out std_logic_vector(9 downto 0); -- Phase shift in units of 17.86 ps
-      ps_degrees_o : out std_logic_vector(9 downto 0); -- Phase shift in degrees
-      rst_o        : out std_logic
+      sys_clk_i      : in  std_logic;   -- expects 100 MHz
+      sys_rstn_i     : in  std_logic;   -- Asynchronous, asserted low
+      clk_x1_o       : out std_logic;   -- 100 MHz
+      clk_x1_del_o   : out std_logic;   -- 100 MHz phase shifted
+      delay_refclk_o : out std_logic;   -- 200 MHz
+      ps_clk_i       : in  std_logic;
+      ps_en_i        : in  std_logic;
+      ps_incdec_i    : in  std_logic;
+      ps_done_o      : out std_logic;
+      ps_count_o     : out std_logic_vector(9 downto 0); -- Phase shift in units of 17.86 ps
+      ps_degrees_o   : out std_logic_vector(9 downto 0); -- Phase shift in degrees
+      rst_o          : out std_logic
    );
 end entity clk;
 
 architecture synthesis of clk is
 
-   signal clkfb           : std_logic;
-   signal clkfb_mmcm      : std_logic;
-   signal clk_x2_mmcm     : std_logic;
-   signal clk_x2_del_mmcm : std_logic;
-   signal clk_x1_mmcm     : std_logic;
-   signal locked          : std_logic;
+   signal clkfb             : std_logic;
+   signal clkfb_mmcm        : std_logic;
+   signal delay_refclk_mmcm : std_logic;
+   signal clk_x1_del_mmcm   : std_logic;
+   signal clk_x1_mmcm       : std_logic;
+   signal locked            : std_logic;
 
    -- Set the initial value based in the generic
-   signal ps_count        : integer range 0 to 279 := integer(G_HYPERRAM_PHASE / 360.0 * 280.0);
+   signal ps_count          : integer range 0 to 279 := integer(G_HYPERRAM_PHASE / 360.0 * 280.0);
 
-   signal ps_count_9      : integer range 0 to 279*9;
-   signal ps_degrees_8_2  : integer range 0 to 359*8*8;
-   signal ps_degrees_8_4  : integer range 0 to 359*8*8*8*8;
-   signal phase_degrees   : integer range 0 to 359;
+   signal ps_count_9        : integer range 0 to 279*9;
+   signal ps_degrees_8_2    : integer range 0 to 359*8*8;
+   signal ps_degrees_8_4    : integer range 0 to 359*8*8*8*8;
+   signal phase_degrees     : integer range 0 to 359;
 
 begin
 
@@ -85,18 +85,18 @@ begin
          CLKIN1_PERIOD        => 10.0,       -- INPUT @ 100 MHz
          REF_JITTER1          => 0.010,
          DIVCLK_DIVIDE        => 1,
-         CLKFBOUT_MULT_F      => (10.0*real(G_HYPERRAM_FREQ_MHZ)/100.0),
+         CLKFBOUT_MULT_F      => 12.000,
          CLKFBOUT_PHASE       => 0.000,
          CLKFBOUT_USE_FINE_PS => FALSE,
-         CLKOUT1_DIVIDE       => 5,          -- 200 MHz
+         CLKOUT1_DIVIDE       => 6,          -- 200 MHz
          CLKOUT1_PHASE        => 0.000,
          CLKOUT1_DUTY_CYCLE   => 0.500,
          CLKOUT1_USE_FINE_PS  => FALSE,
-         CLKOUT2_DIVIDE       => 5,          -- 200 MHz
+         CLKOUT2_DIVIDE       => 12,         -- 100 MHz
          CLKOUT2_PHASE        => G_HYPERRAM_PHASE,
          CLKOUT2_DUTY_CYCLE   => 0.500,
          CLKOUT2_USE_FINE_PS  => TRUE,
-         CLKOUT3_DIVIDE       => 10,         -- 100 MHz
+         CLKOUT3_DIVIDE       => 12,         -- 100 MHz
          CLKOUT3_PHASE        => 0.000,
          CLKOUT3_DUTY_CYCLE   => 0.500,
          CLKOUT3_USE_FINE_PS  => FALSE
@@ -104,8 +104,8 @@ begin
       port map (
          -- Output clocks
          CLKFBOUT            => clkfb_mmcm,
-         CLKOUT1             => clk_x2_mmcm,
-         CLKOUT2             => clk_x2_del_mmcm,
+         CLKOUT1             => delay_refclk_mmcm,
+         CLKOUT2             => clk_x1_del_mmcm,
          CLKOUT3             => clk_x1_mmcm,
          -- Input clock control
          CLKFBIN             => clkfb,
@@ -172,17 +172,17 @@ begin
          O => clk_x1_o
       ); -- i_bufg_clk_x1
 
-   i_bufg_clk_x2 : BUFG
+   i_bufg_clk_x1_del : BUFG
       port map (
-         I => clk_x2_mmcm,
-         O => clk_x2_o
-      ); -- i_bufg_clk_x2
+         I => clk_x1_del_mmcm,
+         O => clk_x1_del_o
+      ); -- i_bufg_clk_x1_del
 
-   i_bufg_clk_x2_del : BUFG
+   i_bufg_delay_refclk : BUFG
       port map (
-         I => clk_x2_del_mmcm,
-         O => clk_x2_del_o
-      ); -- i_bufg_clk_x2_del
+         I => delay_refclk_mmcm,
+         O => delay_refclk_o
+      ); -- i_bufg_delay_refclk
 
 
    -------------------------------------

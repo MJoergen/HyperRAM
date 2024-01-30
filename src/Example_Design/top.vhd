@@ -39,8 +39,8 @@ architecture synthesis of top is
 
    -- HyperRAM clocks
    signal clk_x1               : std_logic; -- HyperRAM clock
-   signal clk_x2               : std_logic; -- Double speed clock
-   signal clk_x2_del           : std_logic; -- Double speed clock, phase shifted
+   signal clk_x1_del           : std_logic; -- HyperRAM clock, phase shifted
+   signal delay_refclk         : std_logic; -- 200 MHz
 
    -- Incremental phase shift
    signal ps_en                : std_logic;
@@ -53,7 +53,7 @@ architecture synthesis of top is
    signal rst                  : std_logic;
 
    constant C_HYPERRAM_FREQ_MHZ    : integer := 100;
-   constant C_HYPERRAM_PHASE       : real := 162.000;
+   constant C_HYPERRAM_PHASE    : real := 90.000;
 
    -- Control and Status for trafic generator
    signal sys_up               : std_logic;
@@ -100,8 +100,8 @@ begin
          sys_clk_i    => clk,
          sys_rstn_i   => reset_n,
          clk_x1_o     => clk_x1,
-         clk_x2_o     => clk_x2,
-         clk_x2_del_o => clk_x2_del,
+         clk_x1_del_o   => clk_x1_del,
+         delay_refclk_o => delay_refclk,
          ps_clk_i     => clk_x1,
          ps_en_i      => ps_en,
          ps_incdec_i  => ps_incdec,
@@ -118,14 +118,15 @@ begin
 
    i_core : entity work.core
       generic map (
+         G_HYPERRAM_FREQ_MHZ => C_HYPERRAM_FREQ_MHZ,
          G_SYS_ADDRESS_SIZE => C_SYS_ADDRESS_SIZE,
          G_ADDRESS_SIZE     => C_ADDRESS_SIZE,
          G_DATA_SIZE        => C_DATA_SIZE
       )
       port map (
          clk_x1_i      => clk_x1,
-         clk_x2_i      => clk_x2,
-         clk_x2_del_i  => clk_x2_del,
+         clk_x1_del_i   => clk_x1_del,
+         delay_refclk_i => delay_refclk,
          rst_i         => rst,
          start_i       => sys_start,
          error_o       => sys_error,

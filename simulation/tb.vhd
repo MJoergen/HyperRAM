@@ -22,8 +22,8 @@ architecture simulation of tb is
    signal sys_rstn          : std_logic := '0';
 
    signal clk_x1            : std_logic;
-   signal clk_x2            : std_logic;
-   signal clk_x2_del        : std_logic;
+   signal clk_x1_del        : std_logic;
+   signal delay_refclk      : std_logic;
    signal rst               : std_logic;
 
    signal ps_clk            : std_logic := '1';
@@ -92,18 +92,18 @@ begin
          G_HYPERRAM_PHASE    => C_HYPERRAM_PHASE
       )
       port map (
-         sys_clk_i    => sys_clk,
-         sys_rstn_i   => sys_rstn,
-         clk_x1_o     => clk_x1,
-         clk_x2_o     => clk_x2,
-         clk_x2_del_o => clk_x2_del,
-         ps_clk_i     => ps_clk,
-         ps_en_i      => ps_en,
-         ps_incdec_i  => ps_incdec,
-         ps_done_o    => ps_done,
-         ps_count_o   => ps_count,
-         ps_degrees_o => ps_degrees,
-         rst_o        => rst
+         sys_clk_i      => sys_clk,
+         sys_rstn_i     => sys_rstn,
+         clk_x1_o       => clk_x1,
+         clk_x1_del_o   => clk_x1_del,
+         delay_refclk_o => delay_refclk,
+         ps_clk_i       => ps_clk,
+         ps_en_i        => ps_en,
+         ps_incdec_i    => ps_incdec,
+         ps_done_o      => ps_done,
+         ps_count_o     => ps_count,
+         ps_degrees_o   => ps_degrees,
+         rst_o          => rst
       ); -- clk_inst
 
 
@@ -115,6 +115,7 @@ begin
       ps_en     <= '0';
       wait for 180 us;
       wait until ps_clk = '1';
+      wait;
 
       loop
         ps_incdec <= '1';
@@ -153,23 +154,24 @@ begin
 
    i_core : entity work.core
       generic map (
-         G_SYS_ADDRESS_SIZE => 8,
-         G_ADDRESS_SIZE     => 22,
-         G_DATA_SIZE        => 16
+         G_HYPERRAM_FREQ_MHZ => C_HYPERRAM_FREQ_MHZ,
+         G_SYS_ADDRESS_SIZE  => 8,
+         G_ADDRESS_SIZE      => 22,
+         G_DATA_SIZE         => 16
       )
       port map (
-         clk_x1_i      => clk_x1,
-         clk_x2_i      => clk_x2,
-         clk_x2_del_i  => clk_x2_del,
-         rst_i         => rst,
-         start_i       => tb_start,
-         count_long_o  => count_long,
-         count_short_o => count_short,
-         hr_resetn_o   => sys_resetn,
-         hr_csn_o      => sys_csn,
-         hr_ck_o       => sys_ck,
-         hr_rwds_io    => sys_rwds,
-         hr_dq_io      => sys_dq
+         clk_x1_i       => clk_x1,
+         clk_x1_del_i   => clk_x1_del,
+         delay_refclk_i => delay_refclk,
+         rst_i          => rst,
+         start_i        => tb_start,
+         count_long_o   => count_long,
+         count_short_o  => count_short,
+         hr_resetn_o    => sys_resetn,
+         hr_csn_o       => sys_csn,
+         hr_ck_o        => sys_ck,
+         hr_rwds_io     => sys_rwds,
+         hr_dq_io       => sys_dq
       ); -- i_core
 
 

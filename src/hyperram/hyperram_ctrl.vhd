@@ -53,6 +53,7 @@ architecture synthesis of hyperram_ctrl is
    type state_t is (
       INIT_ST,
       COMMAND_ADDRESS_ST,
+      SAMPLE_RWDS_ST,
       LATENCY_ST,
       READ_ST,
       WRITE_ST,
@@ -132,20 +133,23 @@ begin
                   hb_ck_ddr_o <= "10";
                   ca_count    <= ca_count - 1;
                else
-                  if hb_rwds_in_i = '1' then
-                     latency_count <= 2*G_LATENCY - 2;
-                     count_long <= count_long + 1;
-                  else
-                     latency_count <= G_LATENCY - 2;
-                     count_short <= count_short + 1;
-                  end if;
                   if config = '1' and read = '0' then
                      recovery_count <= 3;
                      state <= RECOVERY_ST;
                   else
-                     state <= LATENCY_ST;
+                     state <= SAMPLE_RWDS_ST;
                   end if;
                end if;
+
+            when SAMPLE_RWDS_ST =>
+               if hb_rwds_in_i = '1' then
+                  latency_count <= 2*G_LATENCY - 3;
+                  count_long <= count_long + 1;
+               else
+                  latency_count <= G_LATENCY - 3;
+                  count_short <= count_short + 1;
+               end if;
+               state <= LATENCY_ST;
 
             when LATENCY_ST =>
                if latency_count > 0 then

@@ -8,34 +8,35 @@ use ieee.numeric_std.all;
 
 entity core is
    generic (
-      G_ADDRESS_SIZE     : integer;
-      G_SYS_ADDRESS_SIZE : integer;
-      G_DATA_SIZE        : integer
+      G_HYPERRAM_FREQ_MHZ : integer;
+      G_ADDRESS_SIZE      : integer;
+      G_SYS_ADDRESS_SIZE  : integer;
+      G_DATA_SIZE         : integer
    );
    port (
-      clk_x1_i      : in    std_logic; -- Main clock
-      clk_x2_i      : in    std_logic; -- Physical I/O only
-      clk_x2_del_i  : in    std_logic; -- Double frequency, phase shifted
-      rst_i         : in    std_logic; -- Synchronous reset
+      clk_x1_i       : in    std_logic; -- Main clock
+      clk_x1_del_i   : in    std_logic; -- Main clock, phase shifted
+      delay_refclk_i : in    std_logic; -- 200 MHz
+      rst_i          : in    std_logic; -- Synchronous reset
 
       -- Control and Status for trafic generator
-      start_i       : in    std_logic;
-      active_o      : out   std_logic;
-      error_o       : out   std_logic;
-      address_o     : out   std_logic_vector(31 downto 0) := (others => '0');
-      data_exp_o    : out   std_logic_vector(31 downto 0) := (others => '0');
-      data_read_o   : out   std_logic_vector(31 downto 0) := (others => '0');
+      start_i        : in    std_logic;
+      active_o       : out   std_logic;
+      error_o        : out   std_logic;
+      address_o      : out   std_logic_vector(31 downto 0) := (others => '0');
+      data_exp_o     : out   std_logic_vector(31 downto 0) := (others => '0');
+      data_read_o    : out   std_logic_vector(31 downto 0) := (others => '0');
 
       -- Statistics
-      count_long_o  : out   unsigned(31 downto 0);
-      count_short_o : out   unsigned(31 downto 0);
+      count_long_o   : out   unsigned(31 downto 0);
+      count_short_o  : out   unsigned(31 downto 0);
 
       -- HyperRAM device interface
-      hr_resetn_o   : out   std_logic;
-      hr_csn_o      : out   std_logic;
-      hr_ck_o       : out   std_logic;
-      hr_rwds_io    : inout std_logic;
-      hr_dq_io      : inout std_logic_vector(7 downto 0)
+      hr_resetn_o    : out   std_logic;
+      hr_csn_o       : out   std_logic;
+      hr_ck_o        : out   std_logic;
+      hr_rwds_io     : inout std_logic;
+      hr_dq_io       : inout std_logic_vector(7 downto 0)
    );
 end entity core;
 
@@ -67,8 +68,8 @@ architecture synthesis of core is
    signal hr_dq_in             : std_logic_vector(7 downto 0);
    signal hr_rwds_out          : std_logic;
    signal hr_dq_out            : std_logic_vector(7 downto 0);
-   signal hr_rwds_oe           : std_logic;
-   signal hr_dq_oe             : std_logic;
+   signal hr_rwds_oe_n         : std_logic;
+   signal hr_dq_oe_n           : std_logic;
 
    signal start_d              : std_logic;
    signal start_long           : unsigned(31 downto 0);
@@ -171,10 +172,14 @@ begin
    --------------------------------------------------------
 
    i_hyperram : entity work.hyperram
+      generic map (
+         G_HYPERRAM_FREQ_MHZ => G_HYPERRAM_FREQ_MHZ,
+         G_ERRATA_ISSI_D_FIX => true
+      )
       port map (
          clk_x1_i            => clk_x1_i,
-         clk_x2_i            => clk_x2_i,
-         clk_x2_del_i        => clk_x2_del_i,
+         clk_x1_del_i        => clk_x1_del_i,
+         delay_refclk_i      => delay_refclk_i,
          rst_i               => rst_i,
          avm_write_i         => dec_write,
          avm_read_i          => dec_read,
@@ -194,8 +199,8 @@ begin
          hr_dq_in_i          => hr_dq_in,
          hr_rwds_out_o       => hr_rwds_out,
          hr_dq_out_o         => hr_dq_out,
-         hr_rwds_oe_o        => hr_rwds_oe,
-         hr_dq_oe_o          => hr_dq_oe
+         hr_rwds_oe_n_o      => hr_rwds_oe_n,
+         hr_dq_oe_n_o        => hr_dq_oe_n
       ); -- i_hyperram
 
 
@@ -203,8 +208,8 @@ begin
    -- Tri-state buffers for HyperRAM
    ----------------------------------
 
-   hr_rwds_io <= hr_rwds_out when hr_rwds_oe = '1' else 'Z';
-   hr_dq_io   <= hr_dq_out   when hr_dq_oe   = '1' else (others => 'Z');
+   hr_rwds_io <= hr_rwds_out when hr_rwds_oe_n = '0' else 'Z';
+   hr_dq_io   <= hr_dq_out   when hr_dq_oe_n   = '0' else (others => 'Z');
    hr_rwds_in <= hr_rwds_io;
    hr_dq_in   <= hr_dq_io;
 

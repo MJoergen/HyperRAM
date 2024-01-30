@@ -11,6 +11,7 @@ use ieee.numeric_std.all;
 
 entity hyperram_config is
    generic (
+      G_HYPERRAM_FREQ_MHZ : natural;
       G_LATENCY : integer
    );
    port (
@@ -43,7 +44,7 @@ end entity hyperram_config;
 
 architecture synthesis of hyperram_config is
 
-   constant C_INIT_DELAY : integer := 150*100; -- 150 us @ 100 MHz.
+   constant C_INIT_DELAY : integer := 150*G_HYPERRAM_FREQ_MHZ; -- 150 us
 
    -- Decode configuration register 0
    constant R_C0_DPD          : integer := 15;
