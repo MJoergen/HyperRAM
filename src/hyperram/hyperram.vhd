@@ -52,7 +52,7 @@ entity hyperram is
       hr_rwds_oe_n_o      : out std_logic;   -- Output enable for RWDS
       hr_dq_in_i          : in  std_logic_vector(7 downto 0);
       hr_dq_out_o         : out std_logic_vector(7 downto 0);
-      hr_dq_oe_n_o        : out std_logic    -- Output enable for DQ
+      hr_dq_oe_n_o        : out std_logic_vector(7 downto 0)    -- Output enable for DQ
    );
 end entity hyperram;
 

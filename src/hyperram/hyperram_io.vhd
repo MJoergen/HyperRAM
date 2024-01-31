@@ -44,7 +44,7 @@ entity hyperram_io is
       hr_rwds_out_o       : out std_logic;
       hr_dq_out_o         : out std_logic_vector(7 downto 0);
       hr_rwds_oe_n_o      : out std_logic;
-      hr_dq_oe_n_o        : out std_logic
+      hr_dq_oe_n_o        : out std_logic_vector(7 downto 0)
    );
 end entity hyperram_io;
 
@@ -61,8 +61,10 @@ begin
    ------------------------------------------------
 
    b_output : block
-      signal hr_dq_oe_n   : std_logic;
+      signal hr_dq_oe_n   : std_logic_vector(7 downto 0);
       signal hr_rwds_oe_n : std_logic;
+      attribute dont_touch : string;
+      attribute dont_touch of hr_dq_oe_n : signal is "true";
    begin
 
       i_oddr_clk : ODDR
@@ -108,15 +110,15 @@ begin
       p_output : process (clk_x1_i)
       begin
          if rising_edge(clk_x1_i) then
-            hr_dq_oe_n   <= not ctrl_dq_oe_i;
+            hr_dq_oe_n   <= (others => not ctrl_dq_oe_i);
             hr_rwds_oe_n <= not ctrl_rwds_oe_i;
          end if;
       end process p_output;
 
       -- This assert the OE a clock cycle earlier for better timing.
       -- See also the set_multicycle_path constraints in the XDC file.
-      hr_dq_oe_n_o   <= hr_dq_oe_n   and not ctrl_dq_oe_i;
-      hr_rwds_oe_n_o <= hr_rwds_oe_n and not ctrl_rwds_oe_i;
+      hr_dq_oe_n_o   <= hr_dq_oe_n   ; --and not ctrl_dq_oe_i;
+      hr_rwds_oe_n_o <= hr_rwds_oe_n ; --and not ctrl_rwds_oe_i;
 
    end block b_output;
 
