@@ -10,6 +10,8 @@ use ieee.std_logic_unsigned.all;
 
 entity bytewrite_tdp_ram_wf is
    generic(
+      G_DOA_REG  : boolean;
+      G_DOB_REG  : boolean;
       SIZE       : integer;
       ADDR_WIDTH : integer;
       COL_WIDTH  : integer;
@@ -36,6 +38,14 @@ architecture byte_wr_ram_wf of bytewrite_tdp_ram_wf is
    type ram_type is array (0 to SIZE - 1) of std_logic_vector(NB_COL * COL_WIDTH - 1 downto 0);
    shared variable RAM : ram_type := (others => (others => '1'));
 
+   attribute ram_decomp : string;
+   attribute ram_decomp of RAM : variable is "power";
+
+   signal doa_noreg : std_logic_vector(NB_COL * COL_WIDTH - 1 downto 0);
+   signal doa_reg   : std_logic_vector(NB_COL * COL_WIDTH - 1 downto 0);
+   signal dob_noreg : std_logic_vector(NB_COL * COL_WIDTH - 1 downto 0);
+   signal dob_reg   : std_logic_vector(NB_COL * COL_WIDTH - 1 downto 0);
+
 begin
 
 ------- Port A -------
@@ -49,10 +59,14 @@ begin
                   + 1) * COL_WIDTH - 1 downto i * COL_WIDTH);
                end if;
             end loop;
-            doa <= RAM(conv_integer(addra));
+            doa_noreg <= RAM(conv_integer(addra));
          end if;
+         doa_reg <= doa_noreg;
       end if;
    end process;
+
+   doa <= doa_reg when G_DOA_REG else doa_noreg;
+
 
 ------- Port B -------
    process(clkb)
@@ -65,9 +79,13 @@ begin
                   + 1) * COL_WIDTH - 1 downto i * COL_WIDTH);
                end if;
             end loop;
-            dob <= RAM(conv_integer(addrb));
+            dob_noreg <= RAM(conv_integer(addrb));
          end if;
+         dob_reg <= dob_noreg;
       end if;
    end process;
+
+   dob <= dob_reg when G_DOB_REG else dob_noreg;
+
 end architecture byte_wr_ram_wf;
 

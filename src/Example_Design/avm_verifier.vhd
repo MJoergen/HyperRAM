@@ -49,6 +49,8 @@ begin
 
    i_bytewrite_tdp_ram_wf : entity work.bytewrite_tdp_ram_wf
       generic map (
+         G_DOA_REG  => true,
+         G_DOB_REG  => false,
          SIZE       => 2**G_ADDRESS_SIZE,
          ADDR_WIDTH => G_ADDRESS_SIZE,
          COL_WIDTH  => 8,
