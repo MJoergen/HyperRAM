@@ -39,10 +39,47 @@ end entity avm_verifier;
 
 architecture synthesis of avm_verifier is
 
-   signal wr_en    : std_logic_vector(G_DATA_SIZE/8-1 downto 0);
-   signal mem_data : std_logic_vector(G_DATA_SIZE-1 downto 0);
+   signal wr_en      : std_logic_vector(G_DATA_SIZE/8-1 downto 0);
+   signal mem_data   : std_logic_vector(G_DATA_SIZE-1 downto 0);
+
+   -- Debug counters
+   signal req_count  : natural range 0 to 1023;
+   signal read_count : natural range 0 to 1023;
+   signal reading    : std_logic;
 
 begin
+
+   -- Debug counters
+   wait_proc : process (clk_i)
+   begin
+      if rising_edge(clk_i) then
+         if avm_waitrequest_i = '1' then
+            if avm_write_i = '1' or avm_read_i = '1' then
+               req_count <= req_count + 1;
+            end if;
+         else
+            req_count <= 0;
+         end if;
+      end if;
+   end process wait_proc;
+
+   -- Debug counters
+   read_proc : process (clk_i)
+   begin
+      if rising_edge(clk_i) then
+         if avm_waitrequest_i = '0' and avm_read_i = '1' then
+            read_count <= 0;
+            reading <= '1';
+         end if;
+         if reading = '1' then
+            read_count <= read_count + 1;
+         end if;
+         if avm_readdatavalid_i = '1' then
+            reading <= '0';
+         end if;
+      end if;
+   end process read_proc;
+
 
    wr_en <= avm_byteenable_i when avm_write_i = '1' and avm_waitrequest_i = '0'
             else (others => '0');
