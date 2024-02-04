@@ -85,20 +85,6 @@ set tDSHmin -0.8 ; # RWDS to data invalid, min
 ################################################################################
 # FPGA to HyperRAM (address and write data)
 
-# multicycle for OE (assumes OE asserted 1 clock before address/data is driven valid)
-
-#set_multicycle_path 2 -setup -from [get_pins i_core/i_hyperram/i_hyperram_ctrl/hb_dq_oe_o_reg*/C] -to [get_ports hr_dq[*]]
-#set_multicycle_path 1 -hold  -from [get_pins i_core/i_hyperram/i_hyperram_ctrl/hb_dq_oe_o_reg*/C] -to [get_ports hr_dq[*]]
-#
-#set_multicycle_path 2 -setup -from [get_pins i_core/i_hyperram/i_hyperram_ctrl/hb_rwds_oe_o_reg*/C] -to [get_ports hr_rwds]
-#set_multicycle_path 1 -hold  -from [get_pins i_core/i_hyperram/i_hyperram_ctrl/hb_rwds_oe_o_reg*/C] -to [get_ports hr_rwds]
-#
-#set_multicycle_path 2 -setup -from [get_pins i_core/i_hyperram/i_hyperram_io/b_output.hr_dq_oe_n_reg*/C] -to [get_ports hr_dq[*]]
-#set_multicycle_path 1 -hold  -from [get_pins i_core/i_hyperram/i_hyperram_io/b_output.hr_dq_oe_n_reg*/C] -to [get_ports hr_dq[*]]
-#
-#set_multicycle_path 2 -setup -from [get_pins i_core/i_hyperram/i_hyperram_io/b_output.hr_rwds_oe_n_reg*/C] -to [get_ports hr_rwds]
-#set_multicycle_path 1 -hold  -from [get_pins i_core/i_hyperram/i_hyperram_io/b_output.hr_rwds_oe_n_reg*/C] -to [get_ports hr_rwds]
-
 # setup
 set_output_delay -max  $HR_tIS -clock hr_ck [get_ports {hr_rwds hr_dq[*]}]
 set_output_delay -max  $HR_tIS -clock hr_ck [get_ports {hr_rwds hr_dq[*]}] -clock_fall -add_delay

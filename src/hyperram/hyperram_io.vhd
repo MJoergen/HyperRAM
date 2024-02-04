@@ -63,6 +63,10 @@ begin
    b_output : block
       signal hr_dq_oe_n   : std_logic_vector(7 downto 0);
       signal hr_rwds_oe_n : std_logic;
+
+      -- Make sure all eight flip-flops are preserved, even though
+      -- they have identical inputs. This is necessary for the
+      -- set_property IOB TRUE constraint to have effect.
       attribute dont_touch : string;
       attribute dont_touch of hr_dq_oe_n : signal is "true";
    begin
@@ -115,10 +119,8 @@ begin
          end if;
       end process p_output;
 
-      -- This assert the OE a clock cycle earlier for better timing.
-      -- See also the set_multicycle_path constraints in the XDC file.
-      hr_dq_oe_n_o   <= hr_dq_oe_n   ; --and not ctrl_dq_oe_i;
-      hr_rwds_oe_n_o <= hr_rwds_oe_n ; --and not ctrl_rwds_oe_i;
+      hr_dq_oe_n_o   <= hr_dq_oe_n;
+      hr_rwds_oe_n_o <= hr_rwds_oe_n;
 
    end block b_output;
 
