@@ -93,7 +93,6 @@ begin
    p_fsm : process (clk_i)
    begin
       if rising_edge(clk_i) then
-         avm_readdatavalid_o <= '0';
          hb_rstn_o           <= '1';
          hb_dq_oe_o          <= '0';
          hb_rwds_oe_o        <= '0';
@@ -175,8 +174,6 @@ begin
                end if;
 
                if hb_dq_ie_i = '1' then
-                  avm_readdata_o      <= hb_dq_ddr_in_i;
-                  avm_readdatavalid_o <= '1';
                   read_return_count <= read_return_count - 1;
                   if read_return_count = 1 then
                      hb_csn_o       <= '1';
@@ -223,7 +220,6 @@ begin
 
          if rst_i = '1' then
             avm_waitrequest_o   <= '1';
-            avm_readdatavalid_o <= '0';
             state        <= INIT_ST;
             hb_rstn_o    <= '0';
             hb_ck_ddr_o  <= (others => '0');
@@ -235,6 +231,9 @@ begin
          end if;
       end if;
    end process p_fsm;
+
+   avm_readdata_o      <= hb_dq_ddr_in_i;
+   avm_readdatavalid_o <= hb_dq_ie_i when state = READ_ST else '0';
 
    hb_dq_ddr_out_o   <= avm_writedata_i when state = WRITE_BURST_ST else
                         command_address(47 downto 32);
