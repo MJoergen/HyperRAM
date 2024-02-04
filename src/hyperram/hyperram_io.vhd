@@ -141,12 +141,14 @@ begin
       signal hr_toggle        : std_logic := '0';
 
       signal ctrl_toggle      : std_logic;
+      signal ctrl_toggle_d    : std_logic;
       signal ctrl_dq_ddr_in   : std_logic_vector(15 downto 0);
       signal ctrl_dq_ie       : std_logic;
       signal ctrl_rwds_in     : std_logic;
 
       attribute ASYNC_REG : string;
       attribute ASYNC_REG of ctrl_toggle    : signal is "TRUE";
+      attribute ASYNC_REG of ctrl_toggle_d  : signal is "TRUE";
       attribute ASYNC_REG of ctrl_dq_ddr_in : signal is "TRUE";
       attribute ASYNC_REG of ctrl_dq_ie     : signal is "TRUE";
       attribute ASYNC_REG of ctrl_rwds_in   : signal is "TRUE";
@@ -214,11 +216,12 @@ begin
       begin
          if rising_edge(clk_x1_i) then
             ctrl_toggle    <= hr_toggle;
+            ctrl_toggle_d  <= ctrl_toggle;
             ctrl_dq_ddr_in <= hr_dq_in;
-            ctrl_dq_ie     <= hr_toggle xor ctrl_toggle;
             ctrl_rwds_in   <= hr_rwds_in_delay;
          end if;
       end process p_async;
+      ctrl_dq_ie       <= ctrl_toggle_d xor ctrl_toggle;
 
       ctrl_dq_ddr_in_o <= ctrl_dq_ddr_in;
       ctrl_dq_ie_o     <= ctrl_dq_ie;
