@@ -178,7 +178,7 @@ begin
                   if read_return_count = 1 then
                      hb_csn_o       <= '1';
                      hb_ck_ddr_o    <= "00";
-                     recovery_count <= 3;
+                     recovery_count <= 1;
                      state          <= RECOVERY_ST;
                   end if;
                end if;
@@ -196,7 +196,7 @@ begin
                   if write_clk_count > 0 then
                      write_clk_count <= write_clk_count - 1;
                      if write_clk_count = 1 then
-                        recovery_count    <= 4;
+                        recovery_count    <= 2;
                         hb_dq_oe_o        <= '0';
                         hb_rwds_oe_o      <= '0';
                         avm_waitrequest_o <= '1';
