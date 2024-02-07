@@ -14,7 +14,7 @@ end entity tb;
 architecture simulation of tb is
 
    constant C_HYPERRAM_FREQ_MHZ : integer := 100;
-   constant C_HYPERRAM_PHASE    : real := 162.000;
+   constant C_HYPERRAM_PHASE    : real := 90.000;
    constant C_DELAY             : time := 1 ns;
    constant C_CLK_PERIOD        : time := (1000/C_HYPERRAM_FREQ_MHZ) * 1 ns;
 
