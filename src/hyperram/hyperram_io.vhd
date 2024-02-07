@@ -60,7 +60,7 @@ begin
    -- OUTPUT BUFFERS
    ------------------------------------------------
 
-   b_output : block
+   output_block : block is
       signal hr_dq_oe_n   : std_logic_vector(7 downto 0);
       signal hr_rwds_oe_n : std_logic;
 
@@ -71,7 +71,7 @@ begin
       attribute dont_touch of hr_dq_oe_n : signal is "true";
    begin
 
-      i_oddr_clk : ODDR
+      oddr_clk_inst : ODDR
          generic map (
             DDR_CLK_EDGE => "SAME_EDGE"
          )
@@ -81,9 +81,9 @@ begin
             CE => '1',
             Q  => hr_ck_o,
             C  => clk_x1_del_i
-         ); -- i_oddr_clk
+         ); -- oddr_clk_inst
 
-      i_oddr_rwds : ODDR
+      oddr_rwds_inst : ODDR
          generic map (
             DDR_CLK_EDGE => "SAME_EDGE"
          )
@@ -93,10 +93,10 @@ begin
             CE => '1',
             Q  => hr_rwds_out_o,
             C  => clk_x1_i
-         ); -- i_oddr_rwds
+         ); -- oddr_rwds_inst
 
-      gen_oddr_dq : for i in 0 to 7 generate
-         i_oddr_dq : ODDR
+      oddr_dq_gen : for i in 0 to 7 generate
+         oddr_dq_inst : ODDR
             generic map (
                DDR_CLK_EDGE => "SAME_EDGE"
             )
@@ -106,23 +106,23 @@ begin
                CE => '1',
                Q  => hr_dq_out_o(i),
                C  => clk_x1_i
-            ); -- i_oddr_dq
-      end generate gen_oddr_dq;
+            ); -- oddr_dq_inst
+      end generate oddr_dq_gen;
 
       -- The Output Enable signals are active low, because that maps
       -- directly into the TriState pin of an IOBUFT primitive.
-      p_output : process (clk_x1_i)
+      output_proc : process (clk_x1_i)
       begin
          if rising_edge(clk_x1_i) then
             hr_dq_oe_n   <= (others => not ctrl_dq_oe_i);
             hr_rwds_oe_n <= not ctrl_rwds_oe_i;
          end if;
-      end process p_output;
+      end process output_proc;
 
       hr_dq_oe_n_o   <= hr_dq_oe_n;
       hr_rwds_oe_n_o <= hr_rwds_oe_n;
 
-   end block b_output;
+   end block output_block;
 
 
    ------------------------------------------------
@@ -135,7 +135,7 @@ begin
    -- The actual delay is, according to Vivado's timing report, 2.474 ns.
    ------------------------------------------------
 
-   b_input : block
+   input_block : block is
       signal hr_dq_in         : std_logic_vector(15 downto 0);
       signal hr_rwds_in_delay : std_logic;
       signal hr_toggle        : std_logic := '0';
@@ -154,14 +154,14 @@ begin
       attribute ASYNC_REG of ctrl_rwds_in   : signal is "TRUE";
    begin
 
-      i_delay_ctrl : IDELAYCTRL
+      delay_ctrl_inst : IDELAYCTRL
          port map (
             RST    => rst_i,
             REFCLK => delay_refclk_i,
             RDY    => open
-         ); -- i_delay_ctrl
+         ); -- delay_ctrl_inst
 
-      i_delay_rwds : IDELAYE2
+      delay_rwds_inst : IDELAYE2
          generic map (
             IDELAY_TYPE           => "FIXED",
             DELAY_SRC             => "IDATAIN",
@@ -185,10 +185,10 @@ begin
             LDPIPEEN    => '0',
             DATAOUT     => hr_rwds_in_delay,
             CNTVALUEOUT => open
-         ); -- i_delay_rwds
+         ); -- delay_rwds_inst
 
-      gen_iddr_dq : for i in 0 to 7 generate
-         i_iddr_dq : IDDR
+      iddr_dq_gen : for i in 0 to 7 generate
+         iddr_dq_inst : IDDR
             generic map (
                DDR_CLK_EDGE => "SAME_EDGE"
             )
@@ -198,21 +198,21 @@ begin
                Q1 => hr_dq_in(i),
                Q2 => hr_dq_in(i+8),
                C  => not hr_rwds_in_delay
-            ); -- i_iddr_dq
-      end generate gen_iddr_dq;
+            ); -- iddr_dq_inst
+      end generate iddr_dq_gen;
 
       -- This Clock Domain Crossing block is to synchronize the input signal to the
       -- clk_x1_i clock domain. It's not possible to use an ordinary async fifo, because
       -- the input clock RWDS is not free-running.
-      p_hr : process (hr_rwds_in_delay)
+      hr_proc : process (hr_rwds_in_delay)
       begin
          if falling_edge(hr_rwds_in_delay) then
             hr_toggle <= not hr_toggle;
          end if;
-      end process p_hr;
+      end process hr_proc;
 
       -- Clock domain crossing
-      p_async : process (clk_x1_i)
+      async_proc : process (clk_x1_i)
       begin
          if rising_edge(clk_x1_i) then
             ctrl_toggle    <= hr_toggle;
@@ -220,14 +220,14 @@ begin
             ctrl_dq_ddr_in <= hr_dq_in;
             ctrl_rwds_in   <= hr_rwds_in_delay;
          end if;
-      end process p_async;
+      end process async_proc;
       ctrl_dq_ie       <= ctrl_toggle_d xor ctrl_toggle;
 
       ctrl_dq_ddr_in_o <= ctrl_dq_ddr_in;
       ctrl_dq_ie_o     <= ctrl_dq_ie;
       ctrl_rwds_in_o   <= ctrl_rwds_in;
 
-   end block b_input;
+   end block input_block;
 
 end architecture synthesis;
 
