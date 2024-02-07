@@ -5,46 +5,46 @@
 -- Created by Michael Jørgensen in 2023 (mjoergen.github.io/HyperRAM).
 
 library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+   use ieee.std_logic_1164.all;
+   use ieee.numeric_std.all;
 
 library unisim;
-use unisim.vcomponents.all;
+   use unisim.vcomponents.all;
 
 library xpm;
-use xpm.vcomponents.all;
+   use xpm.vcomponents.all;
 
 -- This is the HyperRAM I/O connections
 
 entity hyperram_io is
    port (
-      clk_x1_i            : in  std_logic;
-      clk_x1_del_i        : in  std_logic; -- phase shifted.
-      delay_refclk_i      : in  std_logic; -- 200 MHz
-      rst_i               : in  std_logic;
+      clk_x1_i            : in    std_logic;
+      clk_x1_del_i        : in    std_logic; -- phase shifted.
+      delay_refclk_i      : in    std_logic; -- 200 MHz
+      rst_i               : in    std_logic;
 
       -- Connect to HyperRAM controller
-      ctrl_rstn_i         : in  std_logic;
-      ctrl_ck_ddr_i       : in  std_logic_vector(1 downto 0);
-      ctrl_csn_i          : in  std_logic;
-      ctrl_dq_ddr_in_o    : out std_logic_vector(15 downto 0);
-      ctrl_dq_ddr_out_i   : in  std_logic_vector(15 downto 0);
-      ctrl_dq_oe_i        : in  std_logic;
-      ctrl_dq_ie_o        : out std_logic;
-      ctrl_rwds_ddr_out_i : in  std_logic_vector(1 downto 0);
-      ctrl_rwds_oe_i      : in  std_logic;
-      ctrl_rwds_in_o      : out std_logic;
+      ctrl_rstn_i         : in    std_logic;
+      ctrl_ck_ddr_i       : in    std_logic_vector(1 downto 0);
+      ctrl_csn_i          : in    std_logic;
+      ctrl_dq_ddr_in_o    : out   std_logic_vector(15 downto 0);
+      ctrl_dq_ddr_out_i   : in    std_logic_vector(15 downto 0);
+      ctrl_dq_oe_i        : in    std_logic;
+      ctrl_dq_ie_o        : out   std_logic;
+      ctrl_rwds_ddr_out_i : in    std_logic_vector(1 downto 0);
+      ctrl_rwds_oe_i      : in    std_logic;
+      ctrl_rwds_in_o      : out   std_logic;
 
       -- Connect to HyperRAM device
-      hr_resetn_o         : out std_logic;
-      hr_csn_o            : out std_logic;
-      hr_ck_o             : out std_logic;
-      hr_rwds_in_i        : in  std_logic;
-      hr_dq_in_i          : in  std_logic_vector(7 downto 0);
-      hr_rwds_out_o       : out std_logic;
-      hr_dq_out_o         : out std_logic_vector(7 downto 0);
-      hr_rwds_oe_n_o      : out std_logic;
-      hr_dq_oe_n_o        : out std_logic_vector(7 downto 0)
+      hr_resetn_o         : out   std_logic;
+      hr_csn_o            : out   std_logic;
+      hr_ck_o             : out   std_logic;
+      hr_rwds_in_i        : in    std_logic;
+      hr_dq_in_i          : in    std_logic_vector(7 downto 0);
+      hr_rwds_out_o       : out   std_logic;
+      hr_dq_out_o         : out   std_logic_vector(7 downto 0);
+      hr_rwds_oe_n_o      : out   std_logic;
+      hr_dq_oe_n_o        : out   std_logic_vector(7 downto 0)
    );
 end entity hyperram_io;
 
@@ -52,8 +52,8 @@ architecture synthesis of hyperram_io is
 
 begin
 
-   hr_csn_o       <= ctrl_csn_i;
-   hr_resetn_o    <= ctrl_rstn_i;
+   hr_csn_o    <= ctrl_csn_i;
+   hr_resetn_o <= ctrl_rstn_i;
 
 
    ------------------------------------------------
@@ -61,6 +61,7 @@ begin
    ------------------------------------------------
 
    output_block : block is
+
       signal hr_dq_oe_n   : std_logic_vector(7 downto 0);
       signal hr_rwds_oe_n : std_logic;
 
@@ -69,9 +70,10 @@ begin
       -- set_property IOB TRUE constraint to have effect.
       attribute dont_touch : string;
       attribute dont_touch of hr_dq_oe_n : signal is "true";
+
    begin
 
-      oddr_clk_inst : ODDR
+      oddr_clk_inst : component ODDR
          generic map (
             DDR_CLK_EDGE => "SAME_EDGE"
          )
@@ -83,7 +85,7 @@ begin
             C  => clk_x1_del_i
          ); -- oddr_clk_inst
 
-      oddr_rwds_inst : ODDR
+      oddr_rwds_inst : component ODDR
          generic map (
             DDR_CLK_EDGE => "SAME_EDGE"
          )
@@ -96,7 +98,7 @@ begin
          ); -- oddr_rwds_inst
 
       oddr_dq_gen : for i in 0 to 7 generate
-         oddr_dq_inst : ODDR
+         oddr_dq_inst : component ODDR
             generic map (
                DDR_CLK_EDGE => "SAME_EDGE"
             )
@@ -136,6 +138,7 @@ begin
    ------------------------------------------------
 
    input_block : block is
+
       signal hr_dq_in         : std_logic_vector(15 downto 0);
       signal hr_rwds_in_delay : std_logic;
       signal hr_toggle        : std_logic := '0';
@@ -154,14 +157,14 @@ begin
       attribute ASYNC_REG of ctrl_rwds_in   : signal is "TRUE";
    begin
 
-      delay_ctrl_inst : IDELAYCTRL
+      delay_ctrl_inst : component IDELAYCTRL
          port map (
             RST    => rst_i,
             REFCLK => delay_refclk_i,
             RDY    => open
          ); -- delay_ctrl_inst
 
-      delay_rwds_inst : IDELAYE2
+      delay_rwds_inst : component IDELAYE2
          generic map (
             IDELAY_TYPE           => "FIXED",
             DELAY_SRC             => "IDATAIN",
@@ -188,7 +191,7 @@ begin
          ); -- delay_rwds_inst
 
       iddr_dq_gen : for i in 0 to 7 generate
-         iddr_dq_inst : IDDR
+         iddr_dq_inst : component IDDR
             generic map (
                DDR_CLK_EDGE => "SAME_EDGE"
             )
@@ -221,6 +224,7 @@ begin
             ctrl_rwds_in   <= hr_rwds_in_delay;
          end if;
       end process async_proc;
+
       ctrl_dq_ie       <= ctrl_toggle_d xor ctrl_toggle;
 
       ctrl_dq_ddr_in_o <= ctrl_dq_ddr_in;
