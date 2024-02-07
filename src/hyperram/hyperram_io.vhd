@@ -139,10 +139,12 @@ begin
 
    input_block : block is
 
-      signal hr_dq_in         : std_logic_vector(15 downto 0);
-      signal hr_rwds_in_delay : std_logic;
-      signal hr_toggle        : std_logic := '0';
+      -- Synchronuous to RWDS
+      signal rwds_dq_in    : std_logic_vector(15 downto 0);
+      signal rwds_in_delay : std_logic;
+      signal rwds_toggle   : std_logic := '0';
 
+      -- Synchronuous to hr_clk_x1
       signal ctrl_toggle      : std_logic;
       signal ctrl_toggle_d    : std_logic;
       signal ctrl_dq_ddr_in   : std_logic_vector(15 downto 0);
@@ -186,7 +188,7 @@ begin
             IDATAIN     => hr_rwds_in_i,
             DATAIN      => '0',
             LDPIPEEN    => '0',
-            DATAOUT     => hr_rwds_in_delay,
+            DATAOUT     => rwds_in_delay,
             CNTVALUEOUT => open
          ); -- delay_rwds_inst
 
@@ -198,19 +200,19 @@ begin
             port map (
                D  => hr_dq_in_i(i),
                CE => '1',
-               Q1 => hr_dq_in(i),
-               Q2 => hr_dq_in(i+8),
-               C  => not hr_rwds_in_delay
+               Q1 => rwds_dq_in(i),
+               Q2 => rwds_dq_in(i+8),
+               C  => not rwds_in_delay
             ); -- iddr_dq_inst
       end generate iddr_dq_gen;
 
       -- This Clock Domain Crossing block is to synchronize the input signal to the
       -- clk_x1_i clock domain. It's not possible to use an ordinary async fifo, because
       -- the input clock RWDS is not free-running.
-      hr_proc : process (hr_rwds_in_delay)
+      hr_proc : process (rwds_in_delay)
       begin
-         if falling_edge(hr_rwds_in_delay) then
-            hr_toggle <= not hr_toggle;
+         if falling_edge(rwds_in_delay) then
+            rwds_toggle <= not rwds_toggle;
          end if;
       end process hr_proc;
 
@@ -218,10 +220,10 @@ begin
       async_proc : process (clk_x1_i)
       begin
          if rising_edge(clk_x1_i) then
-            ctrl_toggle    <= hr_toggle;
+            ctrl_toggle    <= rwds_toggle;
             ctrl_toggle_d  <= ctrl_toggle;
-            ctrl_dq_ddr_in <= hr_dq_in;
-            ctrl_rwds_in   <= hr_rwds_in_delay;
+            ctrl_dq_ddr_in <= rwds_dq_in;
+            ctrl_rwds_in   <= rwds_in_delay;
          end if;
       end process async_proc;
 
