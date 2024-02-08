@@ -71,12 +71,13 @@ set_clock_groups -name cg_async -asynchronous \
  -group [get_clocks -include_generated_clocks clk] \
  -group [get_clocks hr_rwds]
 
-set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_io/b_output.hr_rwds_oe_n_reg ]
-set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_io/b_output.hr_dq_oe_n_reg[*] ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_io/output_block.hr_rwds_oe_n_reg ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_io/output_block.hr_dq_oe_n_reg[*] ]
 
 ################################################################################
 # HyperRAM timing (correct for IS66WVH8M8DBLL-100B1LI)
 
+set tCKHP    5.0 ; # Clock Half Period
 set HR_tIS   1.0 ; # input setup time
 set HR_tIH   1.0 ; # input hold time
 set tDSSmax  0.8 ; # RWDS to data valid, max
@@ -98,12 +99,12 @@ set_output_delay -min -$HR_tIH -clock hr_ck [get_ports {hr_rwds hr_dq[*]}] -cloc
 # edge aligned, so pretend that data is launched by previous edge
 
 # setup
-set_input_delay -max [expr 5.0+$tDSSmax] -clock hr_rwds [get_ports hr_dq[*]]
-set_input_delay -max [expr 5.0+$tDSSmax] -clock hr_rwds [get_ports hr_dq[*]] -clock_fall -add_delay
+set_input_delay -max [expr $tCKHP + $tDSSmax] -clock hr_rwds [get_ports hr_dq[*]]
+set_input_delay -max [expr $tCKHP + $tDSSmax] -clock hr_rwds [get_ports hr_dq[*]] -clock_fall -add_delay
 
 # hold
-set_input_delay -min [expr 5.0+$tDSHmin] -clock hr_rwds [get_ports hr_dq[*]]
-set_input_delay -min [expr 5.0+$tDSHmin] -clock hr_rwds [get_ports hr_dq[*]] -clock_fall -add_delay
+set_input_delay -min [expr $tCKHP + $tDSHmin] -clock hr_rwds [get_ports hr_dq[*]]
+set_input_delay -min [expr $tCKHP + $tDSHmin] -clock hr_rwds [get_ports hr_dq[*]] -clock_fall -add_delay
 
 
 ########### MEGA65 timing ################
