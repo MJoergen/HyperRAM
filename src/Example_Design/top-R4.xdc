@@ -66,13 +66,8 @@ create_generated_clock -name hr_ck         [get_ports hr_ck] \
 # HyperRAM RWDS as a clock for the read path (hr_dq -> IDDR -> XPM FIFO)
 create_clock -period 10.000 -name hr_rwds -waveform {2.5 7.5} [get_ports hr_rwds]
 
-# Asynchronous clock groups
-set_clock_groups -name cg_async -asynchronous \
- -group [get_clocks -include_generated_clocks clk] \
- -group [get_clocks hr_rwds]
-
-set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_io/output_block.hr_rwds_oe_n_reg ]
-set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_io/output_block.hr_dq_oe_n_reg[*] ]
+# Asynchronous clocks
+set_false_path -from [get_ports hr_rwds] -to [get_clocks hr_ck]
 
 ################################################################################
 # HyperRAM timing (correct for IS66WVH8M8DBLL-100B1LI)
@@ -85,6 +80,9 @@ set tDSHmin -0.8 ; # RWDS to data invalid, min
 
 ################################################################################
 # FPGA to HyperRAM (address and write data)
+
+set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_io/output_block.hr_rwds_oe_n_reg ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_io/output_block.hr_dq_oe_n_reg[*] ]
 
 # setup
 set_output_delay -max  $HR_tIS -clock hr_ck [get_ports {hr_rwds hr_dq[*]}]

@@ -145,18 +145,12 @@ begin
       signal rwds_toggle   : std_logic := '0';
 
       -- Synchronuous to hr_clk_x1
-      signal ctrl_toggle      : std_logic;
-      signal ctrl_toggle_d    : std_logic;
-      signal ctrl_dq_ddr_in   : std_logic_vector(15 downto 0);
-      signal ctrl_dq_ie       : std_logic;
-      signal ctrl_rwds_in     : std_logic;
+      signal ctrl_dq_ddr_in : std_logic_vector(15 downto 0);
+      signal ctrl_dq_ie     : std_logic;
+      signal ctrl_rwds_in   : std_logic;
+      signal ctrl_toggle    : std_logic;
+      signal ctrl_toggle_d  : std_logic;
 
-      attribute ASYNC_REG : string;
-      attribute ASYNC_REG of ctrl_toggle    : signal is "TRUE";
-      attribute ASYNC_REG of ctrl_toggle_d  : signal is "TRUE";
-      attribute ASYNC_REG of ctrl_dq_ddr_in : signal is "TRUE";
-      attribute ASYNC_REG of ctrl_dq_ie     : signal is "TRUE";
-      attribute ASYNC_REG of ctrl_rwds_in   : signal is "TRUE";
    begin
 
       delay_ctrl_inst : component IDELAYCTRL
@@ -209,29 +203,45 @@ begin
       -- This Clock Domain Crossing block is to synchronize the input signal to the
       -- clk_x1_i clock domain. It's not possible to use an ordinary async fifo, because
       -- the input clock RWDS is not free-running.
-      hr_proc : process (rwds_in_delay)
+
+      rwds_toggle_proc : process (rwds_in_delay)
       begin
          if falling_edge(rwds_in_delay) then
             rwds_toggle <= not rwds_toggle;
          end if;
-      end process hr_proc;
+      end process rwds_toggle_proc;
 
-      -- Clock domain crossing
-      async_proc : process (clk_x1_i)
-      begin
-         if rising_edge(clk_x1_i) then
-            ctrl_toggle    <= rwds_toggle;
-            ctrl_toggle_d  <= ctrl_toggle;
-            ctrl_dq_ddr_in <= rwds_dq_in;
-            ctrl_rwds_in   <= rwds_in_delay;
-         end if;
-      end process async_proc;
+      xpm_cdc_array_single_inst : component xpm_cdc_array_single
+         generic map (
+            DEST_SYNC_FF   => 2,
+            INIT_SYNC_FF   => 0,
+            SIM_ASSERT_CHK => 0,
+            SRC_INPUT_REG  => 0,
+            WIDTH          => 18
+         )
+         port map (
+            src_clk               => '0',
+            src_in(15 downto 0)   => rwds_dq_in,
+            src_in(16)            => rwds_in_delay,
+            src_in(17)            => rwds_toggle,
+            dest_clk              => clk_x1_i,
+            dest_out(15 downto 0) => ctrl_dq_ddr_in,
+            dest_out(16)          => ctrl_rwds_in,
+            dest_out(17)          => ctrl_toggle
+         );
 
       ctrl_dq_ie       <= ctrl_toggle_d xor ctrl_toggle;
 
       ctrl_dq_ddr_in_o <= ctrl_dq_ddr_in;
       ctrl_dq_ie_o     <= ctrl_dq_ie;
       ctrl_rwds_in_o   <= ctrl_rwds_in;
+
+      ctrl_dq_ie_proc : process (clk_x1_i)
+      begin
+         if rising_edge(clk_x1_i) then
+            ctrl_toggle_d <= ctrl_toggle;
+         end if;
+      end process ctrl_dq_ie_proc;
 
    end block input_block;
 

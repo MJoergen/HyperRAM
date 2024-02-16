@@ -36,10 +36,10 @@ end bytewrite_tdp_ram_wf;
 architecture byte_wr_ram_wf of bytewrite_tdp_ram_wf is
 
    type ram_type is array (0 to SIZE - 1) of std_logic_vector(NB_COL * COL_WIDTH - 1 downto 0);
-   shared variable RAM : ram_type := (others => (others => '1'));
+   signal RAM : ram_type := (others => (others => '1'));
 
    attribute ram_decomp : string;
-   attribute ram_decomp of RAM : variable is "power";
+   attribute ram_decomp of RAM : signal is "power";
 
    signal doa_noreg : std_logic_vector(NB_COL * COL_WIDTH - 1 downto 0);
    signal doa_reg   : std_logic_vector(NB_COL * COL_WIDTH - 1 downto 0);
@@ -55,7 +55,7 @@ begin
          if ena = '1' then
             for i in 0 to NB_COL - 1 loop
                if wea(i) = '1' then
-                  RAM(conv_integer(addra))((i + 1) * COL_WIDTH - 1 downto i * COL_WIDTH) := dia((i
+                  RAM(conv_integer(addra))((i + 1) * COL_WIDTH - 1 downto i * COL_WIDTH) <= dia((i
                   + 1) * COL_WIDTH - 1 downto i * COL_WIDTH);
                end if;
             end loop;
@@ -75,7 +75,7 @@ begin
          if enb = '1' then
             for i in 0 to NB_COL - 1 loop
                if web(i) = '1' then
-                  RAM(conv_integer(addrb))((i + 1) * COL_WIDTH - 1 downto i * COL_WIDTH) := dib((i
+                  RAM(conv_integer(addrb))((i + 1) * COL_WIDTH - 1 downto i * COL_WIDTH) <= dib((i
                   + 1) * COL_WIDTH - 1 downto i * COL_WIDTH);
                end if;
             end loop;
