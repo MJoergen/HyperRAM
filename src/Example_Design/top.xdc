@@ -59,13 +59,6 @@ create_generated_clock -name delay_refclk [get_pins i_clk/i_clk_hyperram/CLKOUT1
 create_generated_clock -name clk_x1_del   [get_pins i_clk/i_clk_hyperram/CLKOUT2]
 create_generated_clock -name clk_x1       [get_pins i_clk/i_clk_hyperram/CLKOUT3]
 
-# Place HyperRAM close to I/O pins
-startgroup
-create_pblock pblock_i_hyperram
-resize_pblock pblock_i_hyperram -add {SLICE_X0Y200:SLICE_X7Y224}
-add_cells_to_pblock pblock_i_hyperram [get_cells [list i_core/i_hyperram]]
-endgroup
-
 # HyperRAM output clock relative to delayed clock
 create_generated_clock -name hr_ck         [get_ports hr_ck] \
    -source [get_pins i_clk/i_clk_hyperram/CLKOUT2] -multiply_by 1
@@ -90,14 +83,16 @@ set tDSHmin -0.8 ; # RWDS to data invalid, min
 
 set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_io/output_block.hr_rwds_oe_n_reg ]
 set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_io/output_block.hr_dq_oe_n_reg[*] ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_ctrl/hb_csn_o_reg ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_ctrl/hb_rstn_o_reg ]
 
 # setup
-set_output_delay -max  $HR_tIS -clock hr_ck [get_ports {hr_rwds hr_dq[*]}]
-set_output_delay -max  $HR_tIS -clock hr_ck [get_ports {hr_rwds hr_dq[*]}] -clock_fall -add_delay
+set_output_delay -max  $HR_tIS -clock hr_ck [get_ports {hr_resetn hr_csn hr_rwds hr_dq[*]}]
+set_output_delay -max  $HR_tIS -clock hr_ck [get_ports {hr_resetn hr_csn hr_rwds hr_dq[*]}] -clock_fall -add_delay
 
 # hold
-set_output_delay -min -$HR_tIH -clock hr_ck [get_ports {hr_rwds hr_dq[*]}]
-set_output_delay -min -$HR_tIH -clock hr_ck [get_ports {hr_rwds hr_dq[*]}] -clock_fall -add_delay
+set_output_delay -min -$HR_tIH -clock hr_ck [get_ports {hr_resetn hr_csn hr_rwds hr_dq[*]}]
+set_output_delay -min -$HR_tIH -clock hr_ck [get_ports {hr_resetn hr_csn hr_rwds hr_dq[*]}] -clock_fall -add_delay
 
 ################################################################################
 # HyperRAM to FPGA (read data, clocked in by RWDS)

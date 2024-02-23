@@ -36,8 +36,8 @@ entity hyperram_ctrl is
 
       -- HyperBus control signals
       hb_rstn_o           : out std_logic;
-      hb_ck_ddr_o         : out std_logic_vector(1 downto 0);
       hb_csn_o            : out std_logic;
+      hb_ck_ddr_o         : out std_logic_vector(1 downto 0);
       hb_dq_ddr_in_i      : in  std_logic_vector(15 downto 0);
       hb_dq_ddr_out_o     : out std_logic_vector(15 downto 0);
       hb_dq_oe_o          : out std_logic;

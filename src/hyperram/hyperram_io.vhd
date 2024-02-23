@@ -25,8 +25,8 @@ entity hyperram_io is
 
       -- Connect to HyperRAM controller
       ctrl_rstn_i         : in    std_logic;
-      ctrl_ck_ddr_i       : in    std_logic_vector(1 downto 0);
       ctrl_csn_i          : in    std_logic;
+      ctrl_ck_ddr_i       : in    std_logic_vector(1 downto 0);
       ctrl_dq_ddr_in_o    : out   std_logic_vector(15 downto 0);
       ctrl_dq_ddr_out_i   : in    std_logic_vector(15 downto 0);
       ctrl_dq_oe_i        : in    std_logic;
@@ -40,10 +40,10 @@ entity hyperram_io is
       hr_csn_o            : out   std_logic;
       hr_ck_o             : out   std_logic;
       hr_rwds_in_i        : in    std_logic;
-      hr_dq_in_i          : in    std_logic_vector(7 downto 0);
       hr_rwds_out_o       : out   std_logic;
-      hr_dq_out_o         : out   std_logic_vector(7 downto 0);
       hr_rwds_oe_n_o      : out   std_logic;
+      hr_dq_in_i          : in    std_logic_vector(7 downto 0);
+      hr_dq_out_o         : out   std_logic_vector(7 downto 0);
       hr_dq_oe_n_o        : out   std_logic_vector(7 downto 0)
    );
 end entity hyperram_io;
