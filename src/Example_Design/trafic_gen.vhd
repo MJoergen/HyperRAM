@@ -35,7 +35,7 @@ entity trafic_gen is
       address_o           : out std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
       data_exp_o          : out std_logic_vector(G_DATA_SIZE-1 downto 0);
       data_read_o         : out std_logic_vector(G_DATA_SIZE-1 downto 0);
-      error_o             : out std_logic
+      count_error_o       : out unsigned(31 downto 0)
    );
 end entity trafic_gen;
 
@@ -95,7 +95,7 @@ begin
          avm_readdata_i      => avm_readdata,
          avm_readdatavalid_i => avm_readdatavalid,
          avm_waitrequest_i   => avm_waitrequest,
-         error_o             => error_o,
+         count_error_o       => count_error_o,
          address_o           => address_o,
          data_exp_o          => data_exp_o,
          data_read_o         => data_read_o

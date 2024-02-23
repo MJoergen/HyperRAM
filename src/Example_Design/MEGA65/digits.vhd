@@ -45,7 +45,9 @@ architecture synthesis of digits is
    constant PIXEL_WHITE : std_logic_vector(7 downto 0) := B"111_111_11";
 
    type txt_t is array (0 to 7*NUM_ROWS-1) of character;
-   constant txt : txt_t := "FAST-HI" &
+   constant txt : txt_t := " ERR-HI" &
+                           " ERR-LO" &
+                           "FAST-HI" &
                            "FAST-LO" &
                            "SLOW-HI" &
                            "SLOW-LO" &

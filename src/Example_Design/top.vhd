@@ -69,9 +69,10 @@ architecture synthesis of top is
    signal sys_data_read        : std_logic_vector(31 downto 0);
    signal sys_count_long       : unsigned(31 downto 0);
    signal sys_count_short      : unsigned(31 downto 0);
+   signal sys_count_error      : unsigned(31 downto 0);
 
    -- Interface to MEGA65 video
-   signal sys_digits           : std_logic_vector(191 downto 0);
+   signal sys_digits           : std_logic_vector(223 downto 0);
 
    -- Convert an integer to BCD (4 bits per digit)
    pure function int2bcd(arg : integer) return std_logic_vector is
@@ -129,13 +130,13 @@ begin
          delay_refclk_i => delay_refclk,
          rst_i         => rst,
          start_i       => sys_start,
-         error_o       => sys_error,
          active_o      => sys_active,
          address_o     => sys_address,
          data_exp_o    => sys_data_exp,
          data_read_o   => sys_data_read,
          count_long_o  => sys_count_long,
          count_short_o => sys_count_short,
+         count_error_o => sys_count_error,
          hr_resetn_o   => hr_resetn,
          hr_csn_o      => hr_csn,
          hr_ck_o       => hr_ck,
@@ -179,6 +180,9 @@ begin
    sys_digits(127 downto  96) <= sys_data_exp;
    sys_digits(159 downto 128) <= std_logic_vector(sys_count_long);
    sys_digits(191 downto 160) <= std_logic_vector(sys_count_short);
+   sys_digits(223 downto 192) <= std_logic_vector(sys_count_error);
+
+   sys_error <= or(std_logic_vector(sys_count_error));
 
 
    ----------------------------------

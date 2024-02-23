@@ -22,7 +22,6 @@ entity core is
       -- Control and Status for trafic generator
       start_i        : in    std_logic;
       active_o       : out   std_logic;
-      error_o        : out   std_logic;
       address_o      : out   std_logic_vector(31 downto 0) := (others => '0');
       data_exp_o     : out   std_logic_vector(31 downto 0) := (others => '0');
       data_read_o    : out   std_logic_vector(31 downto 0) := (others => '0');
@@ -30,6 +29,7 @@ entity core is
       -- Statistics
       count_long_o   : out   unsigned(31 downto 0);
       count_short_o  : out   unsigned(31 downto 0);
+      count_error_o  : out   unsigned(31 downto 0);
 
       -- HyperRAM device interface
       hr_resetn_o    : out   std_logic;
@@ -108,11 +108,11 @@ begin
          clk_i               => clk_x1_i,
          rst_i               => rst_i,
          start_i             => start_i,
-         error_o             => error_o,
          wait_o              => active_o,
          address_o           => address_o(G_SYS_ADDRESS_SIZE-1 downto 0),
          data_exp_o          => data_exp_o(G_DATA_SIZE-1 downto 0),
          data_read_o         => data_read_o(G_DATA_SIZE-1 downto 0),
+         count_error_o       => count_error_o,
          avm_write_o         => avm_write,
          avm_read_o          => avm_read,
          avm_address_o       => avm_address(G_SYS_ADDRESS_SIZE-1 downto 0),

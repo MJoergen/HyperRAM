@@ -30,7 +30,7 @@ entity avm_verifier is
       avm_readdatavalid_i : in  std_logic;
       avm_waitrequest_i   : in  std_logic;
       -- Debug output
-      error_o             : out std_logic;
+      count_error_o       : out unsigned(31 downto 0);
       address_o           : out std_logic_vector(G_ADDRESS_SIZE-1 downto 0) := (others => '0');
       data_exp_o          : out std_logic_vector(G_DATA_SIZE-1 downto 0) := (others => '0');
       data_read_o         : out std_logic_vector(G_DATA_SIZE-1 downto 0) := (others => '0')
@@ -122,11 +122,11 @@ begin
                   ", read " & to_hstring(avm_readdata_i)
                   severity failure;
 
-               error_o <= '1';
+               count_error_o <= count_error_o + X"00000001";
             end if;
          end if;
          if rst_i = '1' then
-            error_o <= '0';
+            count_error_o <= (others => '0');
          end if;
       end if;
    end process p_verifier;
