@@ -23,6 +23,10 @@ entity top is
       kb_io1      : out   std_logic;
       kb_io2      : in    std_logic;
 
+      -- UART
+      uart_rx_i   : in    std_logic;
+      uart_tx_o   : out   std_logic;
+
       -- MEGA65 Digital Video (HDMI)
       hdmi_data_p : out   std_logic_vector(2 downto 0);
       hdmi_data_n : out   std_logic_vector(2 downto 0);
@@ -199,6 +203,8 @@ begin
          sys_active_i => sys_active,
          sys_error_i  => sys_error,
          sys_digits_i => sys_digits,
+         uart_rx_i    => uart_rx_i,
+         uart_tx_o    => uart_tx_o,
          kb_io0       => kb_io0,
          kb_io1       => kb_io1,
          kb_io2       => kb_io2,
