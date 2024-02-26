@@ -33,6 +33,10 @@ entity mega65 is
       kb_io1       : out std_logic;
       kb_io2       : in  std_logic;
 
+      -- UART
+      uart_rx_i    : in  std_logic;
+      uart_tx_o    : out std_logic;
+
       -- Digital Video
       hdmi_data_p  : out std_logic_vector(2 downto 0);
       hdmi_data_n  : out std_logic_vector(2 downto 0);
@@ -115,13 +119,14 @@ begin
          src_clk     => kbd_clk,
          src_in(0)   => not kbd_up_out,
          src_in(1)   => not kbd_left_out,
-         src_in(2)   => not kbd_return_out,
+         src_in(2)   => (not kbd_return_out) or (not uart_rx_i),
          dest_clk    => sys_clk,
          dest_out(0) => sys_up_o,
          dest_out(1) => sys_left_o,
          dest_out(2) => sys_start_o
       ); -- i_cdc_start
 
+   uart_tx_o   <= '1';
 
    i_cdc_keyboard: xpm_cdc_array_single
       generic map (
