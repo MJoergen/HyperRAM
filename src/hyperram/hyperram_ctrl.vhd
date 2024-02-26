@@ -44,7 +44,8 @@ entity hyperram_ctrl is
       hb_dq_ie_i          : in  std_logic;
       hb_rwds_ddr_out_o   : out std_logic_vector(1 downto 0);
       hb_rwds_oe_o        : out std_logic;
-      hb_rwds_in_i        : in  std_logic
+      hb_rwds_in_i        : in  std_logic;
+      hb_read_o           : out std_logic
    );
 end entity hyperram_ctrl;
 
@@ -53,6 +54,7 @@ architecture synthesis of hyperram_ctrl is
    type state_t is (
       INIT_ST,
       COMMAND_ADDRESS_ST,
+      WAIT_ST,
       SAMPLE_RWDS_ST,
       LATENCY_ST,
       READ_ST,
@@ -96,6 +98,7 @@ begin
          hb_rstn_o           <= '1';
          hb_dq_oe_o          <= '0';
          hb_rwds_oe_o        <= '0';
+         hb_read_o           <= '0';
 
          case state is
             when INIT_ST =>
@@ -136,16 +139,19 @@ begin
                      recovery_count <= 3;
                      state <= RECOVERY_ST;
                   else
-                     state <= SAMPLE_RWDS_ST;
+                     state <= WAIT_ST;
                   end if;
                end if;
 
+            when WAIT_ST =>
+               state <= SAMPLE_RWDS_ST;
+
             when SAMPLE_RWDS_ST =>
                if hb_rwds_in_i = '1' then
-                  latency_count <= 2*G_LATENCY - 3;
+                  latency_count <= 2*G_LATENCY - 4;
                   count_long <= count_long + 1;
                else
-                  latency_count <= G_LATENCY - 3;
+                  latency_count <= G_LATENCY - 4;
                   count_short <= count_short + 1;
                end if;
                state <= LATENCY_ST;
@@ -157,6 +163,7 @@ begin
                   if read = '1' then
                      read_clk_count    <= burst_count;
                      read_return_count <= burst_count;
+                     hb_read_o         <= '1';
                      state             <= READ_ST;
                   else
                      write_clk_count <= burst_count;
@@ -167,6 +174,7 @@ begin
                end if;
 
             when READ_ST =>
+               hb_read_o <= '1';
                if read_clk_count > 0 then
                   read_clk_count <= read_clk_count - 1;
                else

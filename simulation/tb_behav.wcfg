@@ -13,12 +13,12 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="374.939321 us"></ZoomEndTime>
+      <ZoomEndTime time="617.931355 us"></ZoomEndTime>
       <Cursor1Time time="501.000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="258"></NameColumnWidth>
-      <ValueColumnWidth column_width="75"></ValueColumnWidth>
+      <NameColumnWidth column_width="249"></NameColumnWidth>
+      <ValueColumnWidth column_width="79"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="9" />
    <wvobject type="group" fp_name="group127">
@@ -567,14 +567,9 @@
       <obj_property name="ElementShortName">RAM[0:255][15:0]</obj_property>
       <obj_property name="ObjectShortName">RAM[0:255][15:0]</obj_property>
    </wvobject>
-   <wvobject type="group" fp_name="group720">
-      <obj_property name="label">input_block</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
    <wvobject type="group" fp_name="group184">
       <obj_property name="label">hyperram_rx</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject type="logic" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/clk_x1_i">
          <obj_property name="ElementShortName">clk_x1_i</obj_property>
          <obj_property name="ObjectShortName">clk_x1_i</obj_property>
@@ -599,6 +594,10 @@
          <obj_property name="ElementShortName">ctrl_rwds_in_o</obj_property>
          <obj_property name="ObjectShortName">ctrl_rwds_in_o</obj_property>
       </wvobject>
+      <wvobject type="logic" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/ctrl_read_i">
+         <obj_property name="ElementShortName">ctrl_read_i</obj_property>
+         <obj_property name="ObjectShortName">ctrl_read_i</obj_property>
+      </wvobject>
       <wvobject type="logic" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/hr_rwds_in_i">
          <obj_property name="ElementShortName">hr_rwds_in_i</obj_property>
          <obj_property name="ObjectShortName">hr_rwds_in_i</obj_property>
@@ -615,29 +614,57 @@
          <obj_property name="ElementShortName">rwds_in_delay</obj_property>
          <obj_property name="ObjectShortName">rwds_in_delay</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/rwds_toggle">
-         <obj_property name="ElementShortName">rwds_toggle</obj_property>
-         <obj_property name="ObjectShortName">rwds_toggle</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group322">
+      <obj_property name="label">hyperram_fifo</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/hyperram_fifo_inst/src_clk_i">
+         <obj_property name="ElementShortName">src_clk_i</obj_property>
+         <obj_property name="ObjectShortName">src_clk_i</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/ctrl_dq_ddr_in">
-         <obj_property name="ElementShortName">ctrl_dq_ddr_in[15:0]</obj_property>
-         <obj_property name="ObjectShortName">ctrl_dq_ddr_in[15:0]</obj_property>
+      <wvobject type="logic" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/hyperram_fifo_inst/src_valid_i">
+         <obj_property name="ElementShortName">src_valid_i</obj_property>
+         <obj_property name="ObjectShortName">src_valid_i</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/ctrl_dq_ie">
-         <obj_property name="ElementShortName">ctrl_dq_ie</obj_property>
-         <obj_property name="ObjectShortName">ctrl_dq_ie</obj_property>
+      <wvobject type="array" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/hyperram_fifo_inst/src_data_i">
+         <obj_property name="ElementShortName">src_data_i[15:0]</obj_property>
+         <obj_property name="ObjectShortName">src_data_i[15:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/ctrl_rwds_in">
-         <obj_property name="ElementShortName">ctrl_rwds_in</obj_property>
-         <obj_property name="ObjectShortName">ctrl_rwds_in</obj_property>
+      <wvobject type="logic" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/hyperram_fifo_inst/dst_clk_i">
+         <obj_property name="ElementShortName">dst_clk_i</obj_property>
+         <obj_property name="ObjectShortName">dst_clk_i</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/ctrl_toggle">
-         <obj_property name="ElementShortName">ctrl_toggle</obj_property>
-         <obj_property name="ObjectShortName">ctrl_toggle</obj_property>
+      <wvobject type="logic" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/hyperram_fifo_inst/dst_valid_o">
+         <obj_property name="ElementShortName">dst_valid_o</obj_property>
+         <obj_property name="ObjectShortName">dst_valid_o</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/ctrl_toggle_d">
-         <obj_property name="ElementShortName">ctrl_toggle_d</obj_property>
-         <obj_property name="ObjectShortName">ctrl_toggle_d</obj_property>
+      <wvobject type="array" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/hyperram_fifo_inst/dst_data_o">
+         <obj_property name="ElementShortName">dst_data_o[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dst_data_o[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/hyperram_fifo_inst/src_ram">
+         <obj_property name="ElementShortName">src_ram[31:0]</obj_property>
+         <obj_property name="ObjectShortName">src_ram[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/hyperram_fifo_inst/src_gray_wr">
+         <obj_property name="ElementShortName">src_gray_wr[1:0]</obj_property>
+         <obj_property name="ObjectShortName">src_gray_wr[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/hyperram_fifo_inst/dst_ram">
+         <obj_property name="ElementShortName">dst_ram[31:0]</obj_property>
+         <obj_property name="ObjectShortName">dst_ram[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/hyperram_fifo_inst/dst_gray_wr">
+         <obj_property name="ElementShortName">dst_gray_wr[1:0]</obj_property>
+         <obj_property name="ObjectShortName">dst_gray_wr[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/hyperram_fifo_inst/dst_gray_rd">
+         <obj_property name="ElementShortName">dst_gray_rd[1:0]</obj_property>
+         <obj_property name="ObjectShortName">dst_gray_rd[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/hyperram_fifo_inst/G_DATA_SIZE">
+         <obj_property name="ElementShortName">G_DATA_SIZE</obj_property>
+         <obj_property name="ObjectShortName">G_DATA_SIZE</obj_property>
       </wvobject>
    </wvobject>
 </wave_config>
