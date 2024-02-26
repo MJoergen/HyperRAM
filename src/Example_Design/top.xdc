@@ -63,7 +63,7 @@ create_generated_clock -name clk_x1       [get_pins i_clk/i_clk_hyperram/CLKOUT3
 create_generated_clock -name hr_ck         [get_ports hr_ck] \
    -source [get_pins i_clk/i_clk_hyperram/CLKOUT2] -multiply_by 1
 
-# HyperRAM RWDS as a clock for the read path (hr_dq -> IDDR -> XPM FIFO)
+# HyperRAM RWDS as a clock for the read path (hr_dq -> IDDR -> CDC)
 create_clock -period 10.000 -name hr_rwds -waveform {2.5 7.5} [get_ports hr_rwds]
 
 # Asynchronous clocks

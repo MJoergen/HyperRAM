@@ -92,6 +92,9 @@ begin
    -- the input clock RWDS is not free-running.
 
    hyperram_fifo_inst : entity work.hyperram_fifo
+      generic map (
+         G_DATA_SIZE => 16
+      )
       port map (
          src_clk_i   => not rwds_in_delay,
          src_data_i  => rwds_dq_in,

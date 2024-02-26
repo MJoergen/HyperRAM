@@ -11,12 +11,15 @@ library xpm;
    use xpm.vcomponents.all;
 
 entity hyperram_fifo is
+   generic (
+      G_DATA_SIZE : natural
+   );
    port (
       src_clk_i   : in    std_logic;
-      src_data_i  : in    std_logic_vector(15 downto 0);
+      src_data_i  : in    std_logic_vector(G_DATA_SIZE - 1 downto 0);
       dst_clk_i   : in    std_logic;
-      dst_data_o  : out   std_logic_vector(15 downto 0);
-      dst_valid_o : out   std_logic
+      dst_valid_o : out   std_logic;
+      dst_data_o  : out   std_logic_vector(G_DATA_SIZE - 1 downto 0)
    );
 end entity hyperram_fifo;
 
@@ -29,16 +32,12 @@ architecture synthesis of hyperram_fifo is
 
 begin
 
-   -- This Clock Domain Crossing block is to synchronize the input signal to the
-   -- dst_clk_i clock domain. It's not possible to use an ordinary async fifo, because
-   -- the input clock RWDS is not free-running.
-
-   rwds_toggle_proc : process (src_clk_i)
+   src_proc : process (src_clk_i)
    begin
       if rising_edge(src_clk_i) then
          src_toggle <= not src_toggle;
       end if;
-   end process rwds_toggle_proc;
+   end process src_proc;
 
    xpm_cdc_array_single_inst : component xpm_cdc_array_single
       generic map (
@@ -59,12 +58,12 @@ begin
 
    dst_valid_o <= dst_toggle_d xor dst_toggle;
 
-   ctrl_dq_ie_proc : process (dst_clk_i)
+   dst_proc : process (dst_clk_i)
    begin
       if rising_edge(dst_clk_i) then
          dst_toggle_d <= dst_toggle;
       end if;
-   end process ctrl_dq_ie_proc;
+   end process dst_proc;
 
 end architecture synthesis;
 
