@@ -81,8 +81,8 @@ architecture synthesis of hyperram is
    signal cfg_waitrequest   : std_logic;
 
    signal ctrl_rstn         : std_logic;
-   signal ctrl_ck_ddr       : std_logic_vector(1 downto 0);
    signal ctrl_csn          : std_logic;
+   signal ctrl_ck_ddr       : std_logic_vector(1 downto 0);
    signal ctrl_dq_ddr_in    : std_logic_vector(15 downto 0);
    signal ctrl_dq_ddr_out   : std_logic_vector(15 downto 0);
    signal ctrl_dq_oe        : std_logic;
@@ -90,6 +90,7 @@ architecture synthesis of hyperram is
    signal ctrl_rwds_ddr_out : std_logic_vector(1 downto 0);
    signal ctrl_rwds_oe      : std_logic;
    signal ctrl_rwds_in      : std_logic;
+   signal ctrl_read         : std_logic;
 
 begin
 
@@ -198,15 +199,16 @@ begin
          count_long_o         => count_long_o,
          count_short_o        => count_short_o,
          hb_rstn_o            => ctrl_rstn,
-         hb_ck_ddr_o          => ctrl_ck_ddr,
          hb_csn_o             => ctrl_csn,
+         hb_ck_ddr_o          => ctrl_ck_ddr,
          hb_dq_ddr_in_i       => ctrl_dq_ddr_in,
          hb_dq_ddr_out_o      => ctrl_dq_ddr_out,
          hb_dq_oe_o           => ctrl_dq_oe,
          hb_dq_ie_i           => ctrl_dq_ie,
          hb_rwds_ddr_out_o    => ctrl_rwds_ddr_out,
          hb_rwds_oe_o         => ctrl_rwds_oe,
-         hb_rwds_in_i         => ctrl_rwds_in
+         hb_rwds_in_i         => ctrl_rwds_in,
+         hb_read_o            => ctrl_read
       ); -- i_hyperram_ctrl
 
 
@@ -214,32 +216,38 @@ begin
    -- Instantiate HyperRAM I/O
    --------------------------------------------------------
 
-   i_hyperram_io : entity work.hyperram_io
+   hr_resetn_o <= ctrl_rstn;
+   hr_csn_o    <= ctrl_csn;
+
+   i_hyperram_rx : entity work.hyperram_rx
       port map (
          clk_x1_i            => clk_x1_i,
          delay_refclk_i      => delay_refclk_i,
+         rst_i               => rst_i,
+         ctrl_dq_ddr_in_o    => ctrl_dq_ddr_in,
+         ctrl_dq_ie_o        => ctrl_dq_ie,
+         ctrl_rwds_in_o      => ctrl_rwds_in,
+         ctrl_read_i         => ctrl_read,
+         hr_rwds_in_i        => hr_rwds_in_i,
+         hr_dq_in_i          => hr_dq_in_i
+      ); -- i_hyperram_rx
+
+   i_hyperram_tx : entity work.hyperram_tx
+      port map (
+         clk_x1_i            => clk_x1_i,
          clk_x1_del_i        => clk_x1_del_i,
          rst_i               => rst_i,
-         ctrl_rstn_i         => ctrl_rstn,
          ctrl_ck_ddr_i       => ctrl_ck_ddr,
-         ctrl_csn_i          => ctrl_csn,
-         ctrl_dq_ddr_in_o    => ctrl_dq_ddr_in,
          ctrl_dq_ddr_out_i   => ctrl_dq_ddr_out,
          ctrl_dq_oe_i        => ctrl_dq_oe,
-         ctrl_dq_ie_o        => ctrl_dq_ie,
          ctrl_rwds_ddr_out_i => ctrl_rwds_ddr_out,
          ctrl_rwds_oe_i      => ctrl_rwds_oe,
-         ctrl_rwds_in_o      => ctrl_rwds_in,
-         hr_resetn_o         => hr_resetn_o,
-         hr_csn_o            => hr_csn_o,
          hr_ck_o             => hr_ck_o,
-         hr_rwds_in_i        => hr_rwds_in_i,
-         hr_dq_in_i          => hr_dq_in_i,
          hr_rwds_out_o       => hr_rwds_out_o,
          hr_dq_out_o         => hr_dq_out_o,
          hr_rwds_oe_n_o      => hr_rwds_oe_n_o,
          hr_dq_oe_n_o        => hr_dq_oe_n_o
-      ); -- i_hyperram_io
+      ); -- i_hyperram_tx
 
 end architecture synthesis;
 

@@ -67,11 +67,18 @@ create_generated_clock -name clk_x1       [get_pins i_clk/i_clk_hyperram/CLKOUT3
 create_generated_clock -name hr_ck         [get_ports hr_ck] \
    -source [get_pins i_clk/i_clk_hyperram/CLKOUT2] -multiply_by 1
 
-# HyperRAM RWDS as a clock for the read path (hr_dq -> IDDR -> XPM FIFO)
+# HyperRAM RWDS as a clock for the read path (hr_dq -> IDDR -> CDC)
 create_clock -period 10.000 -name hr_rwds -waveform {2.5 7.5} [get_ports hr_rwds]
 
 # Asynchronous clocks
 set_false_path -from [get_ports hr_rwds] -to [get_clocks hr_ck]
+
+# Clock Domain Crossing
+set_max_delay 2 -datapath_only -from [get_cells i_core/i_hyperram/i_hyperram_ctrl/hb_read_o_reg]
+set_max_delay 2 -datapath_only -from [get_cells i_core/i_hyperram/i_hyperram_rx/iddr_dq_gen[*].iddr_dq_inst]
+
+# Prevent insertion of extra BUFG
+set_property CLOCK_BUFFER_TYPE NONE [get_nets -of [get_pins i_core/i_hyperram/i_hyperram_rx/delay_rwds2_inst/DATAOUT]]
 
 ################################################################################
 # HyperRAM timing (correct for IS66WVH8M8DBLL-100B1LI)
@@ -85,8 +92,8 @@ set tDSHmin -0.8 ; # RWDS to data invalid, min
 ################################################################################
 # FPGA to HyperRAM (address and write data)
 
-set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_io/output_block.hr_rwds_oe_n_reg ]
-set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_io/output_block.hr_dq_oe_n_reg[*] ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_tx/hr_rwds_oe_n_reg ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_tx/hr_dq_oe_n_reg[*] ]
 set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_ctrl/hb_csn_o_reg ]
 set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_ctrl/hb_rstn_o_reg ]
 
