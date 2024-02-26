@@ -81,8 +81,8 @@ set tDSHmin -0.8 ; # RWDS to data invalid, min
 ################################################################################
 # FPGA to HyperRAM (address and write data)
 
-set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_io/output_block.hr_rwds_oe_n_reg ]
-set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_io/output_block.hr_dq_oe_n_reg[*] ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_tx/hr_rwds_oe_n_reg ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_tx/hr_dq_oe_n_reg[*] ]
 set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_ctrl/hb_csn_o_reg ]
 set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_ctrl/hb_rstn_o_reg ]
 
