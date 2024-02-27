@@ -61,11 +61,22 @@ architecture synthesis of mega65 is
 
    -- resets
    signal sys_rst        : std_logic;
+   signal sys_rst_d      : std_logic;
    signal video_rst      : std_logic;
 
    signal sys_active_d   : std_logic;
    signal sys_digits_hex : std_logic_vector(2*G_DIGITS_SIZE-1 downto 0);
-   signal sys_uart_hex   : std_logic_vector(9*G_DIGITS_SIZE/2-1 downto 0);
+   signal sys_result_hex : std_logic_vector(9*G_DIGITS_SIZE/2-1 downto 0);
+
+   signal sys_start       : std_logic;
+   signal sys_start_valid : std_logic;
+   signal sys_start_ready : std_logic;
+   signal sys_start_data  : std_logic_vector(7 downto 0);
+
+   signal sys_result_valid : std_logic;
+   signal sys_result_ready : std_logic;
+   signal sys_result_data  : std_logic_vector(7 downto 0);
+
    signal sys_uart_valid : std_logic;
    signal sys_uart_ready : std_logic;
    signal sys_uart_data  : std_logic_vector(7 downto 0);
@@ -279,21 +290,45 @@ begin
          m_data_o => sys_digits_hex
       ); -- i_hexifier
 
-   sys_uart_hex <= str2slv("ERRORS: ") & sys_digits_hex(383 downto 320) & X"0D0A" &
-                   str2slv("FAST:   ") & sys_digits_hex(319 downto 256) & X"0D0A" &
-                   str2slv("SLOW:   ") & sys_digits_hex(255 downto 192) & X"0D0A" &
-                   str2slv("EXPECT: ") & sys_digits_hex(191 downto 128) & X"0D0A" &
-                   str2slv("ADDR:   ") & sys_digits_hex(127 downto  64) & X"0D0A" &
-                   str2slv("READ:   ") & sys_digits_hex( 63 downto   0) & X"0D0A";
+   sys_result_hex <= str2slv("ERRORS: ") & sys_digits_hex(383 downto 320) & X"0D0A" &
+                     str2slv("FAST:   ") & sys_digits_hex(319 downto 256) & X"0D0A" &
+                     str2slv("SLOW:   ") & sys_digits_hex(255 downto 192) & X"0D0A" &
+                     str2slv("EXPECT: ") & sys_digits_hex(191 downto 128) & X"0D0A" &
+                     str2slv("ADDR:   ") & sys_digits_hex(127 downto  64) & X"0D0A" &
+                     str2slv("READ:   ") & sys_digits_hex( 63 downto   0) & X"0D0A";
 
-   sys_active_proc : process (sys_clk_i)
+   sys_proc : process (sys_clk_i)
    begin
       if rising_edge(sys_clk_i) then
+         sys_rst_d    <= sys_rst;
          sys_active_d <= sys_active_i;
-      end if;
-   end process sys_active_proc;
 
-   i_serializer_uart : entity work.serializer
+         sys_start <= sys_rst_d and not sys_rst;
+
+         if sys_rst = '1' then
+            sys_start <= '0';
+         end if;
+
+      end if;
+   end process sys_proc;
+
+   i_serializer_start : entity work.serializer
+      generic map (
+         G_DATA_SIZE_IN  => 232,
+         G_DATA_SIZE_OUT => 8
+      )
+      port map (
+         clk_i     => sys_clk_i,
+         rst_i     => sys_rst,
+         s_valid_i => sys_start,
+         s_ready_o => open,
+         s_data_i  => X"0D0A" & str2slv("HyperRAM Example Design") & X"0D0A" & X"0D0A",
+         m_valid_o => sys_start_valid,
+         m_ready_i => sys_start_ready,
+         m_data_o  => sys_start_data
+      ); -- i_serializer_start
+
+   i_serializer_result : entity work.serializer
       generic map (
          G_DATA_SIZE_IN  => 9*G_DIGITS_SIZE/2 + 16,
          G_DATA_SIZE_OUT => 8
@@ -303,11 +338,29 @@ begin
          rst_i     => sys_rst,
          s_valid_i => sys_active_d and not sys_active_i, -- falling edge
          s_ready_o => open,
-         s_data_i  => sys_uart_hex & X"0D0A",
-         m_valid_o => sys_uart_valid,
-         m_ready_i => sys_uart_ready,
-         m_data_o  => sys_uart_data
-      ); -- i_serializer_uart
+         s_data_i  => sys_result_hex & X"0D0A",
+         m_valid_o => sys_result_valid,
+         m_ready_i => sys_result_ready,
+         m_data_o  => sys_result_data
+      ); -- i_serializer_result
+
+   i_merginator : entity work.merginator
+      generic map (
+         G_DATA_SIZE => 8
+      )
+      port map (
+         clk_i      => sys_clk_i,
+         rst_i      => sys_rst,
+         s1_valid_i => sys_start_valid,
+         s1_ready_o => sys_start_ready,
+         s1_data_i  => sys_start_data,
+         s2_valid_i => sys_result_valid,
+         s2_ready_o => sys_result_ready,
+         s2_data_i  => sys_result_data,
+         m_valid_o  => sys_uart_valid,
+         m_ready_i  => sys_uart_ready,
+         m_data_o   => sys_uart_data
+      ); -- i_merginator
 
    i_uart : entity work.uart
       port map (
