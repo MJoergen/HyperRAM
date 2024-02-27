@@ -73,7 +73,7 @@ architecture synthesis of hyperram_ctrl is
    signal command_address   : std_logic_vector(47 downto 0);
    signal ca_count          : integer range 0 to 3;
    signal latency_count     : integer range 0 to 15;
-   signal read_clk_count    : integer range 0 to 255;
+   signal read_clk_count    : integer range 0 to 256;
    signal read_return_count : integer range 0 to 255;
    signal write_clk_count   : integer range 0 to 255;
    signal recovery_count    : integer range 0 to 255;
@@ -161,7 +161,7 @@ begin
                   latency_count <= latency_count - 1;
                else
                   if read = '1' then
-                     read_clk_count    <= burst_count;
+                     read_clk_count    <= burst_count+1;
                      read_return_count <= burst_count;
                      hb_read_o         <= '1';
                      state             <= READ_ST;

@@ -36,7 +36,9 @@ architecture synthesis of hyperram_rx is
 
    signal rwds_dq_in     : std_logic_vector(15 downto 0);
    signal rwds_in_delay  : std_logic;
-   signal rwds_in_delay2 : std_logic;
+
+   signal ctrl_dq_ie     : std_logic;
+   signal ctrl_dq_ie_d   : std_logic;
 
 begin
 
@@ -89,32 +91,6 @@ begin
 
    end generate iddr_dq_gen;
 
-   delay_rwds2_inst : component idelaye2
-      generic map (
-         IDELAY_TYPE           => "FIXED",
-         DELAY_SRC             => "DATAIN",
-         IDELAY_VALUE          => 21,
-         HIGH_PERFORMANCE_MODE => "TRUE",
-         SIGNAL_PATTERN        => "CLOCK",
-         REFCLK_FREQUENCY      => 200.0,
-         CINVCTRL_SEL          => "FALSE",
-         PIPE_SEL              => "FALSE"
-      )
-      port map (
-         c           => '0',
-         regrst      => '0',
-         ld          => '0',
-         ce          => '0',
-         inc         => '0',
-         cinvctrl    => '0',
-         cntvaluein  => B"10101", -- 21
-         idatain     => '0',
-         datain      => rwds_in_delay,
-         ldpipeen    => '0',
-         dataout     => rwds_in_delay2,
-         cntvalueout => open
-      ); -- delay_rwds_inst
-
    -- This Clock Domain Crossing block is to synchronize the input signal to the
    -- clk_x1_i clock domain. It's not possible to use an ordinary async fifo, because
    -- the input clock RWDS is not free-running.
@@ -124,13 +100,22 @@ begin
          G_DATA_SIZE => 16
       )
       port map (
-         src_clk_i   => not rwds_in_delay2,
+         src_clk_i   => not rwds_in_delay,
          src_valid_i => ctrl_read_i,
          src_data_i  => rwds_dq_in,
          dst_clk_i   => clk_x1_i,
          dst_data_o  => ctrl_dq_ddr_in_o,
-         dst_valid_o => ctrl_dq_ie_o
+         dst_valid_o => ctrl_dq_ie
       ); -- hyperram_fifo_inst
+
+   process (clk_x1_i)
+   begin
+      if rising_edge(clk_x1_i) then
+         ctrl_dq_ie_d <= ctrl_dq_ie;
+      end if;
+   end process;
+
+   ctrl_dq_ie_o <= ctrl_dq_ie_d and ctrl_dq_ie;
 
    xpm_cdc_single_inst : component xpm_cdc_single
       generic map (

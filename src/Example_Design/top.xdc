@@ -78,7 +78,7 @@ set_max_delay 2 -datapath_only -from [get_cells i_core/i_hyperram/i_hyperram_ctr
 set_max_delay 2 -datapath_only -from [get_cells i_core/i_hyperram/i_hyperram_rx/iddr_dq_gen[*].iddr_dq_inst]
 
 # Prevent insertion of extra BUFG
-set_property CLOCK_BUFFER_TYPE NONE [get_nets -of [get_pins i_core/i_hyperram/i_hyperram_rx/delay_rwds2_inst/DATAOUT]]
+set_property CLOCK_BUFFER_TYPE NONE [get_nets -of [get_pins i_core/i_hyperram/i_hyperram_rx/delay_rwds_inst/DATAOUT]]
 
 ################################################################################
 # HyperRAM timing (correct for IS66WVH8M8DBLL-100B1LI)
