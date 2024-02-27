@@ -1,0 +1,93 @@
+% Some macros for logic timing diagrams.
+%
+% Author: ir. Pascal T. Wolkotte and Jochem Rutgers, University of Twente
+\documentclass{article}
+% Start of timing.sty
+
+% Some macros for logic timing diagrams.
+%
+% Author: ir. Pascal T. Wolkotte and Jochem Rutgers, University of Twente
+% Version: 0.1
+% Date: 2007/10/11
+
+\usepackage{tikz}
+
+\newcounter{wavenum}
+
+\setlength{\unitlength}{1cm}
+% advance clock one cycle, not to be called directly
+\newcommand*{\clki}{\
+  \draw (t_cur) -- ++(0,.3) -- ++(.5,0) -- ++(0,-.6) -- ++(.5,0) -- ++(0,.3)
+    node[time] (t_cur) {};
+}
+
+\newcommand*{\bitvector}[3]{\
+  \draw[fill=#3] (t_cur) -- ++( .1, .3) -- ++(#2-.2,0) -- ++(.1, -.3)
+                         -- ++(-.1,-.3) -- ++(.2-#2,0) -- cycle;
+  \path (t_cur) -- node[anchor=mid] {#1} ++(#2,0) node[time] (t_cur) {};
+}
+
+% \known{val}{length}
+\newcommand*{\known}[2]{\
+    \bitvector{#1}{#2}{white}
+}
+
+% \unknown{length}
+\newcommand*{\unknown}[2][XXX]{\
+    \bitvector{#1}{#2}{black!20}
+}
+
+% \bit{1 or 0}{length}
+\newcommand*{\bit}[2]{\
+  \draw (t_cur) -- ++(0,.6*#1-.3) -- ++(#2,0) -- ++(0,.3-.6*#1)
+    node[time] (t_cur) {};
+}
+
+% \unknownbit{length}
+\newcommand*{\unknownbit}[1]{\
+  \draw[ultra thick,black!50] (t_cur) -- ++(#1,0) node[time] (t_cur) {};
+}
+
+% \nextwave{name}
+\newcommand{\nextwave}[1]{\
+  \path (0,\value{wavenum}) node[left] {#1} node[time] (t_cur) {};
+  \addtocounter{wavenum}{-1}
+}
+
+% \clk{name}{period}
+\newcommand{\clk}[2]{\
+    \nextwave{#1}
+    \FPeval{\res}{(\wavewidth+1)/#2}
+    \FPeval{\reshalf}{#2/2}
+    \foreach \t in {1,2,...,\res}{\
+        \bit{\reshalf}{1}
+        \bit{\reshalf}{0}
+    }
+}
+
+% \begin{wave}[clkname]{num_waves}{clock_cycles}
+\newenvironment{wave}[3][clk]{
+  \begin{tikzpicture}[draw=black, yscale=.7,xscale=1]
+    \tikzstyle{time}=[coordinate]
+    \setlength{\unitlength}{1cm}
+    \def\wavewidth{#3}
+    \setcounter{wavenum}{0}
+%    \nextwave{#1}
+%    \foreach \t in {0,1,...,\wavewidth}{
+%      \draw[dotted] (t_cur) +(0,.5) node[above] {t=\t} -- ++(0,.4-#2);
+%      \clki
+%    }
+}{\end{tikzpicture}}
+
+%%% End of timing.sty
+\begin{document}
+\begin{wave}{4}{9}
+ \nextwave{CK}   \bit{0}{1} \bit{1}{1} \bit{0}{1} \bit{1}{1} \bit{0}{6}
+ \nextwave{RWDS} \bit{0}{1.7} \bit{1}{1} \bit{0}{1} \bit{1}{1} \bit{0}{5.3}
+ \nextwave{DQ/8} \unknown[X]{1.7} \known{D1}{1} \known{D2}{1} \known{D3}{1} \known{D4}{1} \unknown[X]{4.3}
+ \nextwave{RWDS\_delay} \bit{0}{2.2} \bit{1}{1} \bit{0}{1} \bit{1}{1} \bit{0}{4.8}
+ \nextwave{DDR/16}\unknown[X]{3.2} \known{D1D2}{2} \known{D3D4}{4.8}
+\end{wave}
+
+\end{document}
+

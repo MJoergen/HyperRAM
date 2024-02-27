@@ -1,22 +1,26 @@
 # Overview of HyperRAM controller
 
-I've split the HyperRAM controller implementation into three parts, but it is
+I've split the HyperRAM controller implementation into six parts, but it is
 only the entity `hyperram` from the wrapper file ([hyperram.vhd](hyperram.vhd))
 that you need to use when working with the controller.
 
-The three parts are:
+The six parts are:
 
-* The state machine ([hyperram\_ctrl.vhd](hyperram_ctrl.vhd)), running in a
+* The state machine ([`hyperram_ctrl.vhd`](hyperram_ctrl.vhd)), running in a
   single clock domain, same as HyperRAM device, i.e. 100 MHz.
-* The I/O ports ([hyperram\_io.vhd](hyperram_io.vhd)), using two additional
-  clocks (one phase shifted) at double-speed (200 MHz) for correct timing of
-  the HyperRAM I/O signals.
+* The transmit path ([`hyperram_tx.vhd`](hyperram_tx.vhd)), using one additional
+  clock at 100 MHz that is phase shifted 90 degrees.
+* The receive path ([`hyperram_rx.vhd`](hyperram_rx.vhd)), using one additional
+  clock at 200 MHz for controlling the input delay.
+* A custom-made shallow (two-element) asynchronuous FIFO
+  ([`hyperram_fifo.vhd`](hyperram_fifo.vhd)) that is used as part of the receive path.
 * The initial configuration of the HyperRAM
-  ([hyperram\_config.vhd](hyperram_config.vhd)), running at the HyperRAM clock
-  speed, i.e. 100 MHz.
+  ([`hyperram_config.vhd`](hyperram_config.vhd)), used to set up e.g. latency.
+* An optional fix for an errata
+  ([`hyperram_errata.vhd`](hyperram_errata.vhd)) that is relevant for ISSI revision D
+  dies.
 
-The above three entities are described in more detail further down in this
-file.
+The above six entities are described in more detail in the following:
 
 ## `hyperram_config.vhd`
 
@@ -30,6 +34,19 @@ I've chosen to implement it as an Avalon MM "sandwich" to be connected directly
 between the client and the main state machine. This makes it very easy to pull
 out this module if your design requires that.
 
+## `hyperram_errata.vhd`
+
+This is an optional errata fix. It's sole purpose is to work around a bug
+in the ISSI revision D dies.
+
+The bug causes all single-word writes to fail (not function correctly). The fix is to
+convert these to double-word writes, where the second word has byte-enable set to false.
+
+This module is also implemented as an Avalon MM "sandwich" to be connected directly
+between the client and the main state machine. This makes it very easy to pull out this
+module if your design requires that. Currently, it's presence is controlled by the
+top-level generic `G_ERRATA_ISSI_D_FIX`, which is default true.
+
 ## `hyperram_ctrl.vhd`
 
 This is the main state machine of the HyperRAM controller.
@@ -41,33 +58,32 @@ The user interface to the HyperRAM controller is a 16-bit [Avalon Memory
 Map](../../doc/Avalon_Interface_Specifications.pdf) interface with support for burst
 operations.  This is a very common bus interface, and quite easy to use.
 
-## `hyperram_io.vhd`
-
-This is the HyperRAM I/O connections.  The additional clock `clk_x2_i` is used
-to drive the `DQ`/`RWDS` output and to sample the `DQ`/`RWDS` input.  The
-additional clock `clk_x2_del_i` is used to drive the `CK` output.
+## `hyperram_tx.vhd`
+This handles the transmit data, i.e. the path from the HyperRAM controller to the device.
+It uses one additional clock at 100 MHz that is phase shifted 90 degrees.
 
 The phase shifted clock is used to delay the HyperRAM clock signal `CK`
 relative to the transitions on the output `DQ` signal. This ensures correct
 values of the timing parameters `t_IS` and `t_IH` during WRITE operation, see
-below.
+later section on Timing Parameters.
 
-The non-phase shifted clock is used to sample the `DQ` input signal during READ
-operation.
+## `hyperram_rx.vhd`
+This handles the receive data, i.e. the path from the HyperRAM device to the controller.
+It uses one additional clock at 200 MHz for controlling the input delay.  Data from the
+HyperRAM device arrives synchronuous with the RWDS signal. I.e. the latter functions as a
+clock, except it is not free-running.
 
-From the above it follows that the entire HyperRAM device is phase shifted
-relative to the FPGA. This is done to satisfy the `t_CKD` timing parameter.
-The actual amount of phase shift required is likely both board and device
-dependent. On the MEGA65 a phase shift of 180 degrees is seen to work, and in
-such case we could alternatively just use the falling edge of `clk_x2_i`.
-However, I've chosen to keep the general phase-shifted clock for greater
-flexibility and to make [porting](../../PORTING.md) to other platforms easier.
+The receive path first delays the `RWDS` signal by 90 degrees using an IDELAY primitive, and
+then uses this as clock signal to sample the `DQ` input, see the following timing diagram:
 
-In the above it is assumed that the timing parameter `t_CKD` is constant for
-any given specific HyperRAM device, even though the datasheet allows for great
-variation.
+![timing diagram](../../doc/rx_timing.png)
 
-### Timing parameters
+The receive path is shown in the following block diagram.
+
+![block diagram](../../doc/rx_block.png)
+
+
+## Timing Parameters
 
 The timing parameters are given in the table below (taken from Table 10.3 of the
 [documentation](../../doc/66-67WVH8M8ALL-BLL-938852.pdf)):
