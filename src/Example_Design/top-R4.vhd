@@ -41,13 +41,11 @@ architecture synthesis of top is
    constant C_ADDRESS_SIZE     : integer := 22;
    constant C_DATA_SIZE        : integer := 16;
 
-   -- HyperRAM clocks
-   signal clk_x1               : std_logic; -- HyperRAM clock
-   signal clk_x1_del           : std_logic; -- HyperRAM clock, phase shifted 90 degrees
+   -- HyperRAM clocks and reset
+   signal hr_clk               : std_logic; -- HyperRAM clock
+   signal hr_clk_del           : std_logic; -- HyperRAM clock, phase shifted 90 degrees
    signal delay_refclk         : std_logic; -- 200 MHz, for IDELAYCTRL
-
-   -- synchronized reset
-   signal rst                  : std_logic;
+   signal hr_rst               : std_logic;
 
    -- Control and Status for trafic generator
    signal sys_up               : std_logic;
@@ -79,10 +77,10 @@ begin
       (
          sys_clk_i      => clk,
          sys_rstn_i     => not reset,
-         clk_x1_o       => clk_x1,
-         clk_x1_del_o   => clk_x1_del,
+         clk_x1_o       => hr_clk,
+         clk_x1_del_o   => hr_clk_del,
          delay_refclk_o => delay_refclk,
-         rst_o          => rst
+         rst_o          => hr_rst
       ); -- i_clk
 
 
@@ -97,10 +95,10 @@ begin
          G_DATA_SIZE         => C_DATA_SIZE
       )
       port map (
-         clk_x1_i       => clk_x1,
-         clk_x1_del_i   => clk_x1_del,
+         clk_x1_i       => hr_clk,
+         clk_x1_del_i   => hr_clk_del,
          delay_refclk_i => delay_refclk,
-         rst_i          => rst,
+         rst_i          => hr_rst,
          start_i        => sys_start,
          active_o       => sys_active,
          address_o      => sys_address,
@@ -141,8 +139,8 @@ begin
          G_DIGITS_SIZE => sys_digits'length
       )
       port map (
-         sys_clk      => clk,
-         sys_reset_n  => not reset,
+         sys_clk_i    => clk,
+         sys_rstn_i   => not reset,
          sys_up_o     => sys_up,
          sys_left_o   => sys_left,
          sys_start_o  => sys_start,
