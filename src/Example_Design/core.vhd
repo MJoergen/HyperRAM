@@ -8,7 +8,6 @@ use ieee.numeric_std.all;
 
 entity core is
    generic (
-      G_HYPERRAM_FREQ_MHZ : integer;
       G_ADDRESS_SIZE      : integer;
       G_SYS_ADDRESS_SIZE  : integer;
       G_DATA_SIZE         : integer
@@ -173,7 +172,6 @@ begin
 
    i_hyperram : entity work.hyperram
       generic map (
-         G_HYPERRAM_FREQ_MHZ => G_HYPERRAM_FREQ_MHZ,
          G_ERRATA_ISSI_D_FIX => true
       )
       port map (

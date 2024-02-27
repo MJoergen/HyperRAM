@@ -13,10 +13,8 @@ end entity tb;
 
 architecture simulation of tb is
 
-   constant C_HYPERRAM_FREQ_MHZ : integer := 100;
-   constant C_HYPERRAM_PHASE    : real := 90.000;
-   constant C_DELAY             : time := 1 ns;
-   constant C_CLK_PERIOD        : time := (1000/C_HYPERRAM_FREQ_MHZ) * 1 ns;
+   constant C_DELAY         : time := 1 ns;
+   constant C_CLK_PERIOD    : time := 10 ns; -- 100 MHz
 
    signal sys_clk           : std_logic := '1';
    signal sys_rstn          : std_logic := '0';
@@ -25,13 +23,6 @@ architecture simulation of tb is
    signal clk_x1_del        : std_logic;
    signal delay_refclk      : std_logic;
    signal rst               : std_logic;
-
-   signal ps_clk            : std_logic := '1';
-   signal ps_en             : std_logic;
-   signal ps_incdec         : std_logic;
-   signal ps_done           : std_logic;
-   signal ps_count          : std_logic_vector(9 downto 0);
-   signal ps_degrees        : std_logic_vector(9 downto 0);
 
    signal tb_start          : std_logic;
 
@@ -87,50 +78,15 @@ begin
    sys_rstn <= '0', '1' after 100 * C_CLK_PERIOD;
 
    clk_inst : entity work.clk
-      generic map (
-         G_HYPERRAM_FREQ_MHZ => C_HYPERRAM_FREQ_MHZ,
-         G_HYPERRAM_PHASE    => C_HYPERRAM_PHASE
-      )
       port map (
          sys_clk_i      => sys_clk,
          sys_rstn_i     => sys_rstn,
          clk_x1_o       => clk_x1,
          clk_x1_del_o   => clk_x1_del,
          delay_refclk_o => delay_refclk,
-         ps_clk_i       => ps_clk,
-         ps_en_i        => ps_en,
-         ps_incdec_i    => ps_incdec,
-         ps_done_o      => ps_done,
-         ps_count_o     => ps_count,
-         ps_degrees_o   => ps_degrees,
          rst_o          => rst
       ); -- clk_inst
 
-
-   ps_clk <= not ps_clk after 10 ns; -- 50 MHz
-
-   ps_proc : process
-   begin
-      ps_incdec <= '1';
-      ps_en     <= '0';
-      wait for 180 us;
-      wait until ps_clk = '1';
-      wait;
-
-      loop
-        ps_incdec <= '1';
-        ps_en     <= '1';
-        wait until ps_clk = '1';
-
-        ps_en     <= '0';
-        wait until ps_clk = '1';
-
-        wait for 1 us;
-        wait until ps_clk = '1';
-      end loop;
-
-      wait;
-   end process ps_proc;
 
    --------------------------------------------------------
    -- Generate start signal for trafic generator
@@ -154,7 +110,6 @@ begin
 
    i_core : entity work.core
       generic map (
-         G_HYPERRAM_FREQ_MHZ => C_HYPERRAM_FREQ_MHZ,
          G_SYS_ADDRESS_SIZE  => 8,
          G_ADDRESS_SIZE      => 22,
          G_DATA_SIZE         => 16

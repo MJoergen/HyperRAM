@@ -43,21 +43,11 @@ architecture synthesis of top is
 
    -- HyperRAM clocks
    signal clk_x1               : std_logic; -- HyperRAM clock
-   signal clk_x1_del           : std_logic; -- HyperRAM clock, phase shifted
-   signal delay_refclk         : std_logic; -- 200 MHz
-
-   -- Incremental phase shift
-   signal ps_en                : std_logic;
-   signal ps_incdec            : std_logic;
-   signal ps_done              : std_logic;
-   signal ps_count             : std_logic_vector(9 downto 0);
-   signal ps_degrees           : std_logic_vector(9 downto 0);
+   signal clk_x1_del           : std_logic; -- HyperRAM clock, phase shifted 90 degrees
+   signal delay_refclk         : std_logic; -- 200 MHz, for IDELAYCTRL
 
    -- synchronized reset
    signal rst                  : std_logic;
-
-   constant C_HYPERRAM_FREQ_MHZ : integer := 100;
-   constant C_HYPERRAM_PHASE    : real := 90.000;
 
    -- Control and Status for trafic generator
    signal sys_up               : std_logic;
@@ -76,17 +66,7 @@ architecture synthesis of top is
    signal sys_count_error      : unsigned(31 downto 0);
 
    -- Interface to MEGA65 video
-   signal sys_digits           : std_logic_vector(223 downto 0);
-
-   -- Convert an integer to BCD (4 bits per digit)
-   pure function int2bcd(arg : integer) return std_logic_vector is
-   begin
-      return
-         std_logic_vector(to_unsigned((arg/1000) mod 10, 4)) &
-         std_logic_vector(to_unsigned((arg/100)  mod 10, 4)) &
-         std_logic_vector(to_unsigned((arg/10)   mod 10, 4)) &
-         std_logic_vector(to_unsigned((arg/1)    mod 10, 4));
-   end function int2bcd;
+   signal sys_digits           : std_logic_vector(191 downto 0);
 
 begin
 
@@ -95,11 +75,6 @@ begin
    --------------------------------------------------------
 
    i_clk : entity work.clk
-      generic map
-      (
-         G_HYPERRAM_FREQ_MHZ => C_HYPERRAM_FREQ_MHZ,
-         G_HYPERRAM_PHASE    => C_HYPERRAM_PHASE
-      )
       port map
       (
          sys_clk_i      => clk,
@@ -107,12 +82,6 @@ begin
          clk_x1_o       => clk_x1,
          clk_x1_del_o   => clk_x1_del,
          delay_refclk_o => delay_refclk,
-         ps_clk_i       => clk_x1,
-         ps_en_i        => ps_en,
-         ps_incdec_i    => ps_incdec,
-         ps_done_o      => ps_done,
-         ps_count_o     => ps_count,
-         ps_degrees_o   => ps_degrees,
          rst_o          => rst
       ); -- i_clk
 
@@ -123,7 +92,6 @@ begin
 
    i_core : entity work.core
       generic map (
-         G_HYPERRAM_FREQ_MHZ => C_HYPERRAM_FREQ_MHZ,
          G_SYS_ADDRESS_SIZE  => C_SYS_ADDRESS_SIZE,
          G_ADDRESS_SIZE      => C_ADDRESS_SIZE,
          G_DATA_SIZE         => C_DATA_SIZE
@@ -148,29 +116,6 @@ begin
          hr_dq_io       => hr_dq
       ); -- i_core
 
-   p_ps : process (clk_x1)
-   begin
-      if rising_edge(clk_x1) then
-         ps_en     <= '0';
-         ps_incdec <= '0';
-
-         sys_up_d   <= sys_up;
-         sys_left_d <= sys_left;
-
-         -- "UP" key just pressed
-         if sys_up_d = '0' and sys_up = '1' then
-            ps_en     <= '1';
-            ps_incdec <= '1';
-         end if;
-
-         -- "LEFT" key just pressed
-         if sys_left_d = '0' and sys_left = '1' then
-            ps_en     <= '1';
-            ps_incdec <= '0';
-         end if;
-      end if;
-   end process p_ps;
-
 
    ----------------------------------
    -- Generate debug output for video
@@ -179,12 +124,10 @@ begin
    sys_digits( 31 downto   0) <= sys_data_read;
    sys_digits( 47 downto  32) <= sys_address(15 downto 0);
    sys_digits( 63 downto  48) <= X"00" & "000" & sys_address(20 downto 16);
-   sys_digits( 79 downto  64) <= int2bcd(C_HYPERRAM_FREQ_MHZ);
-   sys_digits( 95 downto  80) <= int2bcd(to_integer(unsigned(ps_degrees)));
-   sys_digits(127 downto  96) <= sys_data_exp;
-   sys_digits(159 downto 128) <= std_logic_vector(sys_count_long);
-   sys_digits(191 downto 160) <= std_logic_vector(sys_count_short);
-   sys_digits(223 downto 192) <= std_logic_vector(sys_count_error);
+   sys_digits( 95 downto  64) <= sys_data_exp;
+   sys_digits(127 downto  96) <= std_logic_vector(sys_count_long);
+   sys_digits(159 downto 128) <= std_logic_vector(sys_count_short);
+   sys_digits(191 downto 160) <= std_logic_vector(sys_count_error);
 
    sys_error <= or(std_logic_vector(sys_count_error));
 

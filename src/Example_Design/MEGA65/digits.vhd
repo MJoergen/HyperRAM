@@ -53,8 +53,6 @@ architecture synthesis of digits is
                            "SLOW-LO" &
                            " EXP-HI" &
                            " EXP-LO" &
-                           "  PHASE" &
-                           "   FREQ" &
                            "ADDR-HI" &
                            "ADDR-LO" &
                            "READ-HI" &

@@ -267,11 +267,10 @@ begin
          m_data_o => sys_digits_hex
       ); -- i_hexifier
 
-   sys_uart_hex <= str2slv("ERRORS: ") & sys_digits_hex(447 downto 384) & X"0D0A" &
-                   str2slv("FAST:   ") & sys_digits_hex(383 downto 320) & X"0D0A" &
-                   str2slv("SLOW:   ") & sys_digits_hex(319 downto 256) & X"0D0A" &
-                   str2slv("EXPECT: ") & sys_digits_hex(255 downto 192) & X"0D0A" &
-                   str2slv("PH/FREQ:") & sys_digits_hex(191 downto 128) & X"0D0A" &
+   sys_uart_hex <= str2slv("ERRORS: ") & sys_digits_hex(383 downto 320) & X"0D0A" &
+                   str2slv("FAST:   ") & sys_digits_hex(319 downto 256) & X"0D0A" &
+                   str2slv("SLOW:   ") & sys_digits_hex(255 downto 192) & X"0D0A" &
+                   str2slv("EXPECT: ") & sys_digits_hex(191 downto 128) & X"0D0A" &
                    str2slv("ADDR:   ") & sys_digits_hex(127 downto  64) & X"0D0A" &
                    str2slv("READ:   ") & sys_digits_hex( 63 downto   0) & X"0D0A";
 
