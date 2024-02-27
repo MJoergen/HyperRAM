@@ -129,23 +129,23 @@ begin
          G_DATA_SIZE        => C_DATA_SIZE
       )
       port map (
-         clk_x1_i      => clk_x1,
+         clk_x1_i       => clk_x1,
          clk_x1_del_i   => clk_x1_del,
          delay_refclk_i => delay_refclk,
-         rst_i         => rst,
-         start_i       => sys_start,
-         active_o      => sys_active,
-         address_o     => sys_address,
-         data_exp_o    => sys_data_exp,
-         data_read_o   => sys_data_read,
-         count_long_o  => sys_count_long,
-         count_short_o => sys_count_short,
-         count_error_o => sys_count_error,
-         hr_resetn_o   => hr_resetn,
-         hr_csn_o      => hr_csn,
-         hr_ck_o       => hr_ck,
-         hr_rwds_io    => hr_rwds,
-         hr_dq_io      => hr_dq
+         rst_i          => rst,
+         start_i        => sys_start,
+         active_o       => sys_active,
+         address_o      => sys_address,
+         data_exp_o     => sys_data_exp,
+         data_read_o    => sys_data_read,
+         count_long_o   => sys_count_long,
+         count_short_o  => sys_count_short,
+         count_error_o  => sys_count_error,
+         hr_resetn_o    => hr_resetn,
+         hr_csn_o       => hr_csn,
+         hr_ck_o        => hr_ck,
+         hr_rwds_io     => hr_rwds,
+         hr_dq_io       => hr_dq
       ); -- i_core
 
    p_ps : process (clk_x1)
@@ -194,6 +194,9 @@ begin
    ----------------------------------
 
    i_mega65 : entity work.mega65
+      generic map (
+         G_DIGITS_SIZE => sys_digits'length
+      )
       port map (
          sys_clk      => clk,
          sys_reset_n  => reset_n,

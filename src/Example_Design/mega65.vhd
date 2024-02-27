@@ -16,6 +16,9 @@ library xpm;
 use xpm.vcomponents.all;
 
 entity mega65 is
+   generic (
+      G_DIGITS_SIZE : natural
+   );
    port (
       sys_clk      : in  std_logic;                  -- 100 MHz clock
       sys_reset_n  : in  std_logic;                  -- CPU reset button
@@ -26,7 +29,7 @@ entity mega65 is
       sys_start_o  : out std_logic;
       sys_active_i : in  std_logic;
       sys_error_i  : in  std_logic;
-      sys_digits_i : in  std_logic_vector(223 downto 0);
+      sys_digits_i : in  std_logic_vector(G_DIGITS_SIZE-1 downto 0);
 
       -- Interface for physical keyboard
       kb_io0       : out std_logic;
@@ -60,6 +63,13 @@ architecture synthesis of mega65 is
    signal rst            : std_logic;
    signal video_rst      : std_logic;
 
+   signal sys_active_d   : std_logic;
+   signal sys_digits_hex : std_logic_vector(2*G_DIGITS_SIZE-1 downto 0);
+   signal sys_uart_hex   : std_logic_vector(9*G_DIGITS_SIZE/2-1 downto 0);
+   signal sys_uart_valid : std_logic;
+   signal sys_uart_ready : std_logic;
+   signal sys_uart_data  : std_logic_vector(7 downto 0);
+
    signal kbd_up_out     : std_logic;
    signal kbd_left_out   : std_logic;
    signal kbd_return_out : std_logic;
@@ -72,8 +82,17 @@ architecture synthesis of mega65 is
    signal video_red      : std_logic_vector(7 downto 0);
    signal video_green    : std_logic_vector(7 downto 0);
    signal video_blue     : std_logic_vector(7 downto 0);
-   signal video_digits   : std_logic_vector(223 downto 0);
+   signal video_digits   : std_logic_vector(G_DIGITS_SIZE-1 downto 0);
    signal video_data     : slv_9_0_t(0 to 2);              -- parallel HDMI symbol stream x 3 channels
+
+   pure function str2slv(str : string) return std_logic_vector is
+      variable res_v : std_logic_vector(str'length*8-1 downto 0);
+   begin
+      for i in 0 to str'length-1 loop
+         res_v(8*i+7 downto 8*i) := std_logic_vector(to_unsigned(character'pos(str(str'length - i)), 8));
+      end loop;
+      return res_v;
+   end function str2slv;
 
 begin
 
@@ -126,8 +145,6 @@ begin
          dest_out(2) => sys_start_o
       ); -- i_cdc_start
 
-   uart_tx_o   <= '1';
-
    i_cdc_keyboard: xpm_cdc_array_single
       generic map (
          WIDTH => 2
@@ -148,7 +165,7 @@ begin
 
    i_cdc_video: xpm_cdc_array_single
       generic map (
-         WIDTH => 224
+         WIDTH => G_DIGITS_SIZE
       )
       port map (
          src_clk  => sys_clk,
@@ -162,7 +179,7 @@ begin
       generic map
       (
          G_FONT_FILE   => C_FONT_FILE,
-         G_DIGITS_SIZE => 224,
+         G_DIGITS_SIZE => G_DIGITS_SIZE,
          G_VIDEO_MODE  => C_VIDEO_MODE
       )
       port map
@@ -240,6 +257,56 @@ begin
          out_p_o  => hdmi_clk_p,
          out_n_o  => hdmi_clk_n
       ); -- i_serialiser_10to1_selectio_clk
+
+   i_hexifier : entity work.hexifier
+      generic map (
+         G_DATA_NIBBLES => G_DIGITS_SIZE/4
+      )
+      port map (
+         s_data_i => sys_digits_i,
+         m_data_o => sys_digits_hex
+      ); -- i_hexifier
+
+   sys_uart_hex <= str2slv("ERRORS: ") & sys_digits_hex(447 downto 384) & X"0D0A" &
+                   str2slv("FAST:   ") & sys_digits_hex(383 downto 320) & X"0D0A" &
+                   str2slv("SLOW:   ") & sys_digits_hex(319 downto 256) & X"0D0A" &
+                   str2slv("EXPECT: ") & sys_digits_hex(255 downto 192) & X"0D0A" &
+                   str2slv("PH/FREQ:") & sys_digits_hex(191 downto 128) & X"0D0A" &
+                   str2slv("ADDR:   ") & sys_digits_hex(127 downto  64) & X"0D0A" &
+                   str2slv("READ:   ") & sys_digits_hex( 63 downto   0) & X"0D0A";
+
+   sys_active_proc : process (sys_clk)
+   begin
+      if rising_edge(sys_clk) then
+         sys_active_d <= sys_active_i;
+      end if;
+   end process sys_active_proc;
+
+   i_serializer_uart : entity work.serializer
+      generic map (
+         G_DATA_SIZE_IN  => 9*G_DIGITS_SIZE/2 + 16,
+         G_DATA_SIZE_OUT => 8
+      )
+      port map (
+         clk_i     => sys_clk,
+         rst_i     => not sys_reset_n,
+         s_valid_i => sys_active_d and not sys_active_i, -- falling edge
+         s_ready_o => open,
+         s_data_i  => sys_uart_hex & X"0D0A",
+         m_valid_o => sys_uart_valid,
+         m_ready_i => sys_uart_ready,
+         m_data_o  => sys_uart_data
+      ); -- i_serializer_uart
+
+   i_uart : entity work.uart
+      port map (
+         clk_i     => sys_clk,
+         rst_i     => not sys_reset_n,
+         s_valid_i => sys_uart_valid,
+         s_ready_o => sys_uart_ready,
+         s_data_i  => sys_uart_data,
+         uart_tx_o => uart_tx_o
+      ); -- i_uart
 
 end architecture synthesis;
 

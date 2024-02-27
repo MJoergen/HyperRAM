@@ -194,6 +194,9 @@ begin
    ----------------------------------
 
    i_mega65 : entity work.mega65
+      generic map (
+         G_DIGITS_SIZE => sys_digits'length
+      )
       port map (
          sys_clk      => clk,
          sys_reset_n  => not reset,
