@@ -23,7 +23,7 @@ architecture synthesis of uart is
       BUSY_ST
    );
 
-   signal data    : std_logic_vector(9 downto 0) := (others => '1');
+   signal data    : std_logic_vector(9 downto 0);
    signal state   : state_t := IDLE_ST;
    signal counter : natural range 0 to C_COUNTER_MAX;
 

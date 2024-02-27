@@ -20,8 +20,8 @@ entity mega65 is
       G_DIGITS_SIZE : natural
    );
    port (
-      sys_clk      : in  std_logic;                  -- 100 MHz clock
-      sys_reset_n  : in  std_logic;                  -- CPU reset button
+      sys_clk_i    : in  std_logic;                  -- 100 MHz clock
+      sys_rstn_i   : in  std_logic;                  -- CPU reset button
 
       -- From HyperRAM trafic generator
       sys_up_o     : out std_logic;
@@ -60,7 +60,7 @@ architecture synthesis of mega65 is
    signal hdmi_clk       : std_logic;
 
    -- resets
-   signal rst            : std_logic;
+   signal sys_rst        : std_logic;
    signal video_rst      : std_logic;
 
    signal sys_active_d   : std_logic;
@@ -97,19 +97,26 @@ architecture synthesis of mega65 is
 begin
 
    --------------------------------------------------------
-   -- Generate clocks for MEGA65 platform (keyboard and video)
+   -- Generate clocks and reset for MEGA65 platform (keyboard and video)
    --------------------------------------------------------
 
    i_clk_mega65 : entity work.clk_mega65
       port map
       (
-         sys_clk_i    => sys_clk,
-         sys_rstn_i   => sys_reset_n,
+         sys_clk_i    => sys_clk_i,
+         sys_rstn_i   => sys_rstn_i,
          kbd_clk_o    => kbd_clk,
          pixel_clk_o  => video_clk,
          pixel_rst_o  => video_rst,
          pixel_clk5_o => hdmi_clk
       ); -- i_clk_mega65
+
+   i_xpm_cdc_sync_rst : xpm_cdc_sync_rst
+      port map (
+         src_rst  => not sys_rstn_i,
+         dest_clk => sys_clk_i,
+         dest_rst => sys_rst
+      ); -- i_xpm_cdc_sync_rst
 
 
    --------------------------------------------------------------------------
@@ -139,7 +146,7 @@ begin
          src_in(0)   => not kbd_up_out,
          src_in(1)   => not kbd_left_out,
          src_in(2)   => (not kbd_return_out) or (not uart_rx_i),
-         dest_clk    => sys_clk,
+         dest_clk    => sys_clk_i,
          dest_out(0) => sys_up_o,
          dest_out(1) => sys_left_o,
          dest_out(2) => sys_start_o
@@ -150,7 +157,7 @@ begin
          WIDTH => 2
       )
       port map (
-         src_clk      => sys_clk,
+         src_clk      => sys_clk_i,
          src_in(0)    => sys_active_i,
          src_in(1)    => sys_error_i,
          dest_clk     => kbd_clk,
@@ -168,7 +175,7 @@ begin
          WIDTH => G_DIGITS_SIZE
       )
       port map (
-         src_clk  => sys_clk,
+         src_clk  => sys_clk_i,
          src_in   => sys_digits_i,
          dest_clk => video_clk,
          dest_out => video_digits
@@ -258,6 +265,11 @@ begin
          out_n_o  => hdmi_clk_n
       ); -- i_serialiser_10to1_selectio_clk
 
+
+   --------------------------------------------------------------------------
+   -- UART
+   --------------------------------------------------------------------------
+
    i_hexifier : entity work.hexifier
       generic map (
          G_DATA_NIBBLES => G_DIGITS_SIZE/4
@@ -274,9 +286,9 @@ begin
                    str2slv("ADDR:   ") & sys_digits_hex(127 downto  64) & X"0D0A" &
                    str2slv("READ:   ") & sys_digits_hex( 63 downto   0) & X"0D0A";
 
-   sys_active_proc : process (sys_clk)
+   sys_active_proc : process (sys_clk_i)
    begin
-      if rising_edge(sys_clk) then
+      if rising_edge(sys_clk_i) then
          sys_active_d <= sys_active_i;
       end if;
    end process sys_active_proc;
@@ -287,8 +299,8 @@ begin
          G_DATA_SIZE_OUT => 8
       )
       port map (
-         clk_i     => sys_clk,
-         rst_i     => not sys_reset_n,
+         clk_i     => sys_clk_i,
+         rst_i     => sys_rst,
          s_valid_i => sys_active_d and not sys_active_i, -- falling edge
          s_ready_o => open,
          s_data_i  => sys_uart_hex & X"0D0A",
@@ -299,8 +311,8 @@ begin
 
    i_uart : entity work.uart
       port map (
-         clk_i     => sys_clk,
-         rst_i     => not sys_reset_n,
+         clk_i     => sys_clk_i,
+         rst_i     => sys_rst,
          s_valid_i => sys_uart_valid,
          s_ready_o => sys_uart_ready,
          s_data_i  => sys_uart_data,
