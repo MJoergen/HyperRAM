@@ -6,52 +6,54 @@
 -- The address is word-based, i.e. units of 2 bytes.
 
 -- This module requires three clocks:
--- clk_x1_i     : 100 MHz : This is the main clock used for the Avalon MM
---                          interface as well as controlling the HyperRAM
---                          device.
--- clk_x1_del_i :_100 MHz : Used for I/O to HyperRAM device.
+-- clk_x1_i       : 100 MHz : This is the main clock used for the Avalon MM
+--                            interface as well as controlling the HyperRAM
+--                            device.
+-- clk_x1_del_i   :_100 MHz, phase shifted 90 degrees.
+-- delay_refclk_i : 200 MHz : This is used to control the IDELAY blocks
+--                            used in the receive path.
 --
 -- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
 
 library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+   use ieee.std_logic_1164.all;
+   use ieee.numeric_std.all;
 
 entity hyperram is
    generic (
       G_ERRATA_ISSI_D_FIX : boolean := true
    );
    port (
-      clk_x1_i            : in  std_logic; -- Main clock
-      delay_refclk_i      : in  std_logic; -- 200 MHz, for IDELAYCTRL
-      clk_x1_del_i        : in  std_logic; -- phase shifted 90 degrees
-      rst_i               : in  std_logic; -- Synchronous reset
+      clk_x1_i            : in    std_logic;                   -- Main clock
+      clk_x1_del_i        : in    std_logic;                   -- phase shifted 90 degrees
+      delay_refclk_i      : in    std_logic;                   -- 200 MHz, for IDELAYCTRL
+      rst_i               : in    std_logic;                   -- Synchronous reset
 
       -- Avalon Memory Map
-      avm_write_i         : in  std_logic;
-      avm_read_i          : in  std_logic;
-      avm_address_i       : in  std_logic_vector(31 downto 0);
-      avm_writedata_i     : in  std_logic_vector(15 downto 0);
-      avm_byteenable_i    : in  std_logic_vector(1 downto 0);
-      avm_burstcount_i    : in  std_logic_vector(7 downto 0);
-      avm_readdata_o      : out std_logic_vector(15 downto 0);
-      avm_readdatavalid_o : out std_logic;
-      avm_waitrequest_o   : out std_logic;
+      avm_write_i         : in    std_logic;
+      avm_read_i          : in    std_logic;
+      avm_address_i       : in    std_logic_vector(31 downto 0);
+      avm_writedata_i     : in    std_logic_vector(15 downto 0);
+      avm_byteenable_i    : in    std_logic_vector(1 downto 0);
+      avm_burstcount_i    : in    std_logic_vector(7 downto 0);
+      avm_readdata_o      : out   std_logic_vector(15 downto 0);
+      avm_readdatavalid_o : out   std_logic;
+      avm_waitrequest_o   : out   std_logic;
 
       -- Statistics
-      count_long_o        : out unsigned(31 downto 0);
-      count_short_o       : out unsigned(31 downto 0);
+      count_long_o        : out   unsigned(31 downto 0);
+      count_short_o       : out   unsigned(31 downto 0);
 
       -- HyperRAM device interface
-      hr_resetn_o         : out std_logic;
-      hr_csn_o            : out std_logic;
-      hr_ck_o             : out std_logic;
-      hr_rwds_in_i        : in  std_logic;
-      hr_rwds_out_o       : out std_logic;
-      hr_rwds_oe_n_o      : out std_logic;   -- Output enable for RWDS
-      hr_dq_in_i          : in  std_logic_vector(7 downto 0);
-      hr_dq_out_o         : out std_logic_vector(7 downto 0);
-      hr_dq_oe_n_o        : out std_logic_vector(7 downto 0)    -- Output enable for DQ
+      hr_resetn_o         : out   std_logic;
+      hr_csn_o            : out   std_logic;
+      hr_ck_o             : out   std_logic;
+      hr_rwds_in_i        : in    std_logic;
+      hr_rwds_out_o       : out   std_logic;
+      hr_rwds_oe_n_o      : out   std_logic;                   -- Output enable for RWDS
+      hr_dq_in_i          : in    std_logic_vector(7 downto 0);
+      hr_dq_out_o         : out   std_logic_vector(7 downto 0);
+      hr_dq_oe_n_o        : out   std_logic_vector(7 downto 0) -- Output enable for DQ
    );
 end entity hyperram;
 
@@ -59,47 +61,47 @@ architecture synthesis of hyperram is
 
    constant C_LATENCY : integer := 4; -- 40 ns or above
 
-   signal errata_write         : std_logic;
-   signal errata_read          : std_logic;
-   signal errata_address       : std_logic_vector(31 downto 0);
-   signal errata_writedata     : std_logic_vector(15 downto 0);
-   signal errata_byteenable    : std_logic_vector(1 downto 0);
-   signal errata_burstcount    : std_logic_vector(7 downto 0);
-   signal errata_readdata      : std_logic_vector(15 downto 0);
-   signal errata_readdatavalid : std_logic;
-   signal errata_waitrequest   : std_logic;
+   signal   errata_write         : std_logic;
+   signal   errata_read          : std_logic;
+   signal   errata_address       : std_logic_vector(31 downto 0);
+   signal   errata_writedata     : std_logic_vector(15 downto 0);
+   signal   errata_byteenable    : std_logic_vector( 1 downto 0);
+   signal   errata_burstcount    : std_logic_vector( 7 downto 0);
+   signal   errata_readdata      : std_logic_vector(15 downto 0);
+   signal   errata_readdatavalid : std_logic;
+   signal   errata_waitrequest   : std_logic;
 
-   signal cfg_write         : std_logic;
-   signal cfg_read          : std_logic;
-   signal cfg_address       : std_logic_vector(31 downto 0);
-   signal cfg_writedata     : std_logic_vector(15 downto 0);
-   signal cfg_byteenable    : std_logic_vector(1 downto 0);
-   signal cfg_burstcount    : std_logic_vector(7 downto 0);
-   signal cfg_readdata      : std_logic_vector(15 downto 0);
-   signal cfg_readdatavalid : std_logic;
-   signal cfg_waitrequest   : std_logic;
+   signal   cfg_write         : std_logic;
+   signal   cfg_read          : std_logic;
+   signal   cfg_address       : std_logic_vector(31 downto 0);
+   signal   cfg_writedata     : std_logic_vector(15 downto 0);
+   signal   cfg_byteenable    : std_logic_vector( 1 downto 0);
+   signal   cfg_burstcount    : std_logic_vector( 7 downto 0);
+   signal   cfg_readdata      : std_logic_vector(15 downto 0);
+   signal   cfg_readdatavalid : std_logic;
+   signal   cfg_waitrequest   : std_logic;
 
-   signal ctrl_rstn         : std_logic;
-   signal ctrl_csn          : std_logic;
-   signal ctrl_ck_ddr       : std_logic_vector(1 downto 0);
-   signal ctrl_dq_ddr_in    : std_logic_vector(15 downto 0);
-   signal ctrl_dq_ddr_out   : std_logic_vector(15 downto 0);
-   signal ctrl_dq_oe        : std_logic;
-   signal ctrl_dq_ie        : std_logic;
-   signal ctrl_rwds_ddr_out : std_logic_vector(1 downto 0);
-   signal ctrl_rwds_oe      : std_logic;
-   signal ctrl_rwds_in      : std_logic;
-   signal ctrl_read         : std_logic;
+   signal   ctrl_rstn         : std_logic;
+   signal   ctrl_csn          : std_logic;
+   signal   ctrl_ck_ddr       : std_logic_vector( 1 downto 0);
+   signal   ctrl_dq_ddr_in    : std_logic_vector(15 downto 0);
+   signal   ctrl_dq_ddr_out   : std_logic_vector(15 downto 0);
+   signal   ctrl_dq_oe        : std_logic;
+   signal   ctrl_dq_ie        : std_logic;
+   signal   ctrl_rwds_ddr_out : std_logic_vector( 1 downto 0);
+   signal   ctrl_rwds_oe      : std_logic;
+   signal   ctrl_rwds_in      : std_logic;
+   signal   ctrl_read         : std_logic;
 
 begin
 
-   gen_errata : if G_ERRATA_ISSI_D_FIX generate
+   errata_gen : if G_ERRATA_ISSI_D_FIX generate
 
       --------------------------------------------------------
       -- Instantiate workaround for errata in ISSI rev D dies
       --------------------------------------------------------
 
-      i_hyperram_errata : entity work.hyperram_errata
+      hyperram_errata_inst : entity work.hyperram_errata
          port map (
             clk_i                 => clk_x1_i,
             rst_i                 => rst_i,
@@ -121,7 +123,7 @@ begin
             m_avm_burstcount_o    => errata_burstcount,
             m_avm_readdata_i      => errata_readdata,
             m_avm_readdatavalid_i => errata_readdatavalid
-         ); -- i_hyperram_errata
+         ); -- hyperram_errata_inst
 
    else generate
 
@@ -139,14 +141,14 @@ begin
       errata_byteenable   <= avm_byteenable_i;
       errata_burstcount   <= avm_burstcount_i;
 
-   end generate;
+   end generate errata_gen;
 
 
    --------------------------------------------------------
    -- Instantiate HyperRAM configurator
    --------------------------------------------------------
 
-   i_hyperram_config : entity work.hyperram_config
+   hyperram_config_inst : entity work.hyperram_config
       generic map (
          G_LATENCY => C_LATENCY
       )
@@ -171,43 +173,43 @@ begin
          m_avm_readdata_i      => cfg_readdata,
          m_avm_readdatavalid_i => cfg_readdatavalid,
          m_avm_waitrequest_i   => cfg_waitrequest
-      ); -- i_hyperram_config
+      ); -- hyperram_config_inst
 
 
    --------------------------------------------------------
    -- Instantiate HyperRAM controller
    --------------------------------------------------------
 
-   i_hyperram_ctrl : entity work.hyperram_ctrl
+   hyperram_ctrl_inst : entity work.hyperram_ctrl
       generic map (
          G_LATENCY => C_LATENCY
       )
       port map (
-         clk_i                => clk_x1_i,
-         rst_i                => rst_i,
-         avm_write_i          => cfg_write,
-         avm_read_i           => cfg_read,
-         avm_address_i        => cfg_address,
-         avm_writedata_i      => cfg_writedata,
-         avm_byteenable_i     => cfg_byteenable,
-         avm_burstcount_i     => cfg_burstcount,
-         avm_readdata_o       => cfg_readdata,
-         avm_readdatavalid_o  => cfg_readdatavalid,
-         avm_waitrequest_o    => cfg_waitrequest,
-         count_long_o         => count_long_o,
-         count_short_o        => count_short_o,
-         hb_rstn_o            => ctrl_rstn,
-         hb_csn_o             => ctrl_csn,
-         hb_ck_ddr_o          => ctrl_ck_ddr,
-         hb_dq_ddr_in_i       => ctrl_dq_ddr_in,
-         hb_dq_ddr_out_o      => ctrl_dq_ddr_out,
-         hb_dq_oe_o           => ctrl_dq_oe,
-         hb_dq_ie_i           => ctrl_dq_ie,
-         hb_rwds_ddr_out_o    => ctrl_rwds_ddr_out,
-         hb_rwds_oe_o         => ctrl_rwds_oe,
-         hb_rwds_in_i         => ctrl_rwds_in,
-         hb_read_o            => ctrl_read
-      ); -- i_hyperram_ctrl
+         clk_i               => clk_x1_i,
+         rst_i               => rst_i,
+         avm_write_i         => cfg_write,
+         avm_read_i          => cfg_read,
+         avm_address_i       => cfg_address,
+         avm_writedata_i     => cfg_writedata,
+         avm_byteenable_i    => cfg_byteenable,
+         avm_burstcount_i    => cfg_burstcount,
+         avm_readdata_o      => cfg_readdata,
+         avm_readdatavalid_o => cfg_readdatavalid,
+         avm_waitrequest_o   => cfg_waitrequest,
+         count_long_o        => count_long_o,
+         count_short_o       => count_short_o,
+         hb_rstn_o           => ctrl_rstn,
+         hb_csn_o            => ctrl_csn,
+         hb_ck_ddr_o         => ctrl_ck_ddr,
+         hb_dq_ddr_in_i      => ctrl_dq_ddr_in,
+         hb_dq_ddr_out_o     => ctrl_dq_ddr_out,
+         hb_dq_oe_o          => ctrl_dq_oe,
+         hb_dq_ie_i          => ctrl_dq_ie,
+         hb_rwds_ddr_out_o   => ctrl_rwds_ddr_out,
+         hb_rwds_oe_o        => ctrl_rwds_oe,
+         hb_rwds_in_i        => ctrl_rwds_in,
+         hb_read_o           => ctrl_read
+      ); -- hyperram_ctrl_inst
 
 
    --------------------------------------------------------
@@ -217,20 +219,20 @@ begin
    hr_resetn_o <= ctrl_rstn;
    hr_csn_o    <= ctrl_csn;
 
-   i_hyperram_rx : entity work.hyperram_rx
+   hyperram_rx_inst : entity work.hyperram_rx
       port map (
-         clk_x1_i            => clk_x1_i,
-         delay_refclk_i      => delay_refclk_i,
-         rst_i               => rst_i,
-         ctrl_dq_ddr_in_o    => ctrl_dq_ddr_in,
-         ctrl_dq_ie_o        => ctrl_dq_ie,
-         ctrl_rwds_in_o      => ctrl_rwds_in,
-         ctrl_read_i         => ctrl_read,
-         hr_rwds_in_i        => hr_rwds_in_i,
-         hr_dq_in_i          => hr_dq_in_i
-      ); -- i_hyperram_rx
+         clk_x1_i         => clk_x1_i,
+         delay_refclk_i   => delay_refclk_i,
+         rst_i            => rst_i,
+         ctrl_dq_ddr_in_o => ctrl_dq_ddr_in,
+         ctrl_dq_ie_o     => ctrl_dq_ie,
+         ctrl_rwds_in_o   => ctrl_rwds_in,
+         ctrl_read_i      => ctrl_read,
+         hr_rwds_in_i     => hr_rwds_in_i,
+         hr_dq_in_i       => hr_dq_in_i
+      ); -- hyperram_rx_inst
 
-   i_hyperram_tx : entity work.hyperram_tx
+   hyperram_tx_inst : entity work.hyperram_tx
       port map (
          clk_x1_i            => clk_x1_i,
          clk_x1_del_i        => clk_x1_del_i,
@@ -245,7 +247,7 @@ begin
          hr_dq_out_o         => hr_dq_out_o,
          hr_rwds_oe_n_o      => hr_rwds_oe_n_o,
          hr_dq_oe_n_o        => hr_dq_oe_n_o
-      ); -- i_hyperram_tx
+      ); -- hyperram_tx_inst
 
 end architecture synthesis;
 

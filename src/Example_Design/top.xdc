@@ -16,18 +16,18 @@ set_property -dict {PACKAGE_PIN M13  IOSTANDARD LVCMOS33}                       
 ## HyperRAM (connected to IS66WVH8M8BLL-100B1LI, 64 Mbit, 100 MHz, 3.0 V, single-ended clock).
 ## SLEW and DRIVE set to maximum performance to reduce rise and fall times, and therefore
 ## give better timing margins.
-set_property -dict {PACKAGE_PIN B22  IOSTANDARD LVCMOS33  PULLUP FALSE}                      [get_ports {hr_resetn}]
-set_property -dict {PACKAGE_PIN C22  IOSTANDARD LVCMOS33  PULLUP FALSE}                      [get_ports {hr_csn}]
-set_property -dict {PACKAGE_PIN D22  IOSTANDARD LVCMOS33  PULLUP FALSE  SLEW FAST  DRIVE 16} [get_ports {hr_ck}]
-set_property -dict {PACKAGE_PIN B21  IOSTANDARD LVCMOS33  PULLUP FALSE  SLEW FAST  DRIVE 16} [get_ports {hr_rwds}]
-set_property -dict {PACKAGE_PIN A21  IOSTANDARD LVCMOS33  PULLUP FALSE  SLEW FAST  DRIVE 16} [get_ports {hr_dq[0]}]
-set_property -dict {PACKAGE_PIN D21  IOSTANDARD LVCMOS33  PULLUP FALSE  SLEW FAST  DRIVE 16} [get_ports {hr_dq[1]}]
-set_property -dict {PACKAGE_PIN C20  IOSTANDARD LVCMOS33  PULLUP FALSE  SLEW FAST  DRIVE 16} [get_ports {hr_dq[2]}]
-set_property -dict {PACKAGE_PIN A20  IOSTANDARD LVCMOS33  PULLUP FALSE  SLEW FAST  DRIVE 16} [get_ports {hr_dq[3]}]
-set_property -dict {PACKAGE_PIN B20  IOSTANDARD LVCMOS33  PULLUP FALSE  SLEW FAST  DRIVE 16} [get_ports {hr_dq[4]}]
-set_property -dict {PACKAGE_PIN A19  IOSTANDARD LVCMOS33  PULLUP FALSE  SLEW FAST  DRIVE 16} [get_ports {hr_dq[5]}]
-set_property -dict {PACKAGE_PIN E21  IOSTANDARD LVCMOS33  PULLUP FALSE  SLEW FAST  DRIVE 16} [get_ports {hr_dq[6]}]
-set_property -dict {PACKAGE_PIN E22  IOSTANDARD LVCMOS33  PULLUP FALSE  SLEW FAST  DRIVE 16} [get_ports {hr_dq[7]}]
+set_property -dict {PACKAGE_PIN B22  IOSTANDARD LVCMOS33  PULLTYPE {}                          } [get_ports {hr_resetn}]
+set_property -dict {PACKAGE_PIN C22  IOSTANDARD LVCMOS33  PULLTYPE {}                          } [get_ports {hr_csn}]
+set_property -dict {PACKAGE_PIN D22  IOSTANDARD LVCMOS33  PULLTYPE {}       SLEW FAST  DRIVE 16} [get_ports {hr_ck}]
+set_property -dict {PACKAGE_PIN B21  IOSTANDARD LVCMOS33  PULLTYPE PULLDOWN SLEW FAST  DRIVE 16} [get_ports {hr_rwds}]
+set_property -dict {PACKAGE_PIN A21  IOSTANDARD LVCMOS33  PULLTYPE {}       SLEW FAST  DRIVE 16} [get_ports {hr_dq[0]}]
+set_property -dict {PACKAGE_PIN D21  IOSTANDARD LVCMOS33  PULLTYPE {}       SLEW FAST  DRIVE 16} [get_ports {hr_dq[1]}]
+set_property -dict {PACKAGE_PIN C20  IOSTANDARD LVCMOS33  PULLTYPE {}       SLEW FAST  DRIVE 16} [get_ports {hr_dq[2]}]
+set_property -dict {PACKAGE_PIN A20  IOSTANDARD LVCMOS33  PULLTYPE {}       SLEW FAST  DRIVE 16} [get_ports {hr_dq[3]}]
+set_property -dict {PACKAGE_PIN B20  IOSTANDARD LVCMOS33  PULLTYPE {}       SLEW FAST  DRIVE 16} [get_ports {hr_dq[4]}]
+set_property -dict {PACKAGE_PIN A19  IOSTANDARD LVCMOS33  PULLTYPE {}       SLEW FAST  DRIVE 16} [get_ports {hr_dq[5]}]
+set_property -dict {PACKAGE_PIN E21  IOSTANDARD LVCMOS33  PULLTYPE {}       SLEW FAST  DRIVE 16} [get_ports {hr_dq[6]}]
+set_property -dict {PACKAGE_PIN E22  IOSTANDARD LVCMOS33  PULLTYPE {}       SLEW FAST  DRIVE 16} [get_ports {hr_dq[7]}]
 
 ## Keyboard interface (connected to MAX10)
 set_property -dict {PACKAGE_PIN A14  IOSTANDARD LVCMOS33}                                    [get_ports {kb_io0}]
@@ -74,11 +74,11 @@ create_clock -period 10.000 -name hr_rwds -waveform {2.5 7.5} [get_ports hr_rwds
 set_false_path -from [get_ports hr_rwds] -to [get_clocks hr_ck]
 
 # Clock Domain Crossing
-set_max_delay 2 -datapath_only -from [get_cells i_core/i_hyperram/i_hyperram_ctrl/hb_read_o_reg]
-set_max_delay 2 -datapath_only -from [get_cells i_core/i_hyperram/i_hyperram_rx/iddr_dq_gen[*].iddr_dq_inst]
+set_max_delay 2 -datapath_only -from [get_cells i_core/i_hyperram/hyperram_ctrl_inst/hb_read_o_reg]
+set_max_delay 2 -datapath_only -from [get_cells i_core/i_hyperram/hyperram_rx_inst/iddr_dq_gen[*].iddr_dq_inst]
 
 # Prevent insertion of extra BUFG
-set_property CLOCK_BUFFER_TYPE NONE [get_nets -of [get_pins i_core/i_hyperram/i_hyperram_rx/delay_rwds_inst/DATAOUT]]
+set_property CLOCK_BUFFER_TYPE NONE [get_nets -of [get_pins i_core/i_hyperram/hyperram_rx_inst/delay_rwds_inst/DATAOUT]]
 
 ################################################################################
 # HyperRAM timing (correct for IS66WVH8M8DBLL-100B1LI)
@@ -92,10 +92,10 @@ set tDSHmin -0.8 ; # RWDS to data invalid, min
 ################################################################################
 # FPGA to HyperRAM (address and write data)
 
-set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_tx/hr_rwds_oe_n_reg ]
-set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_tx/hr_dq_oe_n_reg[*] ]
-set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_ctrl/hb_csn_o_reg ]
-set_property IOB TRUE [get_cells i_core/i_hyperram/i_hyperram_ctrl/hb_rstn_o_reg ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/hyperram_tx_inst/hr_rwds_oe_n_reg ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/hyperram_tx_inst/hr_dq_oe_n_reg[*] ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/hyperram_ctrl_inst/hb_csn_o_reg ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/hyperram_ctrl_inst/hb_rstn_o_reg ]
 
 # setup
 set_output_delay -max  $HR_tIS -clock hr_ck [get_ports {hr_resetn hr_csn hr_rwds hr_dq[*]}]

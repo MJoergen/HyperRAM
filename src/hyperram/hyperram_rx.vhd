@@ -34,11 +34,11 @@ end entity hyperram_rx;
 
 architecture synthesis of hyperram_rx is
 
-   signal rwds_dq_in     : std_logic_vector(15 downto 0);
-   signal rwds_in_delay  : std_logic;
+   signal rwds_dq_in    : std_logic_vector(15 downto 0);
+   signal rwds_in_delay : std_logic;
 
-   signal ctrl_dq_ie     : std_logic;
-   signal ctrl_dq_ie_d   : std_logic;
+   signal ctrl_dq_ie   : std_logic;
+   signal ctrl_dq_ie_d : std_logic;
 
 begin
 
@@ -108,12 +108,12 @@ begin
          dst_valid_o => ctrl_dq_ie
       ); -- hyperram_fifo_inst
 
-   process (clk_x1_i)
+   ctrl_dq_ie_d_proc : process (clk_x1_i)
    begin
       if rising_edge(clk_x1_i) then
          ctrl_dq_ie_d <= ctrl_dq_ie;
       end if;
-   end process;
+   end process ctrl_dq_ie_d_proc;
 
    ctrl_dq_ie_o <= ctrl_dq_ie_d and ctrl_dq_ie;
 
