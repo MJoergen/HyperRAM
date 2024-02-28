@@ -33,14 +33,12 @@ architecture bench of hyperram_tb is
 
    shared variable rnd_stimuli, rnd_expected : RandomPType;
 
-   constant C_HYPERRAM_FREQ_MHZ : integer := 100;
-   constant C_HYPERRAM_PHASE    : real := 162.000;
    constant C_DELAY             : time := 1 ns;
    constant G_DATA_SIZE         : integer := 16;
 
-   signal clk_x1            : std_logic;
-   signal clk_x2            : std_logic;
-   signal clk_x2_del        : std_logic;
+   signal clk               : std_logic;
+   signal clk_del           : std_logic;
+   signal delay_refclk      : std_logic;
    signal rst               : std_logic;
 
    signal tb_start          : std_logic;
@@ -96,7 +94,7 @@ begin
             BUS_HANDLE => AVALON_BUS
         )
         port map (
-            clk           => clk_x1,
+            clk           => clk,
             address       => avm_address,
             byteenable    => avm_byteenable,
             burstcount    => avm_burstcount,
@@ -113,15 +111,11 @@ begin
    ---------------------------------------------------------
 
    i_clk : entity work.clk
-      generic map (
-         G_HYPERRAM_FREQ_MHZ => C_HYPERRAM_FREQ_MHZ,
-         G_HYPERRAM_PHASE    => C_HYPERRAM_PHASE
-      )
       port map (
-         clk_x1_o     => clk_x1,
-         clk_x2_o     => clk_x2,
-         clk_x2_del_o => clk_x2_del,
-         rst_o        => rst
+         clk_o          => clk,
+         clk_del_o      => clk_del,
+         delay_refclk_o => delay_refclk,
+         rst_o          => rst
       ); -- i_clk
 
    --------------------------------------------------------
@@ -130,9 +124,9 @@ begin
 
    i_hyperram : entity src_lib.hyperram
       port map (
-         clk_x1_i            => clk_x1,
-         clk_x2_i            => clk_x2,
-         clk_x2_del_i        => clk_x2_del,
+         clk_i               => clk,
+         clk_del_i           => clk_del,
+         delay_refclk_i      => delay_refclk,
          rst_i               => rst,
          avm_write_i         => avm_write,
          avm_read_i          => avm_read,

@@ -1,6 +1,6 @@
 -- This is part of the HyperRAM I/O connections
 -- It handles signals from FPGA to HyperRAM.
--- The additional clock clk_x1_del_i is used to drive the CK output.
+-- The additional clock clk_del_i is used to drive the CK output.
 --
 -- Created by Michael Jørgensen in 2023 (mjoergen.github.io/HyperRAM).
 
@@ -13,8 +13,8 @@ library unisim;
 
 entity hyperram_tx is
    port (
-      clk_x1_i            : in    std_logic;
-      clk_x1_del_i        : in    std_logic; -- phase shifted.
+      clk_i               : in    std_logic;
+      clk_del_i           : in    std_logic; -- phase shifted.
       rst_i               : in    std_logic;
 
       -- Connect to HyperRAM controller
@@ -55,7 +55,7 @@ begin
          d2 => ctrl_ck_ddr_i(0),
          ce => '1',
          q  => hr_ck_o,
-         c  => clk_x1_del_i
+         c  => clk_del_i
       ); -- oddr_clk_inst
 
    oddr_rwds_inst : component oddr
@@ -67,7 +67,7 @@ begin
          d2 => ctrl_rwds_ddr_out_i(0),
          ce => '1',
          q  => hr_rwds_out_o,
-         c  => clk_x1_i
+         c  => clk_i
       ); -- oddr_rwds_inst
 
    oddr_dq_gen : for i in 0 to 7 generate
@@ -81,16 +81,16 @@ begin
             d2 => ctrl_dq_ddr_out_i(i),
             ce => '1',
             q  => hr_dq_out_o(i),
-            c  => clk_x1_i
+            c  => clk_i
          ); -- oddr_dq_inst
 
    end generate oddr_dq_gen;
 
    -- The Output Enable signals are active low, because that maps
    -- directly into the TriState pin of an IOBUFT primitive.
-   output_proc : process (clk_x1_i)
+   output_proc : process (clk_i)
    begin
-      if rising_edge(clk_x1_i) then
+      if rising_edge(clk_i) then
          hr_dq_oe_n   <= (others => not ctrl_dq_oe_i);
          hr_rwds_oe_n <= not ctrl_rwds_oe_i;
       end if;

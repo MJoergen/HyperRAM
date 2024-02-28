@@ -13,8 +13,8 @@ entity core is
       G_DATA_SIZE         : integer
    );
    port (
-      clk_x1_i       : in    std_logic; -- Main clock
-      clk_x1_del_i   : in    std_logic; -- Main clock, phase shifted
+      clk_i          : in    std_logic; -- Main clock
+      clk_del_i      : in    std_logic; -- Main clock, phase shifted
       delay_refclk_i : in    std_logic; -- 200 MHz
       rst_i          : in    std_logic; -- Synchronous reset
 
@@ -81,9 +81,9 @@ begin
    count_long_o  <= count_long  - start_long;
    count_short_o <= count_short - start_short;
 
-   p_start : process (clk_x1_i)
+   p_start : process (clk_i)
    begin
-      if rising_edge(clk_x1_i) then
+      if rising_edge(clk_i) then
          start_d <= start_i;
 
          if start_d = '0' and start_i = '1' then
@@ -98,13 +98,13 @@ begin
    -- Instantiate trafic generator
    --------------------------------------------------------
 
-   i_trafic_gen : entity work.trafic_gen
+   i_traffic_gen : entity work.trafic_gen
       generic map (
          G_DATA_SIZE    => G_DATA_SIZE,
          G_ADDRESS_SIZE => G_SYS_ADDRESS_SIZE
       )
       port map (
-         clk_i               => clk_x1_i,
+         clk_i               => clk_i,
          rst_i               => rst_i,
          start_i             => start_i,
          wait_o              => active_o,
@@ -121,7 +121,7 @@ begin
          avm_readdata_i      => avm_readdata,
          avm_readdatavalid_i => avm_readdatavalid,
          avm_waitrequest_i   => avm_waitrequest
-      ); -- i_trafic_gen
+      ); -- i_traffic_gen
 
    gen_decrease : if G_DATA_SIZE > 16 generate
       i_avm_decrease : entity work.avm_decrease
@@ -132,7 +132,7 @@ begin
             G_MASTER_DATA_SIZE    => 16
          )
          port map (
-            clk_i                 => clk_x1_i,
+            clk_i                 => clk_i,
             rst_i                 => rst_i,
             s_avm_write_i         => avm_write,
             s_avm_read_i          => avm_read,
@@ -175,8 +175,8 @@ begin
          G_ERRATA_ISSI_D_FIX => true
       )
       port map (
-         clk_x1_i            => clk_x1_i,
-         clk_x1_del_i        => clk_x1_del_i,
+         clk_i               => clk_i,
+         clk_del_i           => clk_del_i,
          delay_refclk_i      => delay_refclk_i,
          rst_i               => rst_i,
          avm_write_i         => dec_write,

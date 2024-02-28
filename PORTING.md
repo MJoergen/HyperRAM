@@ -44,26 +44,12 @@ device.
 
 The HyperRAM implementation requires a total of three clocks:
 
-* `clk_i`        : This runs at 100 MHz, and drives the Avalon MM interface as
-  well as the HyperRAM speed.
-* `clk_x2_i`     : This runs at 200 Mhz and must be synchronous to `clk_i` with
-  no phase shift.
-* `clk_x2_del_i` : This runs at 200 Mhz and must be synchronous to `clk_i` with
-  a specific phase shift.
+* `clk_i`          : This runs at 100 MHz, and drives the Avalon MM interface as well as the
+  HyperRAM speed.
+* `clk_del_i`      : This must be synchronous to `clk_i` with a 90 degree phase shift.
+* `delay_refclk_i` : This runs at 200 Mhz
 
 All three clocks should be generated from the same MMCM/PLL.
-
-The reason for the phase-shifted clock is to ensure correct timing when
-sampling the input date `DQ` from the HyperRAM. For more information, see
-[Detailed design description](src/hyperram/README.md#hyperram_io.vhd).
-
-The specific value of the phase shift for `clk_x2_del_i` is board and device
-dependent. To determine the value to use probably requires some hand tuning,
-i.e. experimentally trying different values to find a range where there are no
-errors.
-
-On the MEGA65 platform I've had success with phase shifts in the range 144 to
-180 degrees, and have therefore settled on the central value of 162 degrees.
 
 See the file [src/Example_Design/clk.vhd](src/Example_Design/clk.vhd) for how
 clock synthesis is done on the MEGA65.
@@ -71,45 +57,39 @@ clock synthesis is done on the MEGA65.
 
 ## Constraints
 
-My experiments have shown that the HyperRAM timing is very sensitive to
-variations in design placement within the FPGA. Incorrect or sub-optimal
-placement can lead to large routing delays inside the FPGA that can interfere
-with the HyperRAM timing.  Therefore it is necessary to constrain the design so
-that the HyperRAM controller is placed as close to the I/O pads as possible.
-I've found it convenient to use `pblocks`.
+A number of constraints are needed by the HyperRAM controller in order to function
+properly.
 
-On the MEGA65 the HyperRAM signals are located in the upper left corner of the
-FPGA, i.e. from X0Y200 to X0Y224. To make room for the HyperRAM controller,
-it is constrained to a small region close to these I/O pads. I've chosen the
-region X0Y200 to X7Y224, seen in lines 62-67 in the file top.xdc:
+On the TX side (from FPGA to HyperRAM) we set the IOB property to TRUE on all the output
+ports (`RSTN`, `CSN`, `RWDS`, and `DQ`). This ensures the output registers are part of the
+output buffer, which minimizes the delay inside the FPGA. Note the `CK` signal is already
+controlled directly by an ODDR buffer.
 
 ```
-# Place HyperRAM close to I/O pins
-startgroup
-create_pblock pblock_i_hyperram
-resize_pblock pblock_i_hyperram -add {SLICE_X0Y200:SLICE_X7Y224}
-add_cells_to_pblock pblock_i_hyperram [get_cells [list i_hyperram]]
-endgroup
+set_property IOB TRUE [get_cells i_core/i_hyperram/hyperram_tx_inst/hr_rwds_oe_n_reg ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/hyperram_tx_inst/hr_dq_oe_n_reg[*] ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/hyperram_ctrl_inst/hb_csn_o_reg ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/hyperram_ctrl_inst/hb_rstn_o_reg ]
 ```
 
-With this single constraint Vivado consistently places the HyperRAM controller
-right next to the corresponding I/O ports.
+On the Rx side (from HyperRAM to FPGA) we need several extra constraints. First, we want
+to avoid having an extra BUFG on the `RWDS_DELAY`. This will happen automatically, because
+Vivado recognizes this signal is used as a clock. However, with the IDELAY block we are
+manually controlling the delay of this signal, and any extra inserted BUFG will increase
+the delay many times.
 
-There are other means of coercing Vivado to place the HyperRAM controller
-correctly, e.g. by setting appropriate input and output delays, but I was not
-successfull with that approach.
+```
+set_property CLOCK_BUFFER_TYPE NONE [get_nets -of [get_pins i_core/i_hyperram/hyperram_rx_inst/delay_rwds_inst/DATAOUT]]
+```
 
-### Locating the I/O pad
+Secondly, the data path into the Rx FIFO must be as short as possible, so extra
+constraints are needed for that.
 
-To determine the correct constraint to use I first located the I/O pin D22 (for
-the top-level signal `CK`) in the device view in Vivado:
+```
+set_max_delay 2 -datapath_only -from [get_cells i_core/i_hyperram/hyperram_ctrl_inst/hb_read_o_reg]
+set_max_delay 2 -datapath_only -from [get_cells i_core/i_hyperram/hyperram_rx_inst/iddr_dq_gen[*].iddr_dq_inst]
+```
 
-![device view](doc/device_view.png)
-
-Then selecting the pin and viewing the pin properties gives this result:
-
-![pin properties](doc/iopad.png)
-
-From the line "Tile:" we directly see the value X=0 and Y=205. Then just repeat
-with the other top-level ports connected to the HyperRAM device.
+See the file [src/Example_Design/top.xdc](src/Example_Design/top.xdc) for the full set of
+constraints needed.
 

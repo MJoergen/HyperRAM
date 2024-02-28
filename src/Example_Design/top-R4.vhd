@@ -77,8 +77,8 @@ begin
       (
          sys_clk_i      => clk,
          sys_rstn_i     => not reset,
-         clk_x1_o       => hr_clk,
-         clk_x1_del_o   => hr_clk_del,
+         clk_o          => hr_clk,
+         clk_del_o      => hr_clk_del,
          delay_refclk_o => delay_refclk,
          rst_o          => hr_rst
       ); -- i_clk
@@ -95,8 +95,8 @@ begin
          G_DATA_SIZE         => C_DATA_SIZE
       )
       port map (
-         clk_x1_i       => hr_clk,
-         clk_x1_del_i   => hr_clk_del,
+         clk_i          => hr_clk,
+         clk_del_i      => hr_clk_del,
          delay_refclk_i => delay_refclk,
          rst_i          => hr_rst,
          start_i        => sys_start,

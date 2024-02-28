@@ -20,8 +20,8 @@ entity clk is
    port (
       sys_clk_i      : in  std_logic;   -- expects 100 MHz
       sys_rstn_i     : in  std_logic;   -- Asynchronous, asserted low
-      clk_x1_o       : out std_logic;   -- 100 MHz
-      clk_x1_del_o   : out std_logic;   -- 100 MHz phase shifted 90 degrees
+      clk_o          : out std_logic;   -- 100 MHz
+      clk_del_o      : out std_logic;   -- 100 MHz phase shifted 90 degrees
       delay_refclk_o : out std_logic;   -- 200 MHz, for IDELAYCTRL
       rst_o          : out std_logic
    );
@@ -32,8 +32,8 @@ architecture synthesis of clk is
    signal clkfb             : std_logic;
    signal clkfb_mmcm        : std_logic;
    signal delay_refclk_mmcm : std_logic;
-   signal clk_x1_del_mmcm   : std_logic;
-   signal clk_x1_mmcm       : std_logic;
+   signal clk_del_mmcm      : std_logic;
+   signal clk_mmcm          : std_logic;
    signal locked            : std_logic;
 
 begin
@@ -70,8 +70,8 @@ begin
          -- Output clocks
          CLKFBOUT            => clkfb_mmcm,
          CLKOUT1             => delay_refclk_mmcm,
-         CLKOUT2             => clk_x1_del_mmcm,
-         CLKOUT3             => clk_x1_mmcm,
+         CLKOUT2             => clk_del_mmcm,
+         CLKOUT3             => clk_mmcm,
          -- Input clock control
          CLKFBIN             => clkfb,
          CLKIN1              => sys_clk_i,
@@ -110,17 +110,17 @@ begin
          O => clkfb
       ); -- i_bufg_clkfb
 
-   i_bufg_clk_x1 : BUFG
+   i_bufg_clk : BUFG
       port map (
-         I => clk_x1_mmcm,
-         O => clk_x1_o
-      ); -- i_bufg_clk_x1
+         I => clk_mmcm,
+         O => clk_o
+      ); -- i_bufg_clk
 
-   i_bufg_clk_x1_del : BUFG
+   i_bufg_clk_del : BUFG
       port map (
-         I => clk_x1_del_mmcm,
-         O => clk_x1_del_o
-      ); -- i_bufg_clk_x1_del
+         I => clk_del_mmcm,
+         O => clk_del_o
+      ); -- i_bufg_clk_del
 
    i_bufg_delay_refclk : BUFG
       port map (
@@ -139,7 +139,7 @@ begin
       )
       port map (
          src_rst  => not (sys_rstn_i and locked),  -- 1-bit input: Source reset signal.
-         dest_clk => clk_x1_o,                     -- 1-bit input: Destination clock.
+         dest_clk => clk_o,                        -- 1-bit input: Destination clock.
          dest_rst => rst_o                         -- 1-bit output: src_rst synchronized to the destination clock domain.
                                                    -- This output is registered.
       ); -- i_xpm_cdc_sync_rst_pixel

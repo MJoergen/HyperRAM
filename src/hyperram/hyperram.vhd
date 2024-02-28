@@ -6,10 +6,10 @@
 -- The address is word-based, i.e. units of 2 bytes.
 
 -- This module requires three clocks:
--- clk_x1_i       : 100 MHz : This is the main clock used for the Avalon MM
+-- clk_i          : 100 MHz : This is the main clock used for the Avalon MM
 --                            interface as well as controlling the HyperRAM
 --                            device.
--- clk_x1_del_i   :_100 MHz, phase shifted 90 degrees.
+-- clk_del_i      :_100 MHz, phase shifted 90 degrees.
 -- delay_refclk_i : 200 MHz : This is used to control the IDELAY blocks
 --                            used in the receive path.
 --
@@ -24,8 +24,8 @@ entity hyperram is
       G_ERRATA_ISSI_D_FIX : boolean := true
    );
    port (
-      clk_x1_i            : in    std_logic;                   -- Main clock
-      clk_x1_del_i        : in    std_logic;                   -- phase shifted 90 degrees
+      clk_i               : in    std_logic;                   -- Main clock
+      clk_del_i           : in    std_logic;                   -- phase shifted 90 degrees
       delay_refclk_i      : in    std_logic;                   -- 200 MHz, for IDELAYCTRL
       rst_i               : in    std_logic;                   -- Synchronous reset
 
@@ -34,8 +34,8 @@ entity hyperram is
       avm_read_i          : in    std_logic;
       avm_address_i       : in    std_logic_vector(31 downto 0);
       avm_writedata_i     : in    std_logic_vector(15 downto 0);
-      avm_byteenable_i    : in    std_logic_vector(1 downto 0);
-      avm_burstcount_i    : in    std_logic_vector(7 downto 0);
+      avm_byteenable_i    : in    std_logic_vector( 1 downto 0);
+      avm_burstcount_i    : in    std_logic_vector( 7 downto 0);
       avm_readdata_o      : out   std_logic_vector(15 downto 0);
       avm_readdatavalid_o : out   std_logic;
       avm_waitrequest_o   : out   std_logic;
@@ -59,7 +59,7 @@ end entity hyperram;
 
 architecture synthesis of hyperram is
 
-   constant C_LATENCY : integer := 4; -- 40 ns or above
+   constant C_LATENCY : integer := 4;
 
    signal   errata_write         : std_logic;
    signal   errata_read          : std_logic;
@@ -103,7 +103,7 @@ begin
 
       hyperram_errata_inst : entity work.hyperram_errata
          port map (
-            clk_i                 => clk_x1_i,
+            clk_i                 => clk_i,
             rst_i                 => rst_i,
             s_avm_waitrequest_o   => avm_waitrequest_o,
             s_avm_write_i         => avm_write_i,
@@ -153,7 +153,7 @@ begin
          G_LATENCY => C_LATENCY
       )
       port map (
-         clk_i                 => clk_x1_i,
+         clk_i                 => clk_i,
          rst_i                 => rst_i,
          s_avm_write_i         => errata_write,
          s_avm_read_i          => errata_read,
@@ -185,7 +185,7 @@ begin
          G_LATENCY => C_LATENCY
       )
       port map (
-         clk_i               => clk_x1_i,
+         clk_i               => clk_i,
          rst_i               => rst_i,
          avm_write_i         => cfg_write,
          avm_read_i          => cfg_read,
@@ -221,7 +221,7 @@ begin
 
    hyperram_rx_inst : entity work.hyperram_rx
       port map (
-         clk_x1_i         => clk_x1_i,
+         clk_i            => clk_i,
          delay_refclk_i   => delay_refclk_i,
          rst_i            => rst_i,
          ctrl_dq_ddr_in_o => ctrl_dq_ddr_in,
@@ -234,8 +234,8 @@ begin
 
    hyperram_tx_inst : entity work.hyperram_tx
       port map (
-         clk_x1_i            => clk_x1_i,
-         clk_x1_del_i        => clk_x1_del_i,
+         clk_i               => clk_i,
+         clk_del_i           => clk_del_i,
          rst_i               => rst_i,
          ctrl_ck_ddr_i       => ctrl_ck_ddr,
          ctrl_dq_ddr_out_i   => ctrl_dq_ddr_out,

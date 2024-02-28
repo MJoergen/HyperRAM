@@ -32,9 +32,9 @@
          <obj_property name="ElementShortName">sys_rstn</obj_property>
          <obj_property name="ObjectShortName">sys_rstn</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/clk_x1">
-         <obj_property name="ElementShortName">clk_x1</obj_property>
-         <obj_property name="ObjectShortName">clk_x1</obj_property>
+      <wvobject type="logic" fp_name="/tb/clk">
+         <obj_property name="ElementShortName">clk</obj_property>
+         <obj_property name="ObjectShortName">clk</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb/rst">
          <obj_property name="ElementShortName">rst</obj_property>
@@ -160,9 +160,9 @@
          <obj_property name="ElementShortName">sys_rstn_i</obj_property>
          <obj_property name="ObjectShortName">sys_rstn_i</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/clk_inst/clk_x1_o">
-         <obj_property name="ElementShortName">clk_x1_o</obj_property>
-         <obj_property name="ObjectShortName">clk_x1_o</obj_property>
+      <wvobject type="logic" fp_name="/tb/clk_inst/clk_o">
+         <obj_property name="ElementShortName">clk_o</obj_property>
+         <obj_property name="ObjectShortName">clk_o</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb/clk_inst/ps_clk_i">
          <obj_property name="ElementShortName">ps_clk_i</obj_property>
@@ -202,9 +202,9 @@
          <obj_property name="ElementShortName">clkfb_mmcm</obj_property>
          <obj_property name="ObjectShortName">clkfb_mmcm</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/clk_inst/clk_x1_mmcm">
-         <obj_property name="ElementShortName">clk_x1_mmcm</obj_property>
-         <obj_property name="ObjectShortName">clk_x1_mmcm</obj_property>
+      <wvobject type="logic" fp_name="/tb/clk_inst/clk_mmcm">
+         <obj_property name="ElementShortName">clk_mmcm</obj_property>
+         <obj_property name="ObjectShortName">clk_mmcm</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb/clk_inst/locked">
          <obj_property name="ElementShortName">locked</obj_property>
@@ -222,9 +222,9 @@
    <wvobject type="group" fp_name="group577">
       <obj_property name="label">core</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="logic" fp_name="/tb/i_core/clk_x1_i">
-         <obj_property name="ElementShortName">clk_x1_i</obj_property>
-         <obj_property name="ObjectShortName">clk_x1_i</obj_property>
+      <wvobject type="logic" fp_name="/tb/i_core/clk_i">
+         <obj_property name="ElementShortName">clk_i</obj_property>
+         <obj_property name="ObjectShortName">clk_i</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb/i_core/rst_i">
          <obj_property name="ElementShortName">rst_i</obj_property>
@@ -570,9 +570,9 @@
    <wvobject type="group" fp_name="group184">
       <obj_property name="label">hyperram_rx</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="logic" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/clk_x1_i">
-         <obj_property name="ElementShortName">clk_x1_i</obj_property>
-         <obj_property name="ObjectShortName">clk_x1_i</obj_property>
+      <wvobject type="logic" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/clk_i">
+         <obj_property name="ElementShortName">clk_i</obj_property>
+         <obj_property name="ObjectShortName">clk_i</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb/i_core/i_hyperram/i_hyperram_rx/delay_refclk_i">
          <obj_property name="ElementShortName">delay_refclk_i</obj_property>

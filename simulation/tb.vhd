@@ -19,8 +19,8 @@ architecture simulation of tb is
    signal sys_clk           : std_logic := '1';
    signal sys_rstn          : std_logic := '0';
 
-   signal clk_x1            : std_logic;
-   signal clk_x1_del        : std_logic;
+   signal clk               : std_logic;
+   signal clk_del           : std_logic;
    signal delay_refclk      : std_logic;
    signal rst               : std_logic;
 
@@ -81,8 +81,8 @@ begin
       port map (
          sys_clk_i      => sys_clk,
          sys_rstn_i     => sys_rstn,
-         clk_x1_o       => clk_x1,
-         clk_x1_del_o   => clk_x1_del,
+         clk_o          => clk,
+         clk_del_o      => clk_del,
          delay_refclk_o => delay_refclk,
          rst_o          => rst
       ); -- clk_inst
@@ -96,9 +96,9 @@ begin
    begin
       tb_start <= '0';
       wait for 160 us;
-      wait until clk_x1 = '1';
+      wait until clk = '1';
       tb_start <= '1';
-      wait until clk_x1 = '1';
+      wait until clk = '1';
       tb_start <= '0';
       wait;
    end process p_tb_start;
@@ -115,8 +115,8 @@ begin
          G_DATA_SIZE         => 16
       )
       port map (
-         clk_x1_i       => clk_x1,
-         clk_x1_del_i   => clk_x1_del,
+         clk_i          => clk,
+         clk_del_i      => clk_del,
          delay_refclk_i => delay_refclk,
          rst_i          => rst,
          start_i        => tb_start,

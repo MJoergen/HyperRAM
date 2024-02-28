@@ -16,7 +16,7 @@ library xpm;
 
 entity hyperram_rx is
    port (
-      clk_x1_i         : in    std_logic;
+      clk_i            : in    std_logic;
       delay_refclk_i   : in    std_logic; -- 200 MHz
       rst_i            : in    std_logic;
 
@@ -80,7 +80,7 @@ begin
          cntvalueout => open
       ); -- delay_rwds_inst
 
-   -- Transfer the RWDS signal to the clk_x1 domain. This is used solely to determine the
+   -- Transfer the RWDS signal to the clk_i domain. This is used solely to determine the
    -- latency mode of the current transaction.
    xpm_cdc_single_inst : component xpm_cdc_single
       generic map (
@@ -92,7 +92,7 @@ begin
       port map (
          src_clk  => '0',
          src_in   => rwds_in_delay,
-         dest_clk => clk_x1_i,
+         dest_clk => clk_i,
          dest_out => ctrl_rwds_in_o
       ); -- xpm_cdc_single_inst
 
@@ -116,7 +116,7 @@ begin
    end generate iddr_dq_gen;
 
    -- The signal rwds_dq_in is synchronuous to the RWDS input. The following FIFO will
-   -- synchronize it to the main clock clk_x1.
+   -- synchronize it to the main clock clk_i.
    hyperram_fifo_inst : entity work.hyperram_fifo
       generic map (
          G_DATA_SIZE => 16
@@ -125,15 +125,15 @@ begin
          src_clk_i   => not rwds_in_delay,
          src_valid_i => ctrl_read_i,
          src_data_i  => rwds_dq_in,
-         dst_clk_i   => clk_x1_i,
+         dst_clk_i   => clk_i,
          dst_data_o  => ctrl_dq_ddr_in_o,
          dst_valid_o => ctrl_dq_ie
       ); -- hyperram_fifo_inst
 
    -- This skips the first clock cycle of data from the FIFO.
-   ctrl_dq_ie_d_proc : process (clk_x1_i)
+   ctrl_dq_ie_d_proc : process (clk_i)
    begin
-      if rising_edge(clk_x1_i) then
+      if rising_edge(clk_i) then
          ctrl_dq_ie_d <= ctrl_dq_ie;
       end if;
    end process ctrl_dq_ie_d_proc;

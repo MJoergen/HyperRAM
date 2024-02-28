@@ -6,57 +6,54 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity clk is
-   generic (
-      G_HYPERRAM_FREQ_MHZ : integer;
-      G_HYPERRAM_PHASE    : real
-   );
    port (
-      clk_x1_o     : out std_logic;
-      clk_x2_o     : out std_logic;
-      clk_x2_del_o : out std_logic;
-      rst_o        : out std_logic
+      clk_o          : out std_logic;
+      clk_del_o      : out std_logic;
+      delay_refclk_o : out std_logic;   -- 200 MHz, for IDELAYCTRL
+      rst_o          : out std_logic
    );
 end entity clk;
 
 architecture simulation of clk is
 
-   constant C_CLK_PERIOD : time := (1000/G_HYPERRAM_FREQ_MHZ) * 1 ns;
+   constant C_CLK_PERIOD          : time := 10 ns; -- 100 MHz
+   constant C_DELAY_REFCLK_PERIOD : time := 5 ns;  -- 200 MHz
 
 begin
 
-   p_clk_x1 : process
+   p_clk : process
    begin
-      clk_x1_o <= '1';
+      clk_o <= '1';
       wait for C_CLK_PERIOD/2;
-      clk_x1_o <= '0';
+      clk_o <= '0';
       wait for C_CLK_PERIOD/2;
-   end process p_clk_x1;
+   end process p_clk;
 
-   p_clk_x2 : process
+   p_clk_del : process
    begin
-      clk_x2_o <= '1';
       wait for C_CLK_PERIOD/4;
-      clk_x2_o <= '0';
-      wait for C_CLK_PERIOD/4;
-   end process p_clk_x2;
-
-   p_clk_x2_del : process
-   begin
-      wait for C_CLK_PERIOD/2*(G_HYPERRAM_PHASE/360.0);
       while true loop
-         clk_x2_del_o <= '1';
-         wait for C_CLK_PERIOD/4;
-         clk_x2_del_o <= '0';
-         wait for C_CLK_PERIOD/4;
+         clk_del_o <= '1';
+         wait for C_CLK_PERIOD/2;
+         clk_del_o <= '0';
+         wait for C_CLK_PERIOD/2;
       end loop;
       wait;
-   end process p_clk_x2_del;
+   end process p_clk_del;
+
+   p_delay_refclk : process
+   begin
+      delay_refclk_o <= '1';
+      wait for C_DELAY_REFCLK_PERIOD/2;
+      delay_refclk_o <= '0';
+      wait for C_DELAY_REFCLK_PERIOD/2;
+   end process p_delay_refclk;
 
    p_rst : process
    begin
       rst_o <= '1';
       wait for 10*C_CLK_PERIOD;
-      wait until clk_x1_o = '1';
+      wait until clk_o = '1';
       rst_o <= '0';
       wait;
    end process p_rst;
