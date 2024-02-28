@@ -42,6 +42,7 @@ architecture synthesis of hyperram_rx is
 
 begin
 
+   -- This is needed in order to make use of the IDELAYE2 primitive.
    delay_ctrl_inst : component idelayctrl
       port map (
          rst    => rst_i,
@@ -49,14 +50,18 @@ begin
          rdy    => open
       ); -- delay_ctrl_inst
 
+   -- Delay the input RWDS signal by approx 2.5 ns (90 degrees).
+   -- Each tap is on average 1/32 of the period of delay_refclk_i (here 5 ns),
+   -- but the taps are not evenly spaced. Therefore a value of 21 (rather than 16)
+   -- is used. The actual amount of delay can be read from the timing report.
    delay_rwds_inst : component idelaye2
       generic map (
          IDELAY_TYPE           => "FIXED",
          DELAY_SRC             => "IDATAIN",
-         IDELAY_VALUE          => 21,
+         IDELAY_VALUE          => 21,    -- Number of taps.
          HIGH_PERFORMANCE_MODE => "TRUE",
          SIGNAL_PATTERN        => "CLOCK",
-         REFCLK_FREQUENCY      => 200.0,
+         REFCLK_FREQUENCY      => 200.0, -- Each tap on average 5/32 ns.
          CINVCTRL_SEL          => "FALSE",
          PIPE_SEL              => "FALSE"
       )
@@ -67,13 +72,32 @@ begin
          ce          => '0',
          inc         => '0',
          cinvctrl    => '0',
-         cntvaluein  => B"10101", -- 21
+         cntvaluein  => (others => '0'),
          idatain     => hr_rwds_in_i,
          datain      => '0',
          ldpipeen    => '0',
          dataout     => rwds_in_delay,
          cntvalueout => open
       ); -- delay_rwds_inst
+
+   -- Transfer the RWDS signal to the clk_x1 domain. This is used solely to determine the
+   -- latency mode of the current transaction.
+   xpm_cdc_single_inst : component xpm_cdc_single
+      generic map (
+         DEST_SYNC_FF   => 2,
+         INIT_SYNC_FF   => 0,
+         SIM_ASSERT_CHK => 0,
+         SRC_INPUT_REG  => 0
+      )
+      port map (
+         src_clk  => '0',
+         src_in   => rwds_in_delay,
+         dest_clk => clk_x1_i,
+         dest_out => ctrl_rwds_in_o
+      ); -- xpm_cdc_single_inst
+
+
+   -- Sample the input DQ signal using the delayed RWDS signal.
 
    iddr_dq_gen : for i in 0 to 7 generate
 
@@ -91,10 +115,8 @@ begin
 
    end generate iddr_dq_gen;
 
-   -- This Clock Domain Crossing block is to synchronize the input signal to the
-   -- clk_x1_i clock domain. It's not possible to use an ordinary async fifo, because
-   -- the input clock RWDS is not free-running.
-
+   -- The signal rwds_dq_in is synchronuous to the RWDS input. The following FIFO will
+   -- synchronize it to the main clock clk_x1.
    hyperram_fifo_inst : entity work.hyperram_fifo
       generic map (
          G_DATA_SIZE => 16
@@ -108,6 +130,7 @@ begin
          dst_valid_o => ctrl_dq_ie
       ); -- hyperram_fifo_inst
 
+   -- This skips the first clock cycle of data.
    ctrl_dq_ie_d_proc : process (clk_x1_i)
    begin
       if rising_edge(clk_x1_i) then
@@ -116,20 +139,6 @@ begin
    end process ctrl_dq_ie_d_proc;
 
    ctrl_dq_ie_o <= ctrl_dq_ie_d and ctrl_dq_ie;
-
-   xpm_cdc_single_inst : component xpm_cdc_single
-      generic map (
-         DEST_SYNC_FF   => 2,
-         INIT_SYNC_FF   => 0,
-         SIM_ASSERT_CHK => 0,
-         SRC_INPUT_REG  => 0
-      )
-      port map (
-         src_clk  => '0',
-         src_in   => rwds_in_delay,
-         dest_clk => clk_x1_i,
-         dest_out => ctrl_rwds_in_o
-      ); -- xpm_cdc_single_inst
 
 end architecture synthesis;
 
