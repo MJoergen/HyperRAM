@@ -130,7 +130,7 @@ begin
          dst_valid_o => ctrl_dq_ie
       ); -- hyperram_fifo_inst
 
-   -- This skips the first clock cycle of data.
+   -- This skips the first clock cycle of data from the FIFO.
    ctrl_dq_ie_d_proc : process (clk_x1_i)
    begin
       if rising_edge(clk_x1_i) then

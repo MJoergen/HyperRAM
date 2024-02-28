@@ -68,13 +68,13 @@ Parameters.
 
 ## `hyperram_rx.vhd`
 This handles the receive data, i.e. the path from the HyperRAM device to the controller.
-It uses one additional clock at 200 MHz for controlling the input delay.  Data from the
+It uses one additional clock at 200 MHz for controlling the input delay.  Data (DQ) from the
 HyperRAM device arrives synchronuous with the RWDS signal.  In other words, the RWDS
-signal functions as a clock, except it is not free-running.
+signal functions as a source synchronous clock, except it is not free-running.
 
 The RWDS signal has a second purpose as well, in that it indicates the latency of the
-current transaction. The RWDS signal is therefore fed to the main HyperRAM controller as a
-data signal as well.
+current transaction. The RWDS signal is therefore also fed to the main HyperRAM controller
+as a data signal.
 
 The receive path delays the `RWDS` signal by 90 degrees using an IDELAY primitive, and
 then uses this as a clock signal to sample the `DQ` input, see the following timing diagram:
@@ -107,6 +107,9 @@ The write pointer and input registers are then transferred to the main clock dom
 the extra caveat that the write pointer has an extra synchronization register (three
 instead of two).
 
+Finally, the FIFO outputs data one word at a time, whenever the write pointer is different
+from the read pointer.
+
 ## Timing Parameters
 
 The timing parameters are given in the table below (taken from Table 10.3 of the
@@ -138,4 +141,39 @@ Refresh Time                             | t_RFH  | 40   |  -   | ns
 The symbol names refer to the following figure (taken from the [Cypress HyperRAM datasheet](../../doc/s27kl0642.pdf)):
 ![timing diagram](../../doc/Timing_Diagram.png)
 
+
+# Constraints
+
+A number of constraints are needed by the HyperRAM controller in order to function
+properly.
+
+On the TX side (from FPGA to HyperRAM) we set the IOB property to TRUE on all the output
+ports (`RSTN`, `CSN`, `RWDS`, and `DQ`). This ensures the output registers are part of the
+output buffer, which minimizes the delay inside the FPGA. Note the `CK` signal is already
+controlled directly by an ODDR buffer.
+
+```
+set_property IOB TRUE [get_cells i_core/i_hyperram/hyperram_tx_inst/hr_rwds_oe_n_reg ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/hyperram_tx_inst/hr_dq_oe_n_reg[*] ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/hyperram_ctrl_inst/hb_csn_o_reg ]
+set_property IOB TRUE [get_cells i_core/i_hyperram/hyperram_ctrl_inst/hb_rstn_o_reg ]
+```
+
+On the Rx side (from HyperRAM to FPGA) we need several extra constraints. First, we want
+to avoid having an extra BUFG on the `RWDS_DELAY`. This will happen automatically, because
+Vivado recognizes this signal is used as a clock. However, with the IDELAY block we are
+manually controlling the delay of this signal, and any extra inserted BUFG will increase
+the delay many times.
+
+```
+set_property CLOCK_BUFFER_TYPE NONE [get_nets -of [get_pins i_core/i_hyperram/hyperram_rx_inst/delay_rwds_inst/DATAOUT]]
+```
+
+Secondly, the data path into the Rx FIFO must be as short as possible, so extra
+constraints are needed for that.
+
+```
+set_max_delay 2 -datapath_only -from [get_cells i_core/i_hyperram/hyperram_ctrl_inst/hb_read_o_reg]
+set_max_delay 2 -datapath_only -from [get_cells i_core/i_hyperram/hyperram_rx_inst/iddr_dq_gen[*].iddr_dq_inst]
+```
 
