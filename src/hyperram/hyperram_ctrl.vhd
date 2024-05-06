@@ -33,6 +33,8 @@ entity hyperram_ctrl is
       -- Statistics
       count_long_o        : out unsigned(31 downto 0);
       count_short_o       : out unsigned(31 downto 0);
+      underrun_o          : out std_logic;
+      timeout_o           : out std_logic;
 
       -- HyperBus control signals
       hb_rstn_o           : out std_logic;
@@ -89,6 +91,8 @@ architecture synthesis of hyperram_ctrl is
    -- Statistics
    signal count_long  : unsigned(31 downto 0);
    signal count_short : unsigned(31 downto 0);
+   signal hb_dq_ie_d  : std_logic;
+   signal timeout_count : natural range 0 to 15;
 
 begin
 
@@ -99,6 +103,9 @@ begin
          hb_dq_oe_o          <= '0';
          hb_rwds_oe_o        <= '0';
          hb_read_o           <= '0';
+         underrun_o          <= '0';
+         timeout_o           <= '0';
+         hb_dq_ie_d          <= hb_dq_ie_i;
 
          case state is
             when INIT_ST =>
@@ -164,6 +171,7 @@ begin
                      read_clk_count    <= burst_count+1;
                      read_return_count <= burst_count;
                      hb_read_o         <= '1';
+                     timeout_count     <= 15;
                      state             <= READ_ST;
                   else
                      write_clk_count <= burst_count;
@@ -181,7 +189,18 @@ begin
                   hb_ck_ddr_o <= "00";
                end if;
 
+               if hb_dq_ie_d = '1' and hb_dq_ie_i = '0' then
+                  underrun_o <= '1';
+               end if;
+
+               if timeout_count > 0 then
+                  timeout_count <= timeout_count - 1;
+               else
+                  timeout_o <= '1';
+               end if;
+
                if hb_dq_ie_i = '1' then
+                  timeout_count     <= 1;
                   read_return_count <= read_return_count - 1;
                   if read_return_count = 1 then
                      hb_csn_o       <= '1';

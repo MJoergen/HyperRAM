@@ -20,7 +20,8 @@ entity hyperram_fifo is
       src_data_i  : in    std_logic_vector(G_DATA_SIZE - 1 downto 0);
       dst_clk_i   : in    std_logic;
       dst_valid_o : out   std_logic;
-      dst_data_o  : out   std_logic_vector(G_DATA_SIZE - 1 downto 0)
+      dst_data_o  : out   std_logic_vector(G_DATA_SIZE - 1 downto 0);
+      dst_error_o : out   std_logic
    );
 end entity hyperram_fifo;
 
@@ -47,6 +48,8 @@ architecture synthesis of hyperram_fifo is
 
    -- Read pointer in destination clock domain
    signal dst_gray_rd : std_logic_vector(1 downto 0) := "00";
+
+   signal overflow : std_logic := '0';
 
 begin
 
@@ -122,24 +125,37 @@ begin
    begin
       if rising_edge(dst_clk_i) then
          dst_valid_o <= '0';
+         overflow <= '0';
 
          if dst_gray_wr /= dst_gray_rd then
 
             case dst_gray_rd is
 
                when "00" =>
+                  if dst_gray_wr /= "01" then
+                     overflow <= '1';
+                  end if;
                   dst_data_o  <= dst_registers(G_DATA_SIZE - 1 downto 0);
                   dst_gray_rd <= "01";
 
                when "01" =>
+                  if dst_gray_wr /= "11" then
+                     overflow <= '1';
+                  end if;
                   dst_data_o  <= dst_registers(2 * G_DATA_SIZE - 1 downto G_DATA_SIZE);
                   dst_gray_rd <= "11";
 
                when "10" =>
+                  if dst_gray_wr /= "00" then
+                     overflow <= '1';
+                  end if;
                   dst_data_o  <= dst_registers(2 * G_DATA_SIZE - 1 downto G_DATA_SIZE);
                   dst_gray_rd <= "00";
 
                when "11" =>
+                  if dst_gray_wr /= "10" then
+                     overflow <= '1';
+                  end if;
                   dst_data_o  <= dst_registers(G_DATA_SIZE - 1 downto 0);
                   dst_gray_rd <= "10";
 
@@ -152,6 +168,8 @@ begin
          end if;
       end if;
    end process dst_proc;
+
+   dst_error_o <= overflow;
 
 end architecture synthesis;
 

@@ -92,6 +92,24 @@ architecture synthesis of hyperram is
    signal   ctrl_rwds_oe      : std_logic;
    signal   ctrl_rwds_in      : std_logic;
    signal   ctrl_read         : std_logic;
+   signal   ctrl_dq_error     : std_logic;
+
+   signal   stat_underrun : std_logic;
+   signal   stat_timeout  : std_logic;
+
+--   attribute mark_debug : string;
+--   attribute mark_debug of ctrl_ck_ddr       : signal is "true";
+--   attribute mark_debug of ctrl_dq_ddr_in    : signal is "true";
+--   attribute mark_debug of ctrl_dq_ddr_out   : signal is "true";
+--   attribute mark_debug of ctrl_dq_oe        : signal is "true";
+--   attribute mark_debug of ctrl_dq_ie        : signal is "true";
+--   attribute mark_debug of ctrl_rwds_ddr_out : signal is "true";
+--   attribute mark_debug of ctrl_rwds_oe      : signal is "true";
+--   attribute mark_debug of ctrl_rwds_in      : signal is "true";
+--   attribute mark_debug of ctrl_read         : signal is "true";
+--   attribute mark_debug of ctrl_dq_error     : signal is "true";
+--   attribute mark_debug of stat_underrun     : signal is "true";
+--   attribute mark_debug of stat_timeout      : signal is "true";
 
 begin
 
@@ -198,6 +216,8 @@ begin
          avm_waitrequest_o   => cfg_waitrequest,
          count_long_o        => count_long_o,
          count_short_o       => count_short_o,
+         underrun_o          => stat_underrun,
+         timeout_o           => stat_timeout,
          hb_rstn_o           => ctrl_rstn,
          hb_csn_o            => ctrl_csn,
          hb_ck_ddr_o         => ctrl_ck_ddr,
@@ -228,6 +248,7 @@ begin
          ctrl_dq_ie_o     => ctrl_dq_ie,
          ctrl_rwds_in_o   => ctrl_rwds_in,
          ctrl_read_i      => ctrl_read,
+         ctrl_dq_error_o  => ctrl_dq_error,
          hr_rwds_in_i     => hr_rwds_in_i,
          hr_dq_in_i       => hr_dq_in_i
       ); -- hyperram_rx_inst

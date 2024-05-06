@@ -25,6 +25,7 @@ entity hyperram_rx is
       ctrl_dq_ie_o     : out   std_logic;
       ctrl_rwds_in_o   : out   std_logic;
       ctrl_read_i      : in    std_logic;
+      ctrl_dq_error_o  : out   std_logic;
 
       -- Connect to HyperRAM device
       hr_rwds_in_i     : in    std_logic;
@@ -127,7 +128,8 @@ begin
          src_data_i  => rwds_dq_in,
          dst_clk_i   => clk_i,
          dst_data_o  => ctrl_dq_ddr_in_o,
-         dst_valid_o => ctrl_dq_ie
+         dst_valid_o => ctrl_dq_ie,
+         dst_error_o => ctrl_dq_error_o
       ); -- hyperram_fifo_inst
 
    -- This skips the first clock cycle of data from the FIFO.
