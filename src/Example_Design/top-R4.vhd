@@ -106,7 +106,7 @@ begin
          data_read_o    => sys_data_read,
          count_long_o   => sys_count_long,
          count_short_o  => sys_count_short,
-         count_error_o => sys_count_error,
+         count_error_o  => sys_count_error,
          hr_resetn_o    => hr_resetn,
          hr_csn_o       => hr_csn,
          hr_ck_o        => hr_ck,

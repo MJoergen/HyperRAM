@@ -70,7 +70,7 @@ architecture synthesis of core is
    signal hr_rwds_oe_n         : std_logic;
    signal hr_dq_oe_n           : std_logic_vector(7 downto 0);
 
-   signal start_d              : std_logic;
+   signal active_d             : std_logic;
    signal start_long           : unsigned(31 downto 0);
    signal start_short          : unsigned(31 downto 0);
    signal count_long           : unsigned(31 downto 0);
@@ -84,9 +84,9 @@ begin
    p_start : process (clk_i)
    begin
       if rising_edge(clk_i) then
-         start_d <= start_i;
+         active_d <= active_o;
 
-         if start_d = '0' and start_i = '1' then
+         if active_d = '0' and active_o = '1' then
             start_long  <= count_long;
             start_short <= count_short;
          end if;

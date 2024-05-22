@@ -143,15 +143,15 @@ begin
                   if count + 1 = 0 then
                      m_avm_write_o <= '0';
                      m_avm_read_o  <= '0';
-                     wait_o        <= '0';
                      state         <= DONE_ST;
                      report "Done";
                   end if;
                end if;
 
             when DONE_ST =>
-               if start_i = '0' then
-                  state <= IDLE_ST;
+               if start_i = '0' and m_avm_waitrequest_i = '0' then
+                  wait_o <= '0';
+                  state  <= IDLE_ST;
                end if;
 
             when others =>
