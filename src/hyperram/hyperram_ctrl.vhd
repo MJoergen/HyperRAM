@@ -57,6 +57,7 @@ architecture synthesis of hyperram_ctrl is
       INIT_ST,
       COMMAND_ADDRESS_ST,
       WAIT_ST,
+      WAIT2_ST,
       SAMPLE_RWDS_ST,
       LATENCY_ST,
       READ_ST,
@@ -151,17 +152,36 @@ begin
                end if;
 
             when WAIT_ST =>
+               state <= WAIT2_ST;
+
+            when WAIT2_ST =>
                state <= SAMPLE_RWDS_ST;
 
             when SAMPLE_RWDS_ST =>
                if hb_rwds_in_i = '1' then
-                  latency_count <= 2*G_LATENCY - 4;
-                  count_long <= count_long + 1;
+                  latency_count <= 2*G_LATENCY - 5;
+                  count_long    <= count_long + 1;
+                  state         <= LATENCY_ST;
                else
-                  latency_count <= G_LATENCY - 4;
                   count_short <= count_short + 1;
+                  if G_LATENCY >= 5 then
+                     latency_count <= G_LATENCY - 5;
+                     state         <= LATENCY_ST;
+                  else
+                     if read = '1' then
+                        read_clk_count    <= burst_count+1;
+                        read_return_count <= burst_count;
+                        hb_read_o         <= '1';
+                        timeout_count     <= 15;
+                        state             <= READ_ST;
+                     else
+                        write_clk_count <= burst_count;
+                        hb_dq_oe_o      <= '1';
+                        hb_rwds_oe_o    <= '1';
+                        state           <= WRITE_ST;
+                     end if;
+                  end if;
                end if;
-               state <= LATENCY_ST;
 
             when LATENCY_ST =>
                if latency_count > 0 then
