@@ -37,6 +37,7 @@ architecture synthesis of hyperram_rx is
 
    signal rwds_dq_in    : std_logic_vector(15 downto 0);
    signal rwds_in_delay : std_logic;
+   signal rwds_in_delay_idelay : std_logic;
 
    signal ctrl_dq_ie   : std_logic;
    signal ctrl_dq_ie_d : std_logic;
@@ -53,13 +54,13 @@ begin
 
    -- Delay the input RWDS signal by approx 2.5 ns (90 degrees).
    -- Each tap is on average 1/32 of the period of delay_refclk_i (here 5 ns),
-   -- but the taps are not evenly spaced. Therefore a value of 21 (rather than 16)
+   -- but the taps are not evenly spaced. Therefore a value of 20 (rather than 16)
    -- is used. The actual amount of delay can be read from the timing report.
    delay_rwds_inst : component idelaye2
       generic map (
          IDELAY_TYPE           => "FIXED",
          DELAY_SRC             => "IDATAIN",
-         IDELAY_VALUE          => 21,    -- Number of taps.
+         IDELAY_VALUE          => 12,    -- Number of taps: 6/21/24 sy2002 implemented Antti Lukats proposal
          HIGH_PERFORMANCE_MODE => "TRUE",
          SIGNAL_PATTERN        => "CLOCK",
          REFCLK_FREQUENCY      => 200.0, -- Each tap on average 5/32 ns.
@@ -77,9 +78,23 @@ begin
          idatain     => hr_rwds_in_i,
          datain      => '0',
          ldpipeen    => '0',
-         dataout     => rwds_in_delay,
+         dataout     => rwds_in_delay_idelay,
          cntvalueout => open
       ); -- delay_rwds_inst
+
+   -- 6/21/24 sy2002 implemented Antti Lukats proposal
+   -- add local buffer, is faster than BUFG insertion!
+   BUFR_inst : component BUFR
+      generic map (
+         BUFR_DIVIDE => "BYPASS",   -- Values: "BYPASS, 1, 2, 3, 4, 5, 6, 7, 8"
+         SIM_DEVICE  => "7SERIES"   -- Must be set to "7SERIES"
+      )
+      port map (
+         O   => rwds_in_delay,        -- 1-bit output: Clock output port
+         CE  => '1',                  -- 1-bit input: Active high, clock enable (Divided modes only)
+         CLR => '0',                  -- 1-bit input: Active high, asynchronous clear (Divided modes only)
+         I   => rwds_in_delay_idelay  -- 1-bit input: Clock buffer input driven by an IBUF, MMCM or local interconnect
+      ); -- BUFR_inst
 
    -- Transfer the RWDS signal to the clk_i domain. This is used solely to determine the
    -- latency mode of the current transaction.
