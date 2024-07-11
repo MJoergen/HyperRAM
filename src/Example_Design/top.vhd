@@ -37,9 +37,9 @@ end entity top;
 
 architecture synthesis of top is
 
-   constant C_SYS_ADDRESS_SIZE : integer := 19;
-   constant C_ADDRESS_SIZE     : integer := 22;
-   constant C_DATA_SIZE        : integer := 16;
+   constant C_SYS_ADDRESS_SIZE : integer := 17;
+   constant C_ADDRESS_SIZE     : integer := 20;
+   constant C_DATA_SIZE        : integer := 64;
 
    -- HyperRAM clocks and reset
    signal hr_clk               : std_logic; -- HyperRAM clock

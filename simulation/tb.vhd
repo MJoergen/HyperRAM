@@ -110,9 +110,9 @@ begin
 
    i_core : entity work.core
       generic map (
-         G_SYS_ADDRESS_SIZE  => 8,
-         G_ADDRESS_SIZE      => 22,
-         G_DATA_SIZE         => 16
+         G_SYS_ADDRESS_SIZE  => 6,
+         G_ADDRESS_SIZE      => 20,
+         G_DATA_SIZE         => 64
       )
       port map (
          clk_i          => clk,
