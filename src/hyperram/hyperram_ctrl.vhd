@@ -248,7 +248,8 @@ begin
 
    hb_dq_ddr_out_o     <= avm_writedata_i when state = WRITE_BURST_ST else
                           command_address(47 downto 32);
-   hb_rwds_ddr_out_o   <= not byteenable when state = WRITE_ST or state = WRITE_BURST_ST else
+   hb_rwds_ddr_out_o   <= not byteenable when state = WRITE_ST else
+                          not avm_byteenable_i when state = WRITE_BURST_ST else
                           "00";
 
    -- Statistics
