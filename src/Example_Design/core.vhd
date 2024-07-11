@@ -28,7 +28,7 @@ entity core is
       -- Statistics
       count_long_o   : out   unsigned(31 downto 0);
       count_short_o  : out   unsigned(31 downto 0);
-      count_error_o  : out   unsigned(31 downto 0);
+      count_error_o  : out   std_logic_vector(31 downto 0);
 
       -- HyperRAM device interface
       hr_resetn_o    : out   std_logic;

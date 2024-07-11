@@ -4,6 +4,9 @@ use ieee.numeric_std.all;
 use ieee.numeric_std_unsigned.all;
 
 entity random is
+   generic (
+      G_SEED : std_logic_vector(63 downto 0) := (others => '0')
+   );
    port (
       clk_i    : in  std_logic;
       rst_i    : in  std_logic;
@@ -29,6 +32,7 @@ begin
 
    i_lfsr : entity work.lfsr
       generic map (
+         G_SEED  => G_SEED,
          G_WIDTH => 64,
          G_TAPS  => X"80000000000019E2" -- See https://users.ece.cmu.edu/~koopman/lfsr/64.txt
       )

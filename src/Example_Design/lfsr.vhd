@@ -4,6 +4,7 @@ use ieee.numeric_std.all;
 
 entity lfsr is
    generic (
+      G_SEED  : std_logic_vector(63 downto 0) := (others => '0');
       G_TAPS  : std_logic_vector(63 downto 0);
       G_WIDTH : natural
    );
@@ -40,14 +41,18 @@ begin
          end if;
 
          if rst_i = '1' then
-            lfsr_s <= (others => '1');
-            for i in 0 to (G_WIDTH-1)/3 loop
-               if i/2 = (i+1)/2 then
-                  lfsr_s(3*i) <= '0';
-               else
-                  lfsr_s(2*i+1) <= '0';
-               end if;
-            end loop;
+            if G_SEED = X"0000000000000000" then
+               lfsr_s <= (others => '1');
+               for i in 0 to (G_WIDTH-1)/3 loop
+                  if i/2 = (i+1)/2 then
+                     lfsr_s(3*i) <= '0';
+                  else
+                     lfsr_s(2*i+1) <= '0';
+                  end if;
+               end loop;
+            else
+               lfsr_s <= G_SEED;
+            end if;
          end if;
       end if;
    end process p_lfsr;

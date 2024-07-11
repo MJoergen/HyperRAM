@@ -35,7 +35,7 @@ entity trafic_gen is
       address_o           : out std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
       data_exp_o          : out std_logic_vector(G_DATA_SIZE-1 downto 0);
       data_read_o         : out std_logic_vector(G_DATA_SIZE-1 downto 0);
-      count_error_o       : out unsigned(31 downto 0)
+      count_error_o       : out std_logic_vector(31 downto 0)
    );
 end entity trafic_gen;
 
@@ -59,6 +59,7 @@ begin
 
    i_avm_master3 : entity work.avm_master3
       generic map (
+         G_INIT_FIRST   => true,
          G_DATA_SIZE    => G_DATA_SIZE,
          G_ADDRESS_SIZE => G_ADDRESS_SIZE
       )
@@ -80,6 +81,7 @@ begin
 
    i_avm_verifier : entity work.avm_verifier
       generic map (
+         G_INIT_ZEROS   => false,
          G_DATA_SIZE    => G_DATA_SIZE,
          G_ADDRESS_SIZE => G_ADDRESS_SIZE
       )
