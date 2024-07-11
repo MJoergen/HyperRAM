@@ -25,7 +25,6 @@ entity hyperram_rx is
       ctrl_dq_ie_o     : out   std_logic;
       ctrl_rwds_in_o   : out   std_logic;
       ctrl_read_i      : in    std_logic;
-      ctrl_dq_error_o  : out   std_logic;
 
       -- Connect to HyperRAM device
       hr_rwds_in_i     : in    std_logic;
@@ -38,8 +37,9 @@ architecture synthesis of hyperram_rx is
    signal rwds_dq_in    : std_logic_vector(15 downto 0);
    signal rwds_in_delay : std_logic;
 
-   signal ctrl_dq_ie   : std_logic;
-   signal ctrl_dq_ie_d : std_logic;
+   signal ctrl_dq_ie    : std_logic;
+   signal ctrl_dq_ie_d  : std_logic;
+   signal ctrl_dq_ie_d2 : std_logic;
 
 begin
 
@@ -53,13 +53,13 @@ begin
 
    -- Delay the input RWDS signal by approx 2.5 ns (90 degrees).
    -- Each tap is on average 1/32 of the period of delay_refclk_i (here 5 ns),
-   -- but the taps are not evenly spaced. Therefore a value of 21 (rather than 16)
+   -- but the taps are not evenly spaced. Therefore a value of 20 (rather than 16)
    -- is used. The actual amount of delay can be read from the timing report.
    delay_rwds_inst : component idelaye2
       generic map (
          IDELAY_TYPE           => "FIXED",
          DELAY_SRC             => "IDATAIN",
-         IDELAY_VALUE          => 21,    -- Number of taps.
+         IDELAY_VALUE          => 20,
          HIGH_PERFORMANCE_MODE => "TRUE",
          SIGNAL_PATTERN        => "CLOCK",
          REFCLK_FREQUENCY      => 200.0, -- Each tap on average 5/32 ns.
@@ -128,19 +128,22 @@ begin
          src_data_i  => rwds_dq_in,
          dst_clk_i   => clk_i,
          dst_data_o  => ctrl_dq_ddr_in_o,
-         dst_valid_o => ctrl_dq_ie,
-         dst_error_o => ctrl_dq_error_o
+         dst_valid_o => ctrl_dq_ie
       ); -- hyperram_fifo_inst
 
    -- This skips the first clock cycle of data from the FIFO.
    ctrl_dq_ie_d_proc : process (clk_i)
    begin
       if rising_edge(clk_i) then
-         ctrl_dq_ie_d <= ctrl_dq_ie;
+         ctrl_dq_ie_d  <= ctrl_dq_ie;   -- delayed version of data valid
+         ctrl_dq_ie_d2 <= ctrl_dq_ie_d; -- we need past-2 time also
       end if;
    end process ctrl_dq_ie_d_proc;
 
-   ctrl_dq_ie_o <= ctrl_dq_ie_d and ctrl_dq_ie;
+   -- if it was low for 2 clock cycles then we cut out the valid signal
+   -- it works as long as there is never 2 clocks without fifo valid
+   -- but this is so by design, there is max 1 clock cycle where fifo data is not available
+   ctrl_dq_ie_o <= (ctrl_dq_ie_d or ctrl_dq_ie_d2) and ctrl_dq_ie;
 
 end architecture synthesis;
 

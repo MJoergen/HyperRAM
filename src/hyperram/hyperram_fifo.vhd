@@ -1,14 +1,11 @@
 -- This is part of the HyperRAM Rx connections.
--- It is a general-purpose shallow (two-element) asynchronuous FIFO.
+-- It is a general-purpose shallow asynchronuous FIFO.
 --
 -- Created by Michael Jørgensen in 2023 (mjoergen.github.io/HyperRAM).
 
 library ieee;
    use ieee.std_logic_1164.all;
-   use ieee.numeric_std.all;
-
-library xpm;
-   use xpm.vcomponents.all;
+   use ieee.numeric_std_unsigned.all;
 
 entity hyperram_fifo is
    generic (
@@ -20,156 +17,140 @@ entity hyperram_fifo is
       src_data_i  : in    std_logic_vector(G_DATA_SIZE - 1 downto 0);
       dst_clk_i   : in    std_logic;
       dst_valid_o : out   std_logic;
-      dst_data_o  : out   std_logic_vector(G_DATA_SIZE - 1 downto 0);
-      dst_error_o : out   std_logic
+      dst_data_o  : out   std_logic_vector(G_DATA_SIZE - 1 downto 0)
    );
 end entity hyperram_fifo;
 
 architecture synthesis of hyperram_fifo is
 
-   -- Input registers in source clock domain
-   signal src_registers : std_logic_vector(2 * G_DATA_SIZE - 1 downto 0);
+   -- Number of bits in gray-code counters
+   constant C_GRAY_SIZE : natural                                         := 3;
 
-   -- Write pointer in source clock domain
-   signal src_gray_wr : std_logic_vector(1 downto 0) := "00";
+   -- Number of words in FIFO
+   constant C_FIFO_SIZE : natural                                         := 2 ** (C_GRAY_SIZE - 1);
 
-   -- This instructs Vivado to leave the write pointer literally "as is", instead of
-   -- potentially making some FSM optimization. The reason is that we want the input of
-   -- the CDC to be directly from registers, rather than there being any extra
-   -- combinational logic.
-   attribute fsm_encoding : string;
-   attribute fsm_encoding of src_gray_wr : signal is "none";
+   -- Dual-port LUTRAM memory to contain the FIFO data
+   -- We use LUTRAM instead of registers to save space in the FPGA.
+   -- We could use BRAM, but there is a higher delay writing to BRAM than to LUTRAM.
+   type     ram_type is array (natural range <>) of std_logic_vector(G_DATA_SIZE - 1 downto 0);
+   signal   dpram : ram_type(0 to C_FIFO_SIZE - 1);
+   attribute ram_style : string;
+   attribute ram_style of dpram            : signal is "distributed";
 
-   -- Input registers in destination clock domain
-   signal dst_registers : std_logic_vector(2 * G_DATA_SIZE - 1 downto 0);
+   -- We're using gray codes to avoid glitches when transferring between clock domains.
 
-   -- Write pointer in destination clock domain
-   signal dst_gray_wr : std_logic_vector(1 downto 0) := "00";
+   -- Write pointer (gray code) in source clock domain
+   signal   src_gray_wr : std_logic_vector(C_GRAY_SIZE - 1 downto 0)      := (others => '0');
 
-   -- Read pointer in destination clock domain
-   signal dst_gray_rd : std_logic_vector(1 downto 0) := "00";
+   -- Write pointer (gray code) in destination clock domain
+   signal   dst_gray_wr : std_logic_vector(C_GRAY_SIZE - 1 downto 0)      := (others => '0');
 
-   signal overflow : std_logic := '0';
+   -- Read pointer (gray code) in destination clock domain
+   signal   dst_gray_rd : std_logic_vector(C_GRAY_SIZE - 1 downto 0)      := (others => '0');
+
+   -- Handle CDC
+   -- There must additionally be an explicit set_max_delay in the constraint file.
+   signal   dst_gray_wr_meta : std_logic_vector(C_GRAY_SIZE - 1 downto 0) := (others => '0');
+   attribute async_reg : string;
+   attribute async_reg of dst_gray_wr_meta : signal is "true";
+   attribute async_reg of dst_gray_wr      : signal is "true";
+
+   -- Convert binary to gray code
+
+   pure function bin2gray (
+      b : std_logic_vector
+   ) return std_logic_vector is
+      variable g_v : std_logic_vector(b'range);
+   begin
+      g_v(b'left) := b(b'left);
+
+      for i in b'left-1 downto b'right loop
+         g_v(i) := b(i + 1) xor b(i);
+      end loop;
+
+      return g_v;
+   end function bin2gray;
+
+   -- Convert gray code to binary
+
+   pure function gray2bin (
+      g : std_logic_vector
+   ) return std_logic_vector is
+      variable b_v : std_logic_vector(g'range);
+   begin
+      b_v(g'left) := g(g'left);
+
+      for i in g'left-1 downto g'right loop
+         b_v(i) := b_v(i + 1) xor g(i);
+      end loop;
+
+      return b_v;
+   end function gray2bin;
 
 begin
 
+   -- Dual port memory: One write port, and one read port.
+   -- The memory is implemented with LUTRAM. There is no
+   -- need for a complete CDC circuit on the output of the LUTRAM, a simple
+   -- flip-flop is sufficient. This is because the contents being read from the LUTRAM is
+   -- not changing at the time it is sampled. This is due to the CDC causing a (usually) two-cycle
+   -- delay between writing to and reading from a given memory location.
+   dpram_proc : process (src_clk_i, dst_clk_i)
+      variable index_v : natural range 0 to C_FIFO_SIZE - 1;
+   begin
+      -- Write to memory
+      if rising_edge(src_clk_i) then
+         if src_valid_i = '1' then
+            index_v        := to_integer(gray2bin(src_gray_wr)) mod C_FIFO_SIZE;
+            dpram(index_v) <= src_data_i;
+         end if;
+      end if;
+
+      -- Read from memory
+      if rising_edge(dst_clk_i) then
+         if dst_gray_wr /= dst_gray_rd then
+            index_v    := to_integer(gray2bin(dst_gray_rd)) mod C_FIFO_SIZE;
+            dst_data_o <= dpram(index_v);
+         end if;
+      end if;
+   end process dpram_proc;
+
+   -- Update write pointer
    src_proc : process (src_clk_i)
+      variable index_v : natural range 0 to C_FIFO_SIZE - 1;
    begin
       if rising_edge(src_clk_i) then
          if src_valid_i = '1' then
-
-            case src_gray_wr is
-
-               when "00" =>
-                  src_gray_wr                             <= "01";
-                  src_registers(G_DATA_SIZE - 1 downto 0) <= src_data_i;
-
-               when "01" =>
-                  src_gray_wr                                           <= "11";
-                  src_registers(2 * G_DATA_SIZE - 1 downto G_DATA_SIZE) <= src_data_i;
-
-               when "10" =>
-                  src_gray_wr                                           <= "00";
-                  src_registers(2 * G_DATA_SIZE - 1 downto G_DATA_SIZE) <= src_data_i;
-
-               when "11" =>
-                  src_gray_wr                             <= "10";
-                  src_registers(G_DATA_SIZE - 1 downto 0) <= src_data_i;
-
-               when others =>
-                  null;
-
-            end case;
-
+            src_gray_wr <= bin2gray(gray2bin(src_gray_wr) + 1);
          end if;
       end if;
    end process src_proc;
 
-   xpm_cdc_array_single_ram_inst : component xpm_cdc_array_single
-      generic map (
-         DEST_SYNC_FF   => 2,
-         INIT_SYNC_FF   => 0,
-         SIM_ASSERT_CHK => 0,
-         SRC_INPUT_REG  => 0,
-         WIDTH          => 2 * G_DATA_SIZE
-      )
-      port map (
-         src_clk  => '0',
-         src_in   => src_registers,
-         dest_clk => dst_clk_i,
-         dest_out => dst_registers
-      ); -- xpm_cdc_array_single_ram_inst
-
-   -- Note that the write pointer is delayed one additional clock cycle (3) compared to
-   -- that of the input registers (2). This is to account for any skew there may be in the
-   -- Clock Domain Crossing. In short, we want to make sure that the input registers
-   -- (src_registers) are updated no later than the write pointer (src_gray_wr).
-   xpm_cdc_array_single_gray_wr_inst : component xpm_cdc_array_single
-      generic map (
-         DEST_SYNC_FF   => 3,
-         INIT_SYNC_FF   => 0,
-         SIM_ASSERT_CHK => 0,
-         SRC_INPUT_REG  => 0,
-         WIDTH          => 2
-      )
-      port map (
-         src_clk  => '0',
-         src_in   => src_gray_wr,
-         dest_clk => dst_clk_i,
-         dest_out => dst_gray_wr
-      ); -- xpm_cdc_array_single_gray_wr_inst
+   -- Handle CDC explicitly.
+   -- We won't use the Xilinx XPM primitive, because that includes a set_false_path.
+   -- Instead, we use a set_max_delay in the constraints.
+   async_proc : process (dst_clk_i)
+   begin
+      if rising_edge(dst_clk_i) then
+         dst_gray_wr_meta <= src_gray_wr;
+         dst_gray_wr      <= dst_gray_wr_meta;
+      end if;
+   end process async_proc;
 
    -- Forward data, one word at a time, as soon as the write pointer is different from
    -- the read pointer.
    dst_proc : process (dst_clk_i)
+      variable index_v : natural range 0 to C_FIFO_SIZE - 1;
    begin
       if rising_edge(dst_clk_i) then
          dst_valid_o <= '0';
-         overflow <= '0';
 
          if dst_gray_wr /= dst_gray_rd then
-
-            case dst_gray_rd is
-
-               when "00" =>
-                  if dst_gray_wr /= "01" then
-                     overflow <= '1';
-                  end if;
-                  dst_data_o  <= dst_registers(G_DATA_SIZE - 1 downto 0);
-                  dst_gray_rd <= "01";
-
-               when "01" =>
-                  if dst_gray_wr /= "11" then
-                     overflow <= '1';
-                  end if;
-                  dst_data_o  <= dst_registers(2 * G_DATA_SIZE - 1 downto G_DATA_SIZE);
-                  dst_gray_rd <= "11";
-
-               when "10" =>
-                  if dst_gray_wr /= "00" then
-                     overflow <= '1';
-                  end if;
-                  dst_data_o  <= dst_registers(2 * G_DATA_SIZE - 1 downto G_DATA_SIZE);
-                  dst_gray_rd <= "00";
-
-               when "11" =>
-                  if dst_gray_wr /= "10" then
-                     overflow <= '1';
-                  end if;
-                  dst_data_o  <= dst_registers(G_DATA_SIZE - 1 downto 0);
-                  dst_gray_rd <= "10";
-
-               when others =>
-                  null;
-
-            end case;
-
+            dst_gray_rd <= bin2gray(gray2bin(dst_gray_rd) + 1);
             dst_valid_o <= '1';
          end if;
       end if;
    end process dst_proc;
-
-   dst_error_o <= overflow;
 
 end architecture synthesis;
 

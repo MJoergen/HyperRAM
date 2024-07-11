@@ -61,7 +61,7 @@ architecture synthesis of top is
    signal sys_data_read        : std_logic_vector(31 downto 0);
    signal sys_count_long       : unsigned(31 downto 0);
    signal sys_count_short      : unsigned(31 downto 0);
-   signal sys_count_error      : unsigned(31 downto 0);
+   signal sys_count_error      : std_logic_vector(31 downto 0);
 
    -- Interface to MEGA65 video
    signal sys_digits           : std_logic_vector(191 downto 0);
