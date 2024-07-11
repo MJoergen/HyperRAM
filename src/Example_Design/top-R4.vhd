@@ -57,8 +57,8 @@ architecture synthesis of top is
    signal sys_active           : std_logic;
    signal sys_error            : std_logic;
    signal sys_address          : std_logic_vector(31 downto 0);
-   signal sys_data_exp         : std_logic_vector(31 downto 0);
-   signal sys_data_read        : std_logic_vector(31 downto 0);
+   signal sys_data_exp         : std_logic_vector(63 downto 0);
+   signal sys_data_read        : std_logic_vector(63 downto 0);
    signal sys_count_long       : unsigned(31 downto 0);
    signal sys_count_short      : unsigned(31 downto 0);
    signal sys_count_error      : std_logic_vector(31 downto 0);
@@ -119,10 +119,10 @@ begin
    -- Generate debug output for video
    ----------------------------------
 
-   sys_digits( 31 downto   0) <= sys_data_read;
+   sys_digits( 31 downto   0) <= sys_data_read(31 downto 0);
    sys_digits( 47 downto  32) <= sys_address(15 downto 0);
    sys_digits( 63 downto  48) <= X"00" & "000" & sys_address(20 downto 16);
-   sys_digits( 95 downto  64) <= sys_data_exp;
+   sys_digits( 95 downto  64) <= sys_data_exp(31 downto 0);
    sys_digits(127 downto  96) <= std_logic_vector(sys_count_long);
    sys_digits(159 downto 128) <= std_logic_vector(sys_count_short);
    sys_digits(191 downto 160) <= sys_count_error;
