@@ -6,8 +6,8 @@
 -- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
 
 library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+   use ieee.std_logic_1164.all;
+   use ieee.numeric_std.all;
 
 entity trafic_gen is
    generic (
@@ -15,27 +15,27 @@ entity trafic_gen is
       G_DATA_SIZE    : integer  -- Number of bits
    );
    port (
-      clk_i               : in  std_logic;
-      rst_i               : in  std_logic;
-      start_i             : in  std_logic;
-      wait_o              : out std_logic;
+      clk_i               : in    std_logic;
+      rst_i               : in    std_logic;
+      start_i             : in    std_logic;
+      wait_o              : out   std_logic;
 
       -- Connect to HyperRAM controller
-      avm_write_o         : out std_logic;
-      avm_read_o          : out std_logic;
-      avm_address_o       : out std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
-      avm_writedata_o     : out std_logic_vector(G_DATA_SIZE-1 downto 0);
-      avm_byteenable_o    : out std_logic_vector(G_DATA_SIZE/8-1 downto 0);
-      avm_burstcount_o    : out std_logic_vector(7 downto 0);
-      avm_readdata_i      : in  std_logic_vector(G_DATA_SIZE-1 downto 0);
-      avm_readdatavalid_i : in  std_logic;
-      avm_waitrequest_i   : in  std_logic;
+      avm_write_o         : out   std_logic;
+      avm_read_o          : out   std_logic;
+      avm_address_o       : out   std_logic_vector(G_ADDRESS_SIZE - 1 downto 0);
+      avm_writedata_o     : out   std_logic_vector(G_DATA_SIZE - 1 downto 0);
+      avm_byteenable_o    : out   std_logic_vector(G_DATA_SIZE / 8 - 1 downto 0);
+      avm_burstcount_o    : out   std_logic_vector(7 downto 0);
+      avm_readdata_i      : in    std_logic_vector(G_DATA_SIZE - 1 downto 0);
+      avm_readdatavalid_i : in    std_logic;
+      avm_waitrequest_i   : in    std_logic;
 
       -- Debug output
-      address_o           : out std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
-      data_exp_o          : out std_logic_vector(G_DATA_SIZE-1 downto 0);
-      data_read_o         : out std_logic_vector(G_DATA_SIZE-1 downto 0);
-      count_error_o       : out std_logic_vector(31 downto 0)
+      address_o           : out   std_logic_vector(G_ADDRESS_SIZE - 1 downto 0);
+      data_exp_o          : out   std_logic_vector(G_DATA_SIZE - 1 downto 0);
+      data_read_o         : out   std_logic_vector(G_DATA_SIZE - 1 downto 0);
+      count_error_o       : out   std_logic_vector(31 downto 0)
    );
 end entity trafic_gen;
 
@@ -43,11 +43,11 @@ architecture synthesis of trafic_gen is
 
    signal avm_write         : std_logic;
    signal avm_read          : std_logic;
-   signal avm_address       : std_logic_vector(G_ADDRESS_SIZE-1 downto 0);
-   signal avm_writedata     : std_logic_vector(G_DATA_SIZE-1 downto 0);
-   signal avm_byteenable    : std_logic_vector(G_DATA_SIZE/8-1 downto 0);
+   signal avm_address       : std_logic_vector(G_ADDRESS_SIZE - 1 downto 0);
+   signal avm_writedata     : std_logic_vector(G_DATA_SIZE - 1 downto 0);
+   signal avm_byteenable    : std_logic_vector(G_DATA_SIZE / 8 - 1 downto 0);
    signal avm_burstcount    : std_logic_vector(7 downto 0);
-   signal avm_readdata      : std_logic_vector(G_DATA_SIZE-1 downto 0);
+   signal avm_readdata      : std_logic_vector(G_DATA_SIZE - 1 downto 0);
    signal avm_readdatavalid : std_logic;
    signal avm_waitrequest   : std_logic;
 
@@ -57,7 +57,7 @@ begin
    -- Instantiate Avalon Master
    --------------------------------------------------------
 
-   i_avm_master3 : entity work.avm_master3
+   avm_master3_inst : entity work.avm_master3
       generic map (
          G_INIT_FIRST   => true,
          G_DATA_SIZE    => G_DATA_SIZE,
@@ -77,9 +77,9 @@ begin
          m_avm_readdata_i      => avm_readdata,
          m_avm_readdatavalid_i => avm_readdatavalid,
          m_avm_waitrequest_i   => avm_waitrequest
-      ); -- i_avm_master3
+      ); -- avm_master3_inst
 
-   i_avm_verifier : entity work.avm_verifier
+   avm_verifier_inst : entity work.avm_verifier
       generic map (
          G_INIT_ZEROS   => false,
          G_DATA_SIZE    => G_DATA_SIZE,
@@ -101,7 +101,8 @@ begin
          address_o           => address_o,
          data_exp_o          => data_exp_o,
          data_read_o         => data_read_o
-      );
+      ); -- avm_verifier_inst
+
 
    --------------------------------------------------------
    -- Insert occasional breaks into Avalon stream.
@@ -109,7 +110,7 @@ begin
    -- coverage of the HyperRAM controller.
    --------------------------------------------------------
 
-   i_avm_pause : entity work.avm_pause
+   avm_pause_inst : entity work.avm_pause
       generic map (
          G_PAUSE        => 3,
          G_ADDRESS_SIZE => G_ADDRESS_SIZE,
@@ -136,7 +137,7 @@ begin
          m_avm_readdata_i      => avm_readdata_i,
          m_avm_readdatavalid_i => avm_readdatavalid_i,
          m_avm_waitrequest_i   => avm_waitrequest_i
-      ); -- i_avm_pause
+      ); -- avm_pause_inst
 
 end architecture synthesis;
 
