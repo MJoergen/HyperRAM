@@ -42,6 +42,7 @@ end entity core;
 architecture synthesis of core is
 
    -- Avalon Memory Map interface to HyperRAM Controller
+   signal avm_waitrequest   : std_logic;
    signal avm_write         : std_logic;
    signal avm_read          : std_logic;
    signal avm_address       : std_logic_vector(31 downto 0) := (others => '0');
@@ -50,8 +51,8 @@ architecture synthesis of core is
    signal avm_burstcount    : std_logic_vector(7 downto 0);
    signal avm_readdata      : std_logic_vector(G_DATA_SIZE - 1 downto 0);
    signal avm_readdatavalid : std_logic;
-   signal avm_waitrequest   : std_logic;
 
+   signal dec_waitrequest   : std_logic;
    signal dec_write         : std_logic;
    signal dec_read          : std_logic;
    signal dec_address       : std_logic_vector(31 downto 0) := (others => '0');
@@ -60,7 +61,6 @@ architecture synthesis of core is
    signal dec_burstcount    : std_logic_vector(7 downto 0);
    signal dec_readdata      : std_logic_vector(15 downto 0);
    signal dec_readdatavalid : std_logic;
-   signal dec_waitrequest   : std_logic;
 
    -- HyperRAM tri-state control signals
    signal hr_rwds_in   : std_logic;
@@ -112,6 +112,7 @@ begin
          data_exp_o          => data_exp_o(G_DATA_SIZE - 1 downto 0),
          data_read_o         => data_read_o(G_DATA_SIZE - 1 downto 0),
          count_error_o       => count_error_o,
+         avm_waitrequest_i   => avm_waitrequest,
          avm_write_o         => avm_write,
          avm_read_o          => avm_read,
          avm_address_o       => avm_address(G_SYS_ADDRESS_SIZE - 1 downto 0),
@@ -119,8 +120,7 @@ begin
          avm_byteenable_o    => avm_byteenable,
          avm_burstcount_o    => avm_burstcount,
          avm_readdata_i      => avm_readdata,
-         avm_readdatavalid_i => avm_readdatavalid,
-         avm_waitrequest_i   => avm_waitrequest
+         avm_readdatavalid_i => avm_readdatavalid
       ); -- traffic_gen_inst
 
    decrease_gen : if G_DATA_SIZE > 16 generate
@@ -135,6 +135,7 @@ begin
          port map (
             clk_i                 => clk_i,
             rst_i                 => rst_i,
+            s_avm_waitrequest_o   => avm_waitrequest,
             s_avm_write_i         => avm_write,
             s_avm_read_i          => avm_read,
             s_avm_address_i       => avm_address(G_ADDRESS_SIZE - 1 downto 0),
@@ -143,7 +144,7 @@ begin
             s_avm_burstcount_i    => avm_burstcount,
             s_avm_readdata_o      => avm_readdata,
             s_avm_readdatavalid_o => avm_readdatavalid,
-            s_avm_waitrequest_o   => avm_waitrequest,
+            m_avm_waitrequest_i   => dec_waitrequest,
             m_avm_write_o         => dec_write,
             m_avm_read_o          => dec_read,
             m_avm_address_o       => dec_address(21 downto 0),
@@ -151,11 +152,11 @@ begin
             m_avm_byteenable_o    => dec_byteenable,
             m_avm_burstcount_o    => dec_burstcount,
             m_avm_readdata_i      => dec_readdata,
-            m_avm_readdatavalid_i => dec_readdatavalid,
-            m_avm_waitrequest_i   => dec_waitrequest
+            m_avm_readdatavalid_i => dec_readdatavalid
          ); -- avm_decrease_inst
 
    else generate
+      avm_waitrequest   <= dec_waitrequest;
       dec_write         <= avm_write;
       dec_read          <= avm_read;
       dec_address       <= avm_address;
@@ -164,7 +165,6 @@ begin
       dec_burstcount    <= avm_burstcount;
       avm_readdata      <= dec_readdata;
       avm_readdatavalid <= dec_readdatavalid;
-      avm_waitrequest   <= dec_waitrequest;
    end generate decrease_gen;
 
 
@@ -181,6 +181,7 @@ begin
          clk_del_i           => clk_del_i,
          delay_refclk_i      => delay_refclk_i,
          rst_i               => rst_i,
+         avm_waitrequest_o   => dec_waitrequest,
          avm_write_i         => dec_write,
          avm_read_i          => dec_read,
          avm_address_i       => dec_address,
@@ -189,7 +190,6 @@ begin
          avm_burstcount_i    => dec_burstcount,
          avm_readdata_o      => dec_readdata,
          avm_readdatavalid_o => dec_readdatavalid,
-         avm_waitrequest_o   => dec_waitrequest,
          count_long_o        => count_long,
          count_short_o       => count_short,
          hr_resetn_o         => hr_resetn_o,

@@ -20,6 +20,7 @@ entity hyperram_ctrl is
       rst_i               : in    std_logic;
 
       -- Avalon Memory Map
+      avm_waitrequest_o   : out   std_logic;
       avm_write_i         : in    std_logic;
       avm_read_i          : in    std_logic;
       avm_address_i       : in    std_logic_vector(31 downto 0);
@@ -28,7 +29,6 @@ entity hyperram_ctrl is
       avm_burstcount_i    : in    std_logic_vector(7 downto 0);
       avm_readdata_o      : out   std_logic_vector(15 downto 0);
       avm_readdatavalid_o : out   std_logic;
-      avm_waitrequest_o   : out   std_logic;
 
       -- Statistics
       count_long_o        : out   unsigned(31 downto 0);

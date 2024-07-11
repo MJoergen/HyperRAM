@@ -13,8 +13,8 @@ library ieee;
 
 entity avm_master3 is
    generic (
-      G_SINGLE_REQUEST_ONLY : boolean                       := false;
-      G_SEED                : std_logic_vector(63 downto 0) := (others => '0');
+      G_SINGLE_REQUEST_ONLY : boolean                        := false;
+      G_SEED                : std_logic_vector(127 downto 0) := (others => '0');
       G_INIT_FIRST          : boolean;
       G_ADDRESS_SIZE        : integer; -- Number of bits
       G_DATA_SIZE           : integer  -- Number of bits
@@ -43,7 +43,7 @@ architecture synthesis of avm_master3 is
    constant C_WRITE_SIZE : integer := 1;
 
    -- Combinatorial signals
-   signal   random_s : std_logic_vector(63 downto 0);
+   signal   random_s : std_logic_vector(127 downto 0);
 
    subtype  R_ADDRESS    is natural range G_ADDRESS_SIZE - 1 downto 0;
    subtype  R_DATA       is natural range G_DATA_SIZE + R_ADDRESS'left downto R_ADDRESS'left + 1;
