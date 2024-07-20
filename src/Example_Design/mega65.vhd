@@ -77,15 +77,21 @@ architecture synthesis of mega65 is
    signal sys_result_ready : std_logic;
    signal sys_result_data  : std_logic_vector(7 downto 0);
 
-   signal sys_uart_valid : std_logic;
-   signal sys_uart_ready : std_logic;
-   signal sys_uart_data  : std_logic_vector(7 downto 0);
+   signal sys_uart_tx_valid : std_logic;
+   signal sys_uart_tx_ready : std_logic;
+   signal sys_uart_tx_data  : std_logic_vector(7 downto 0);
+   signal sys_uart_rx_valid : std_logic;
+   signal sys_uart_rx_ready : std_logic;
+   signal sys_uart_rx_data  : std_logic_vector(7 downto 0);
 
    signal kbd_up_out     : std_logic;
    signal kbd_left_out   : std_logic;
    signal kbd_return_out : std_logic;
    signal kbd_active     : std_logic;
    signal kbd_error      : std_logic;
+
+   signal sys_uart_start : std_logic;
+   signal sys_kbd_start  : std_logic;
 
    signal video_vs       : std_logic;
    signal video_hs       : std_logic;
@@ -156,11 +162,11 @@ begin
          src_clk     => kbd_clk,
          src_in(0)   => not kbd_up_out,
          src_in(1)   => not kbd_left_out,
-         src_in(2)   => (not kbd_return_out) or (not uart_rx_i),
+         src_in(2)   => not kbd_return_out,
          dest_clk    => sys_clk_i,
          dest_out(0) => sys_up_o,
          dest_out(1) => sys_left_o,
-         dest_out(2) => sys_start_o
+         dest_out(2) => sys_kbd_start
       ); -- i_cdc_start
 
    i_cdc_keyboard: xpm_cdc_array_single
@@ -357,20 +363,32 @@ begin
          s2_valid_i => sys_result_valid,
          s2_ready_o => sys_result_ready,
          s2_data_i  => sys_result_data,
-         m_valid_o  => sys_uart_valid,
-         m_ready_i  => sys_uart_ready,
-         m_data_o   => sys_uart_data
+         m_valid_o  => sys_uart_tx_valid,
+         m_ready_i  => sys_uart_tx_ready,
+         m_data_o   => sys_uart_tx_data
       ); -- i_merginator
 
+   sys_uart_rx_ready <= '1';
    i_uart : entity work.uart
+      generic map (
+         G_DIVISOR => 100000000/115200
+      )
       port map (
-         clk_i     => sys_clk_i,
-         rst_i     => sys_rst,
-         s_valid_i => sys_uart_valid,
-         s_ready_o => sys_uart_ready,
-         s_data_i  => sys_uart_data,
-         uart_tx_o => uart_tx_o
+         clk_i      => sys_clk_i,
+         rst_i      => sys_rst,
+         tx_valid_i => sys_uart_tx_valid,
+         tx_ready_o => sys_uart_tx_ready,
+         tx_data_i  => sys_uart_tx_data,
+         rx_valid_o => sys_uart_rx_valid,
+         rx_ready_i => sys_uart_rx_ready,
+         rx_data_o  => sys_uart_rx_data,
+         uart_tx_o  => uart_tx_o,
+         uart_rx_i  => uart_rx_i
       ); -- i_uart
+
+   sys_uart_start <= sys_uart_rx_valid when sys_uart_rx_data = X"0D" else '0';
+
+   sys_start_o <= sys_uart_start or sys_kbd_start;
 
 end architecture synthesis;
 
