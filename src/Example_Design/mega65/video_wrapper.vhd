@@ -5,7 +5,7 @@ use ieee.numeric_std.all;
 library work;
 use work.video_modes_pkg.all;
 
-entity video is
+entity video_wrapper is
    generic (
       G_FONT_FILE   : string;
       G_DIGITS_SIZE : integer;
@@ -22,9 +22,9 @@ entity video is
       video_green_o : out std_logic_vector(7 downto 0);
       video_blue_o  : out std_logic_vector(7 downto 0)
    );
-end entity video;
+end entity video_wrapper;
 
-architecture synthesis of video is
+architecture synthesis of video_wrapper is
 
    signal pixel_x   : std_logic_vector(G_VIDEO_MODE.PIX_SIZE-1 downto 0);
    signal pixel_y   : std_logic_vector(G_VIDEO_MODE.PIX_SIZE-1 downto 0);

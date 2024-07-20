@@ -199,7 +199,7 @@ begin
       ); -- i_cdc_video
 
 
-   i_video : entity work.video
+   i_video_wrapper : entity work.video_wrapper
       generic map
       (
          G_FONT_FILE   => C_FONT_FILE,
@@ -217,7 +217,7 @@ begin
          video_red_o   => video_red,
          video_green_o => video_green,
          video_blue_o  => video_blue
-      ); -- i_video
+      ); -- i_video_wrapper
 
 
    i_audio_video_to_hdmi : entity work.audio_video_to_hdmi
