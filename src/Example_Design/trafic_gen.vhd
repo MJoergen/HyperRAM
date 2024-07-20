@@ -87,7 +87,7 @@ begin
       )
       port map (
          clk_i               => clk_i,
-         rst_i               => rst_i or start_i,
+         rst_i               => rst_i,
          avm_write_i         => avm_write,
          avm_read_i          => avm_read,
          avm_address_i       => avm_address,
