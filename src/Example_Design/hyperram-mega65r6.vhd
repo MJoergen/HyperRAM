@@ -6,36 +6,36 @@ library ieee;
    use ieee.std_logic_1164.all;
    use ieee.numeric_std.all;
 
-entity top is
+entity hyperram_mega65r6 is
    port (
-      clk_i         : in    std_logic; -- 100 MHz clock
-      reset_i       : in    std_logic; -- CPU reset button (active high)
+      clk_i          : in    std_logic; -- 100 MHz clock
+      reset_i        : in    std_logic; -- CPU reset button (active high)
 
       -- HyperRAM device interface
-      hr_resetn_o   : out   std_logic;
-      hr_csn_o      : out   std_logic;
-      hr_ck_o       : out   std_logic;
-      hr_rwds_io    : inout std_logic;
-      hr_dq_io      : inout std_logic_vector(7 downto 0);
+      hr_resetn_o    : out   std_logic;
+      hr_csn_o       : out   std_logic;
+      hr_ck_o        : out   std_logic;
+      hr_rwds_io     : inout std_logic;
+      hr_dq_io       : inout std_logic_vector(7 downto 0);
 
       -- MEGA65 keyboard
-      kb_io0_o      : out   std_logic;
-      kb_io1_o      : out   std_logic;
-      kb_io2_i      : in    std_logic;
+      kb_io0_o       : out   std_logic;
+      kb_io1_o       : out   std_logic;
+      kb_io2_i       : in    std_logic;
 
       -- UART
-      uart_rx_i     : in    std_logic;
-      uart_tx_o     : out   std_logic;
+      uart_rx_i      : in    std_logic;
+      uart_tx_o      : out   std_logic;
 
       -- MEGA65 Digital Video (HDMI)
-      hdmi_data_p_o : out   std_logic_vector(2 downto 0);
-      hdmi_data_n_o : out   std_logic_vector(2 downto 0);
-      hdmi_clk_p_o  : out   std_logic;
-      hdmi_clk_n_o  : out   std_logic
+      hdmi_data_p_o  : out   std_logic_vector(2 downto 0);
+      hdmi_data_n_o  : out   std_logic_vector(2 downto 0);
+      hdmi_clk_p_o   : out   std_logic;
+      hdmi_clk_n_o   : out   std_logic
    );
-end entity top;
+end entity hyperram_mega65r6;
 
-architecture synthesis of top is
+architecture synthesis of hyperram_mega65r6 is
 
    constant C_SYS_ADDRESS_SIZE : integer := 17;
    constant C_ADDRESS_SIZE     : integer := 20;
