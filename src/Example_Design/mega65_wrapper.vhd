@@ -15,7 +15,7 @@ library work;
 library xpm;
    use xpm.vcomponents.all;
 
-entity mega65 is
+entity mega65_wrapper is
    generic (
       G_DIGITS_SIZE : natural
    );
@@ -46,9 +46,9 @@ entity mega65 is
       hdmi_clk_p_o  : out   std_logic;
       hdmi_clk_n_o  : out   std_logic
    );
-end entity mega65;
+end entity mega65_wrapper;
 
-architecture synthesis of mega65 is
+architecture synthesis of mega65_wrapper is
 
    -- video mode selection: 720p @ 60 Hz
    constant C_VIDEO_MODE : video_modes_type := C_VIDEO_MODE_1280_720_60;

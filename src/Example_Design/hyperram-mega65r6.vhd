@@ -1,4 +1,4 @@
--- This is the top-level file for the MEGA65 platform (revision 3).
+-- This is the top-level file for the MEGA65 platform (revision 6).
 --
 -- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
 
@@ -8,30 +8,30 @@ library ieee;
 
 entity hyperram_mega65r6 is
    port (
-      clk_i          : in    std_logic; -- 100 MHz clock
-      reset_i        : in    std_logic; -- CPU reset button (active high)
+      sys_clk_i     : in    std_logic; -- 100 MHz clock
+      sys_rst_i     : in    std_logic; -- CPU reset button (active high)
 
       -- HyperRAM device interface
-      hr_resetn_o    : out   std_logic;
-      hr_csn_o       : out   std_logic;
-      hr_ck_o        : out   std_logic;
-      hr_rwds_io     : inout std_logic;
-      hr_dq_io       : inout std_logic_vector(7 downto 0);
+      hr_resetn_o   : out   std_logic;
+      hr_csn_o      : out   std_logic;
+      hr_ck_o       : out   std_logic;
+      hr_rwds_io    : inout std_logic;
+      hr_dq_io      : inout std_logic_vector(7 downto 0);
 
       -- MEGA65 keyboard
-      kb_io0_o       : out   std_logic;
-      kb_io1_o       : out   std_logic;
-      kb_io2_i       : in    std_logic;
+      kb_io0_o      : out   std_logic;
+      kb_io1_o      : out   std_logic;
+      kb_io2_i      : in    std_logic;
 
       -- UART
-      uart_rx_i      : in    std_logic;
-      uart_tx_o      : out   std_logic;
+      uart_rx_i     : in    std_logic;
+      uart_tx_o     : out   std_logic;
 
       -- MEGA65 Digital Video (HDMI)
-      hdmi_data_p_o  : out   std_logic_vector(2 downto 0);
-      hdmi_data_n_o  : out   std_logic_vector(2 downto 0);
-      hdmi_clk_p_o   : out   std_logic;
-      hdmi_clk_n_o   : out   std_logic
+      hdmi_data_p_o : out   std_logic_vector(2 downto 0);
+      hdmi_data_n_o : out   std_logic_vector(2 downto 0);
+      hdmi_clk_p_o  : out   std_logic;
+      hdmi_clk_n_o  : out   std_logic
    );
 end entity hyperram_mega65r6;
 
@@ -66,7 +66,44 @@ architecture synthesis of hyperram_mega65r6 is
    -- Interface to MEGA65 video
    signal   sys_digits : std_logic_vector(191 downto 0);
 
+   -- HyperRAM tri-state control signals
+   signal hr_rwds_in   : std_logic;
+   signal hr_dq_in     : std_logic_vector(7 downto 0);
+   signal hr_rwds_out  : std_logic;
+   signal hr_dq_out    : std_logic_vector(7 downto 0);
+   signal hr_rwds_oe_n : std_logic;
+   signal hr_dq_oe_n   : std_logic_vector(7 downto 0);
+
 begin
+
+   ----------------------------------------------------------
+   -- Instantiate MEGA65 platform interface
+   ----------------------------------------------------------
+
+   mega65_wrapper_inst : entity work.mega65_wrapper
+      generic map (
+         G_DIGITS_SIZE => sys_digits'length
+      )
+      port map (
+         sys_clk_i     => sys_clk_i,
+         sys_rstn_i    => not sys_rst_i,
+         sys_up_o      => sys_up,
+         sys_left_o    => sys_left,
+         sys_start_o   => sys_start,
+         sys_active_i  => sys_active,
+         sys_error_i   => sys_error,
+         sys_digits_i  => sys_digits,
+         uart_rx_i     => uart_rx_i,
+         uart_tx_o     => uart_tx_o,
+         kb_io0_o      => kb_io0_o,
+         kb_io1_o      => kb_io1_o,
+         kb_io2_i      => kb_io2_i,
+         hdmi_data_p_o => hdmi_data_p_o,
+         hdmi_data_n_o => hdmi_data_n_o,
+         hdmi_clk_p_o  => hdmi_clk_p_o,
+         hdmi_clk_n_o  => hdmi_clk_n_o
+      ); -- mega65_wrapper_inst
+
 
    --------------------------------------------------------
    -- Generate clocks for HyperRAM controller
@@ -74,8 +111,8 @@ begin
 
    clk_inst : entity work.clk
       port map (
-         sys_clk_i      => clk_i,
-         sys_rstn_i     => not reset_i,
+         sys_clk_i      => sys_clk_i,
+         sys_rstn_i     => not sys_rst_i,
          clk_o          => hr_clk,
          clk_del_o      => hr_clk_del,
          delay_refclk_o => delay_refclk,
@@ -87,7 +124,7 @@ begin
    -- Instantiate core test generator
    --------------------------------------------------------
 
-   core_inst : entity work.core
+   core_wrapper_inst : entity work.core_wrapper
       generic map (
          G_SYS_ADDRESS_SIZE => C_SYS_ADDRESS_SIZE,
          G_ADDRESS_SIZE     => C_ADDRESS_SIZE,
@@ -109,9 +146,13 @@ begin
          hr_resetn_o    => hr_resetn_o,
          hr_csn_o       => hr_csn_o,
          hr_ck_o        => hr_ck_o,
-         hr_rwds_io     => hr_rwds_io,
-         hr_dq_io       => hr_dq_io
-      ); -- core_inst
+         hr_rwds_in_i   => hr_rwds_in,
+         hr_rwds_out_o  => hr_rwds_out,
+         hr_rwds_oe_n_o => hr_rwds_oe_n,
+         hr_dq_in_i     => hr_dq_in,
+         hr_dq_out_o    => hr_dq_out,
+         hr_dq_oe_n_o   => hr_dq_oe_n
+      ); -- core_wrapper_inst
 
 
    ----------------------------------
@@ -130,32 +171,19 @@ begin
 
 
    ----------------------------------
-   -- Instantiate MEGA65 platform interface
+   -- Tri-state buffers for HyperRAM
    ----------------------------------
 
-   mega65_inst : entity work.mega65
-      generic map (
-         G_DIGITS_SIZE => sys_digits'length
-      )
-      port map (
-         sys_clk_i     => clk_i,
-         sys_rstn_i    => not reset_i,
-         sys_up_o      => sys_up,
-         sys_left_o    => sys_left,
-         sys_start_o   => sys_start,
-         sys_active_i  => sys_active,
-         sys_error_i   => sys_error,
-         sys_digits_i  => sys_digits,
-         uart_rx_i     => uart_rx_i,
-         uart_tx_o     => uart_tx_o,
-         kb_io0_o      => kb_io0_o,
-         kb_io1_o      => kb_io1_o,
-         kb_io2_i      => kb_io2_i,
-         hdmi_data_p_o => hdmi_data_p_o,
-         hdmi_data_n_o => hdmi_data_n_o,
-         hdmi_clk_p_o  => hdmi_clk_p_o,
-         hdmi_clk_n_o  => hdmi_clk_n_o
-      ); -- mega65_inst
+   hr_rwds_io                 <= hr_rwds_out when hr_rwds_oe_n = '0' else
+                                 'Z';
+
+   hr_dq_gen : for i in 0 to 7 generate
+      hr_dq_io(i) <= hr_dq_out(i) when hr_dq_oe_n(i) = '0' else
+                     'Z';
+   end generate hr_dq_gen;
+
+   hr_rwds_in <= hr_rwds_io;
+   hr_dq_in   <= hr_dq_io;
 
 end architecture synthesis;
 

@@ -6,7 +6,7 @@ library ieee;
    use ieee.std_logic_1164.all;
    use ieee.numeric_std.all;
 
-entity core is
+entity core_wrapper is
    generic (
       G_ADDRESS_SIZE     : integer;
       G_SYS_ADDRESS_SIZE : integer;
@@ -34,12 +34,16 @@ entity core is
       hr_resetn_o    : out   std_logic;
       hr_csn_o       : out   std_logic;
       hr_ck_o        : out   std_logic;
-      hr_rwds_io     : inout std_logic;
-      hr_dq_io       : inout std_logic_vector(7 downto 0)
+      hr_rwds_in_i   : in    std_logic;
+      hr_rwds_out_o  : out   std_logic;
+      hr_rwds_oe_n_o : out   std_logic;
+      hr_dq_in_i     : in    std_logic_vector(7 downto 0);
+      hr_dq_out_o    : out   std_logic_vector(7 downto 0);
+      hr_dq_oe_n_o   : out   std_logic_vector(7 downto 0)
    );
-end entity core;
+end entity core_wrapper;
 
-architecture synthesis of core is
+architecture synthesis of core_wrapper is
 
    -- Avalon Memory Map interface to HyperRAM Controller
    signal avm_waitrequest   : std_logic;
@@ -61,14 +65,6 @@ architecture synthesis of core is
    signal dec_burstcount    : std_logic_vector(7 downto 0);
    signal dec_readdata      : std_logic_vector(15 downto 0);
    signal dec_readdatavalid : std_logic;
-
-   -- HyperRAM tri-state control signals
-   signal hr_rwds_in   : std_logic;
-   signal hr_dq_in     : std_logic_vector(7 downto 0);
-   signal hr_rwds_out  : std_logic;
-   signal hr_dq_out    : std_logic_vector(7 downto 0);
-   signal hr_rwds_oe_n : std_logic;
-   signal hr_dq_oe_n   : std_logic_vector(7 downto 0);
 
    signal active_d    : std_logic;
    signal start_long  : unsigned(31 downto 0);
@@ -195,29 +191,13 @@ begin
          hr_resetn_o         => hr_resetn_o,
          hr_csn_o            => hr_csn_o,
          hr_ck_o             => hr_ck_o,
-         hr_rwds_in_i        => hr_rwds_in,
-         hr_dq_in_i          => hr_dq_in,
-         hr_rwds_out_o       => hr_rwds_out,
-         hr_dq_out_o         => hr_dq_out,
-         hr_rwds_oe_n_o      => hr_rwds_oe_n,
-         hr_dq_oe_n_o        => hr_dq_oe_n
+         hr_rwds_in_i        => hr_rwds_in_i,
+         hr_dq_in_i          => hr_dq_in_i,
+         hr_rwds_out_o       => hr_rwds_out_o,
+         hr_dq_out_o         => hr_dq_out_o,
+         hr_rwds_oe_n_o      => hr_rwds_oe_n_o,
+         hr_dq_oe_n_o        => hr_dq_oe_n_o
       ); -- hyperram_inst
-
-
-   ----------------------------------
-   -- Tri-state buffers for HyperRAM
-   ----------------------------------
-
-   hr_rwds_io <= hr_rwds_out when hr_rwds_oe_n = '0' else
-                 'Z';
-
-   hr_dq_gen : for i in 0 to 7 generate
-      hr_dq_io(i) <= hr_dq_out(i) when hr_dq_oe_n(i) = '0' else
-                     'Z';
-   end generate hr_dq_gen;
-
-   hr_rwds_in <= hr_rwds_io;
-   hr_dq_in   <= hr_dq_io;
 
 end architecture synthesis;
 
