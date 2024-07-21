@@ -7,31 +7,45 @@ library ieee;
    use ieee.numeric_std.all;
 
 entity hyperram_mega65r6 is
+   generic (
+      G_FONT_PATH : string := ""
+   );
    port (
-      sys_clk_i     : in    std_logic; -- 100 MHz clock
-      sys_rst_i     : in    std_logic; -- CPU reset button (active high)
+      sys_clk_i      : in    std_logic; -- 100 MHz clock
+      sys_rst_i      : in    std_logic; -- CPU reset button (active high)
 
       -- HyperRAM device interface
-      hr_resetn_o   : out   std_logic;
-      hr_csn_o      : out   std_logic;
-      hr_ck_o       : out   std_logic;
-      hr_rwds_io    : inout std_logic;
-      hr_dq_io      : inout std_logic_vector(7 downto 0);
+      hr_resetn_o    : out   std_logic;
+      hr_csn_o       : out   std_logic;
+      hr_ck_o        : out   std_logic;
+      hr_rwds_io     : inout std_logic;
+      hr_dq_io       : inout std_logic_vector(7 downto 0);
 
       -- MEGA65 keyboard
-      kb_io0_o      : out   std_logic;
-      kb_io1_o      : out   std_logic;
-      kb_io2_i      : in    std_logic;
+      kb_io0_o       : out   std_logic;
+      kb_io1_o       : out   std_logic;
+      kb_io2_i       : in    std_logic;
 
       -- UART
-      uart_rx_i     : in    std_logic;
-      uart_tx_o     : out   std_logic;
+      uart_rx_i      : in    std_logic;
+      uart_tx_o      : out   std_logic;
+
+      -- VGA
+      vga_red_o      : out   std_logic_vector(7 downto 0);
+      vga_green_o    : out   std_logic_vector(7 downto 0);
+      vga_blue_o     : out   std_logic_vector(7 downto 0);
+      vga_hs_o       : out   std_logic;
+      vga_vs_o       : out   std_logic;
+      vdac_clk_o     : out   std_logic;
+      vdac_blank_n_o : out   std_logic;
+      vdac_psave_n_o : out   std_logic;
+      vdac_sync_n_o  : out   std_logic;
 
       -- MEGA65 Digital Video (HDMI)
-      hdmi_data_p_o : out   std_logic_vector(2 downto 0);
-      hdmi_data_n_o : out   std_logic_vector(2 downto 0);
-      hdmi_clk_p_o  : out   std_logic;
-      hdmi_clk_n_o  : out   std_logic
+      hdmi_data_p_o  : out   std_logic_vector(2 downto 0);
+      hdmi_data_n_o  : out   std_logic_vector(2 downto 0);
+      hdmi_clk_p_o   : out   std_logic;
+      hdmi_clk_n_o   : out   std_logic
    );
 end entity hyperram_mega65r6;
 
@@ -82,28 +96,38 @@ begin
 
    mega65_wrapper_inst : entity work.mega65_wrapper
       generic map (
-         G_DIGITS_SIZE => sys_digits'length
+         G_DIGITS_SIZE => sys_digits'length,
+         G_FONT_PATH   => G_FONT_PATH
       )
       port map (
          -- MEGA65 I/O ports
-         sys_clk_i     => sys_clk_i,
-         sys_rst_i     => sys_rst_i,
-         uart_rx_i     => uart_rx_i,
-         uart_tx_o     => uart_tx_o,
-         kb_io0_o      => kb_io0_o,
-         kb_io1_o      => kb_io1_o,
-         kb_io2_i      => kb_io2_i,
-         hdmi_data_p_o => hdmi_data_p_o,
-         hdmi_data_n_o => hdmi_data_n_o,
-         hdmi_clk_p_o  => hdmi_clk_p_o,
-         hdmi_clk_n_o  => hdmi_clk_n_o,
+         sys_clk_i      => sys_clk_i,
+         sys_rst_i      => sys_rst_i,
+         uart_rx_i      => uart_rx_i,
+         uart_tx_o      => uart_tx_o,
+         kb_io0_o       => kb_io0_o,
+         kb_io1_o       => kb_io1_o,
+         kb_io2_i       => kb_io2_i,
+         vga_red_o      => vga_red_o,
+         vga_green_o    => vga_green_o,
+         vga_blue_o     => vga_blue_o,
+         vga_hs_o       => vga_hs_o,
+         vga_vs_o       => vga_vs_o,
+         vdac_clk_o     => vdac_clk_o,
+         vdac_blank_n_o => vdac_blank_n_o,
+         vdac_psave_n_o => vdac_psave_n_o,
+         vdac_sync_n_o  => vdac_sync_n_o,
+         hdmi_data_p_o  => hdmi_data_p_o,
+         hdmi_data_n_o  => hdmi_data_n_o,
+         hdmi_clk_p_o   => hdmi_clk_p_o,
+         hdmi_clk_n_o   => hdmi_clk_n_o,
          -- Connection to core
-         sys_up_o      => sys_up,
-         sys_left_o    => sys_left,
-         sys_start_o   => sys_start,
-         sys_active_i  => sys_active,
-         sys_error_i   => sys_error,
-         sys_digits_i  => sys_digits
+         sys_up_o       => sys_up,
+         sys_left_o     => sys_left,
+         sys_start_o    => sys_start,
+         sys_active_i   => sys_active,
+         sys_error_i    => sys_error,
+         sys_digits_i   => sys_digits
       ); -- mega65_wrapper_inst
 
 

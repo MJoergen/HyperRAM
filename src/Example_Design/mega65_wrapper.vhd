@@ -17,32 +17,45 @@ library xpm;
 
 entity mega65_wrapper is
    generic (
-      G_DIGITS_SIZE : natural
+      G_DIGITS_SIZE : natural;
+      G_FONT_PATH   : string
    );
    port (
       -- MEGA65 I/O ports
-      sys_clk_i     : in    std_logic; -- 100 MHz clock
-      sys_rst_i     : in    std_logic; -- CPU reset button
-      uart_rx_i     : in    std_logic;
-      uart_tx_o     : out   std_logic;
-      kb_io0_o      : out   std_logic;
-      kb_io1_o      : out   std_logic;
-      kb_io2_i      : in    std_logic;
-      hdmi_data_p_o : out   std_logic_vector(2 downto 0);
-      hdmi_data_n_o : out   std_logic_vector(2 downto 0);
-      hdmi_clk_p_o  : out   std_logic;
-      hdmi_clk_n_o  : out   std_logic;
+      sys_clk_i      : in    std_logic; -- 100 MHz clock
+      sys_rst_i      : in    std_logic; -- CPU reset button
+      uart_rx_i      : in    std_logic;
+      uart_tx_o      : out   std_logic;
+      kb_io0_o       : out   std_logic;
+      kb_io1_o       : out   std_logic;
+      kb_io2_i       : in    std_logic;
+      vga_red_o      : out   std_logic_vector(7 downto 0);
+      vga_green_o    : out   std_logic_vector(7 downto 0);
+      vga_blue_o     : out   std_logic_vector(7 downto 0);
+      vga_hs_o       : out   std_logic;
+      vga_vs_o       : out   std_logic;
+      vdac_clk_o     : out   std_logic;
+      vdac_blank_n_o : out   std_logic;
+      vdac_psave_n_o : out   std_logic;
+      vdac_sync_n_o  : out   std_logic;
+      hdmi_data_p_o  : out   std_logic_vector(2 downto 0);
+      hdmi_data_n_o  : out   std_logic_vector(2 downto 0);
+      hdmi_clk_p_o   : out   std_logic;
+      hdmi_clk_n_o   : out   std_logic;
       -- Connection to design
-      sys_up_o      : out   std_logic;
-      sys_left_o    : out   std_logic;
-      sys_start_o   : out   std_logic;
-      sys_active_i  : in    std_logic;
-      sys_error_i   : in    std_logic;
-      sys_digits_i  : in    std_logic_vector(G_DIGITS_SIZE - 1 downto 0)
+      sys_up_o       : out   std_logic;
+      sys_left_o     : out   std_logic;
+      sys_start_o    : out   std_logic;
+      sys_active_i   : in    std_logic;
+      sys_error_i    : in    std_logic;
+      sys_digits_i   : in    std_logic_vector(G_DIGITS_SIZE - 1 downto 0)
    );
 end entity mega65_wrapper;
 
 architecture synthesis of mega65_wrapper is
+
+   constant C_CTRL_HZ : natural             := 100_000_000;
+   constant C_UART_HZ : natural             := 115_200;
 
    -- video mode selection: 720p @ 60 Hz
    constant C_VIDEO_MODE : video_modes_type := C_VIDEO_MODE_1280_720_60;
@@ -108,9 +121,9 @@ architecture synthesis of mega65_wrapper is
 
 begin
 
-   --------------------------------------------------------
-   -- Generate clocks and reset for MEGA65 platform (keyboard and video)
-   --------------------------------------------------------
+   --------------------------------------------------------------------------
+   -- Generate clocks and reset
+   --------------------------------------------------------------------------
 
    clk_inst : entity work.clk
       port map (
@@ -134,9 +147,10 @@ begin
    --------------------------------------------------------------------------
 
    sys_key_ready <= '1';
+
    keyboard_wrapper_inst : entity work.keyboard_wrapper
       generic map (
-         G_CTRL_HZ => 100_000_000
+         G_CTRL_HZ => C_CTRL_HZ
       )
       port map (
          ctrl_clk_i        => sys_clk_i,
@@ -151,109 +165,8 @@ begin
          kb_io2_i          => kb_io2_i
       ); -- keyboard_wrapper_inst
 
-   sys_kbd_start <= sys_key_valid when sys_key_data = X"0D" else '0';
-
-
-   --------------------------------------------------------------------------
-   -- video
-   --------------------------------------------------------------------------
-
-   cdc_video_inst : component xpm_cdc_array_single
-      generic map (
-         WIDTH => G_DIGITS_SIZE
-      )
-      port map (
-         src_clk  => sys_clk_i,
-         src_in   => sys_digits_i,
-         dest_clk => video_clk,
-         dest_out => video_digits
-      ); -- cdc_video_inst
-
-
-   video_wrapper_inst : entity work.video_wrapper
-      generic map (
-
-         G_FONT_FILE   => C_FONT_FILE,
-         G_DIGITS_SIZE => G_DIGITS_SIZE,
-         G_VIDEO_MODE  => C_VIDEO_MODE
-      )
-      port map (
-         rst_i         => video_rst,
-         clk_i         => video_clk,
-         digits_i      => video_digits,   -- From HyperRAM trafic generator
-         video_vs_o    => video_vs,
-         video_hs_o    => video_hs,
-         video_de_o    => video_de,
-         video_red_o   => video_red,
-         video_green_o => video_green,
-         video_blue_o  => video_blue
-      ); -- video_wrapper_inst
-
-
-   audio_video_to_hdmi_inst : entity work.audio_video_to_hdmi
-      port map (
-         select_44100 => '0',
-         dvi          => '0',
-         vic          => std_logic_vector(to_unsigned(4,8)), -- CEA/CTA VIC 4=720p @ 60 Hz
-         aspect       => "10",                               -- 01=4:3, 10=16:9
-         pix_rep      => '0',                                -- no pixel repetition
-         vs_pol       => C_VIDEO_MODE.V_POL,                 -- horizontal polarity: positive
-         hs_pol       => C_VIDEO_MODE.H_POL,                 -- vertaical polarity: positive
-
-         vga_rst      => video_rst,                          -- active high reset
-         vga_clk      => video_clk,                          -- video pixel clock
-         vga_vs       => video_vs,
-         vga_hs       => video_hs,
-         vga_de       => video_de,
-         vga_r        => video_red,
-         vga_g        => video_green,
-         vga_b        => video_blue,
-
-         -- PCM audio
-         pcm_rst      => '0',
-         pcm_clk      => '0',
-         pcm_clken    => '0',
-
-         -- PCM audio is signed
-         pcm_l        => X"0000",
-         pcm_r        => X"0000",
-
-         pcm_acr      => '0',
-         pcm_n        => X"00000",
-         pcm_cts      => X"00000",
-
-         -- TMDS output (parallel)
-         tmds         => video_data
-      ); -- audio_video_to_hdmi_inst
-
-
-   -- serialiser: in this design we use HDMI SelectIO outputs
-
-   hdmi_data_gen : for i in 0 to 2 generate
-   begin
-
-      serialiser_10to1_selectio_data_inst : entity work.serialiser_10to1_selectio
-         port map (
-            rst_i    => video_rst,
-            clk_i    => video_clk,
-            d_i      => video_data(i),
-            clk_x5_i => hdmi_clk,
-            out_p_o  => hdmi_data_p_o(i),
-            out_n_o  => hdmi_data_n_o(i)
-         ); -- serialiser_10to1_selectio_data_inst
-
-   end generate hdmi_data_gen;
-
-
-   serialiser_10to1_selectio_clk_inst : entity work.serialiser_10to1_selectio
-      port map (
-         rst_i    => video_rst,
-         clk_i    => video_clk,
-         clk_x5_i => hdmi_clk,
-         d_i      => "0000011111",
-         out_p_o  => hdmi_clk_p_o,
-         out_n_o  => hdmi_clk_n_o
-      ); -- serialiser_10to1_selectio_clk_inst
+   sys_kbd_start <= sys_key_valid when sys_key_data = X"0D" else
+                    '0';
 
 
    --------------------------------------------------------------------------
@@ -344,7 +257,7 @@ begin
 
    uart_inst : entity work.uart
       generic map (
-         G_DIVISOR => 100000000 / 115200
+         G_DIVISOR => C_CTRL_HZ / C_UART_HZ
       )
       port map (
          clk_i      => sys_clk_i,
@@ -363,6 +276,116 @@ begin
                      '0';
 
    sys_start_o    <= sys_uart_start or sys_kbd_start;
+
+
+   --------------------------------------------------------------------------
+   -- video
+   --------------------------------------------------------------------------
+
+   cdc_video_inst : component xpm_cdc_array_single
+      generic map (
+         WIDTH => G_DIGITS_SIZE
+      )
+      port map (
+         src_clk  => sys_clk_i,
+         src_in   => sys_digits_i,
+         dest_clk => video_clk,
+         dest_out => video_digits
+      ); -- cdc_video_inst
+
+
+   video_wrapper_inst : entity work.video_wrapper
+      generic map (
+         G_DIGITS_SIZE => G_DIGITS_SIZE,
+         G_FONT_PATH   => G_FONT_PATH
+      )
+      port map (
+         video_clk_i    => video_clk,
+         video_rst_i    => video_rst,
+         video_digits_i => video_digits,   -- From HyperRAM trafic generator
+         vga_red_o      => video_red,
+         vga_green_o    => video_green,
+         vga_blue_o     => video_blue,
+         vga_hs_o       => video_hs,
+         vga_vs_o       => video_vs,
+         vga_de_o       => video_de,
+         vdac_clk_o     => vdac_clk_o,
+         vdac_blank_n_o => vdac_blank_n_o,
+         vdac_psave_n_o => vdac_psave_n_o,
+         vdac_sync_n_o  => vdac_sync_n_o
+      ); -- video_wrapper_inst
+
+   vga_red_o   <= video_red;
+   vga_green_o <= video_green;
+   vga_blue_o  <= video_blue;
+   vga_hs_o    <= video_hs;
+   vga_vs_o    <= video_vs;
+
+
+   audio_video_to_hdmi_inst : entity work.audio_video_to_hdmi
+      port map (
+         select_44100 => '0',
+         dvi          => '0',
+         vic          => std_logic_vector(to_unsigned(4,8)), -- CEA/CTA VIC 4=720p @ 60 Hz
+         aspect       => "10",                               -- 01=4:3, 10=16:9
+         pix_rep      => '0',                                -- no pixel repetition
+         vs_pol       => C_VIDEO_MODE.V_POL,                 -- horizontal polarity: positive
+         hs_pol       => C_VIDEO_MODE.H_POL,                 -- vertaical polarity: positive
+
+         vga_rst      => video_rst,                          -- active high reset
+         vga_clk      => video_clk,                          -- video pixel clock
+         vga_vs       => video_vs,
+         vga_hs       => video_hs,
+         vga_de       => video_de,
+         vga_r        => video_red,
+         vga_g        => video_green,
+         vga_b        => video_blue,
+
+         -- PCM audio
+         pcm_rst      => '0',
+         pcm_clk      => '0',
+         pcm_clken    => '0',
+
+         -- PCM audio is signed
+         pcm_l        => X"0000",
+         pcm_r        => X"0000",
+
+         pcm_acr      => '0',
+         pcm_n        => X"00000",
+         pcm_cts      => X"00000",
+
+         -- TMDS output (parallel)
+         tmds         => video_data
+      ); -- audio_video_to_hdmi_inst
+
+
+   -- serialiser: in this design we use HDMI SelectIO outputs
+
+   hdmi_data_gen : for i in 0 to 2 generate
+   begin
+
+      serialiser_10to1_selectio_data_inst : entity work.serialiser_10to1_selectio
+         port map (
+            rst_i    => video_rst,
+            clk_i    => video_clk,
+            d_i      => video_data(i),
+            clk_x5_i => hdmi_clk,
+            out_p_o  => hdmi_data_p_o(i),
+            out_n_o  => hdmi_data_n_o(i)
+         ); -- serialiser_10to1_selectio_data_inst
+
+   end generate hdmi_data_gen;
+
+
+   serialiser_10to1_selectio_clk_inst : entity work.serialiser_10to1_selectio
+      port map (
+         rst_i    => video_rst,
+         clk_i    => video_clk,
+         clk_x5_i => hdmi_clk,
+         d_i      => "0000011111",
+         out_p_o  => hdmi_clk_p_o,
+         out_n_o  => hdmi_clk_n_o
+      ); -- serialiser_10to1_selectio_clk_inst
 
 end architecture synthesis;
 
