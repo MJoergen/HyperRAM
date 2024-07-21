@@ -39,8 +39,8 @@ architecture simulation of tb is
    signal sys_dq_in         : std_logic_vector(7 downto 0);
    signal sys_rwds_out      : std_logic;
    signal sys_dq_out        : std_logic_vector(7 downto 0);
-   signal sys_rwds_oe       : std_logic;
-   signal sys_dq_oe         : std_logic;
+   signal sys_rwds_oe_n     : std_logic;
+   signal sys_dq_oe_n       : std_logic_vector(7 downto 0);
 
    -- HyperRAM simulation device interface
    signal hr_resetn         : std_logic;
@@ -77,7 +77,7 @@ begin
    sys_clk  <= not sys_clk after C_CLK_PERIOD/2;
    sys_rstn <= '0', '1' after 100 * C_CLK_PERIOD;
 
-   clk_inst : entity work.clk
+   clk_controller_inst : entity work.clk_controller
       port map (
          sys_clk_i      => sys_clk,
          sys_rstn_i     => sys_rstn,
@@ -85,7 +85,7 @@ begin
          clk_del_o      => clk_del,
          delay_refclk_o => delay_refclk,
          rst_o          => rst
-      ); -- clk_inst
+      ); -- clk_controller_inst
 
 
    --------------------------------------------------------
@@ -108,7 +108,7 @@ begin
    -- Instantiate core test generator
    --------------------------------------------------------
 
-   i_core : entity work.core
+   i_core_wrapper : entity work.core_wrapper
       generic map (
          G_SYS_ADDRESS_SIZE  => 6,
          G_ADDRESS_SIZE      => 20,
@@ -125,9 +125,28 @@ begin
          hr_resetn_o    => sys_resetn,
          hr_csn_o       => sys_csn,
          hr_ck_o        => sys_ck,
-         hr_rwds_io     => sys_rwds,
-         hr_dq_io       => sys_dq
-      ); -- i_core
+         hr_rwds_in_i   => sys_rwds_in,
+         hr_rwds_out_o  => sys_rwds_out,
+         hr_rwds_oe_n_o => sys_rwds_oe_n,
+         hr_dq_in_i     => sys_dq_in,
+         hr_dq_out_o    => sys_dq_out,
+         hr_dq_oe_n_o   => sys_dq_oe_n
+      ); -- i_core_wrapper
+
+   ----------------------------------
+   -- Tri-state buffers for HyperRAM
+   ----------------------------------
+
+   sys_rwds                 <= sys_rwds_out when sys_rwds_oe_n = '0' else
+                                 'Z';
+
+   sys_dq_gen : for i in 0 to 7 generate
+      sys_dq(i) <= sys_dq_out(i) when sys_dq_oe_n(i) = '0' else
+                     'Z';
+   end generate sys_dq_gen;
+
+   sys_rwds_in <= sys_rwds;
+   sys_dq_in   <= sys_dq;
 
 
    ---------------------------------------------------------

@@ -20,31 +20,25 @@ entity mega65_wrapper is
       G_DIGITS_SIZE : natural
    );
    port (
+      -- MEGA65 I/O ports
       sys_clk_i     : in    std_logic; -- 100 MHz clock
-      sys_rstn_i    : in    std_logic; -- CPU reset button
-
-      -- From HyperRAM trafic generator
+      sys_rst_i     : in    std_logic; -- CPU reset button
+      uart_rx_i     : in    std_logic;
+      uart_tx_o     : out   std_logic;
+      kb_io0_o      : out   std_logic;
+      kb_io1_o      : out   std_logic;
+      kb_io2_i      : in    std_logic;
+      hdmi_data_p_o : out   std_logic_vector(2 downto 0);
+      hdmi_data_n_o : out   std_logic_vector(2 downto 0);
+      hdmi_clk_p_o  : out   std_logic;
+      hdmi_clk_n_o  : out   std_logic;
+      -- Connection to design
       sys_up_o      : out   std_logic;
       sys_left_o    : out   std_logic;
       sys_start_o   : out   std_logic;
       sys_active_i  : in    std_logic;
       sys_error_i   : in    std_logic;
-      sys_digits_i  : in    std_logic_vector(G_DIGITS_SIZE - 1 downto 0);
-
-      -- Interface for physical keyboard
-      kb_io0_o      : out   std_logic;
-      kb_io1_o      : out   std_logic;
-      kb_io2_i      : in    std_logic;
-
-      -- UART
-      uart_rx_i     : in    std_logic;
-      uart_tx_o     : out   std_logic;
-
-      -- Digital Video
-      hdmi_data_p_o : out   std_logic_vector(2 downto 0);
-      hdmi_data_n_o : out   std_logic_vector(2 downto 0);
-      hdmi_clk_p_o  : out   std_logic;
-      hdmi_clk_n_o  : out   std_logic
+      sys_digits_i  : in    std_logic_vector(G_DIGITS_SIZE - 1 downto 0)
    );
 end entity mega65_wrapper;
 
@@ -121,19 +115,19 @@ begin
    -- Generate clocks and reset for MEGA65 platform (keyboard and video)
    --------------------------------------------------------
 
-   clk_mega65_inst : entity work.clk_mega65
+   clk_inst : entity work.clk
       port map (
          sys_clk_i    => sys_clk_i,
-         sys_rstn_i   => sys_rstn_i,
+         sys_rstn_i   => not sys_rst_i,
          kbd_clk_o    => kbd_clk,
          pixel_clk_o  => video_clk,
          pixel_rst_o  => video_rst,
          pixel_clk5_o => hdmi_clk
-      ); -- clk_mega65_inst
+      ); -- clk_inst
 
    xpm_cdc_sync_rst_inst : component xpm_cdc_sync_rst
       port map (
-         src_rst  => not sys_rstn_i,
+         src_rst  => sys_rst_i,
          dest_clk => sys_clk_i,
          dest_rst => sys_rst
       ); -- xpm_cdc_sync_rst_inst

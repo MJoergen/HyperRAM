@@ -85,14 +85,9 @@ begin
          G_DIGITS_SIZE => sys_digits'length
       )
       port map (
+         -- MEGA65 I/O ports
          sys_clk_i     => sys_clk_i,
-         sys_rstn_i    => sys_rstn_i,
-         sys_up_o      => sys_up,
-         sys_left_o    => sys_left,
-         sys_start_o   => sys_start,
-         sys_active_i  => sys_active,
-         sys_error_i   => sys_error,
-         sys_digits_i  => sys_digits,
+         sys_rst_i     => not sys_rstn_i,
          uart_rx_i     => uart_rx_i,
          uart_tx_o     => uart_tx_o,
          kb_io0_o      => kb_io0_o,
@@ -101,7 +96,14 @@ begin
          hdmi_data_p_o => hdmi_data_p_o,
          hdmi_data_n_o => hdmi_data_n_o,
          hdmi_clk_p_o  => hdmi_clk_p_o,
-         hdmi_clk_n_o  => hdmi_clk_n_o
+         hdmi_clk_n_o  => hdmi_clk_n_o,
+         -- Connection to core
+         sys_up_o      => sys_up,
+         sys_left_o    => sys_left,
+         sys_start_o   => sys_start,
+         sys_active_i  => sys_active,
+         sys_error_i   => sys_error,
+         sys_digits_i  => sys_digits
       ); -- mega65_wrapper_inst
 
 
@@ -109,7 +111,7 @@ begin
    -- Generate clocks for HyperRAM controller
    --------------------------------------------------------
 
-   clk_inst : entity work.clk
+   clk_controller_inst : entity work.clk_controller
       port map (
          sys_clk_i      => sys_clk_i,
          sys_rstn_i     => sys_rstn_i,
@@ -117,7 +119,7 @@ begin
          clk_del_o      => hr_clk_del,
          delay_refclk_o => delay_refclk,
          rst_o          => hr_rst
-      ); -- clk_inst
+      ); -- clk_controller_inst
 
 
    --------------------------------------------------------

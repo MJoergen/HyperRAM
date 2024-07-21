@@ -16,7 +16,7 @@ use unisim.vcomponents.all;
 library xpm;
 use xpm.vcomponents.all;
 
-entity clk is
+entity clk_controller is
    port (
       sys_clk_i      : in  std_logic;   -- expects 100 MHz
       sys_rstn_i     : in  std_logic;   -- Asynchronous, asserted low
@@ -25,9 +25,9 @@ entity clk is
       delay_refclk_o : out std_logic;   -- 200 MHz, for IDELAYCTRL
       rst_o          : out std_logic
    );
-end entity clk;
+end entity clk_controller;
 
-architecture synthesis of clk is
+architecture synthesis of clk_controller is
 
    signal clkfb             : std_logic;
    signal clkfb_mmcm        : std_logic;

@@ -7,7 +7,7 @@ use unisim.vcomponents.all;
 library xpm;
 use xpm.vcomponents.all;
 
-entity clk_mega65 is
+entity clk is
    port (
       sys_clk_i    : in  std_logic;   -- expects 100 MHz
       sys_rstn_i   : in  std_logic;   -- Asynchronous, asserted low
@@ -16,9 +16,9 @@ entity clk_mega65 is
       pixel_rst_o  : out std_logic;   -- pixelclock reset, synchronized
       pixel_clk5_o : out std_logic    -- pixelclock (74.25 MHz x 5 = 371.25 MHz) for HDMI
    );
-end entity clk_mega65;
+end entity clk;
 
-architecture synthesis of clk_mega65 is
+architecture synthesis of clk is
 
    signal clkfb           : std_logic;
    signal clkfb_mmcm      : std_logic;
