@@ -11,7 +11,6 @@ entity clk is
    port (
       sys_clk_i    : in  std_logic;   -- expects 100 MHz
       sys_rstn_i   : in  std_logic;   -- Asynchronous, asserted low
-      kbd_clk_o    : out std_logic;   -- 40 MHz
       pixel_clk_o  : out std_logic;   -- 74.25 MHz pixelclock for 720p @ 60 Hz
       pixel_rst_o  : out std_logic;   -- pixelclock reset, synchronized
       pixel_clk5_o : out std_logic    -- pixelclock (74.25 MHz x 5 = 371.25 MHz) for HDMI
@@ -22,7 +21,6 @@ architecture synthesis of clk is
 
    signal clkfb           : std_logic;
    signal clkfb_mmcm      : std_logic;
-   signal kbd_clk_mmcm    : std_logic;
    signal pixel_clk_mmcm  : std_logic;
    signal pixel_clk5_mmcm : std_logic;
    signal locked          : std_logic;
@@ -44,10 +42,6 @@ begin
          CLKFBOUT_MULT_F      => 37.125,     -- f_VCO = (100 MHz / 5) x 37.125 = 742.5 MHz
          CLKFBOUT_PHASE       => 0.000,
          CLKFBOUT_USE_FINE_PS => FALSE,
-         CLKOUT0_DIVIDE_F     => 18.500,     -- 40.135 MHz
-         CLKOUT0_PHASE        => 0.000,
-         CLKOUT0_DUTY_CYCLE   => 0.500,
-         CLKOUT0_USE_FINE_PS  => FALSE,
          CLKOUT1_DIVIDE       => 10,         -- 74.25 MHz
          CLKOUT1_PHASE        => 0.000,
          CLKOUT1_DUTY_CYCLE   => 0.500,
@@ -60,7 +54,7 @@ begin
       port map (
          -- Output clocks
          CLKFBOUT            => clkfb_mmcm,
-         CLKOUT0             => kbd_clk_mmcm,
+         CLKOUT0             => open,
          CLKOUT1             => pixel_clk_mmcm,
          CLKOUT2             => pixel_clk5_mmcm,
          -- Input clock control
@@ -100,12 +94,6 @@ begin
          I => clkfb_mmcm,
          O => clkfb
       ); -- i_bufg_clkfb
-
-   i_bufg_kbd_clk : BUFG
-      port map (
-         I => kbd_clk_mmcm,
-         O => kbd_clk_o
-      ); -- i_bufg_kbd_clk
 
    i_bufg_pixel_clk : BUFG
       port map (

@@ -49,7 +49,6 @@ architecture synthesis of mega65_wrapper is
    constant C_FONT_FILE  : string           := "font8x8.txt";
 
    -- MEGA65 clocks
-   signal   kbd_clk   : std_logic;
    signal   video_clk : std_logic;
    signal   hdmi_clk  : std_logic;
 
@@ -78,11 +77,9 @@ architecture synthesis of mega65_wrapper is
    signal   sys_uart_rx_ready : std_logic;
    signal   sys_uart_rx_data  : std_logic_vector(7 downto 0);
 
-   signal   kbd_up_out     : std_logic;
-   signal   kbd_left_out   : std_logic;
-   signal   kbd_return_out : std_logic;
-   signal   kbd_active     : std_logic;
-   signal   kbd_error      : std_logic;
+   signal   sys_key_valid : std_logic;
+   signal   sys_key_ready : std_logic;
+   signal   sys_key_data  : std_logic_vector(7 downto 0);
 
    signal   sys_uart_start : std_logic;
    signal   sys_kbd_start  : std_logic;
@@ -119,7 +116,6 @@ begin
       port map (
          sys_clk_i    => sys_clk_i,
          sys_rstn_i   => not sys_rst_i,
-         kbd_clk_o    => kbd_clk,
          pixel_clk_o  => video_clk,
          pixel_rst_o  => video_rst,
          pixel_clk5_o => hdmi_clk
@@ -134,50 +130,28 @@ begin
 
 
    --------------------------------------------------------------------------
-   -- keyboard
+   -- Keyboard
    --------------------------------------------------------------------------
 
-   keyboard_inst : entity work.keyboard
-      port map (
-         cpuclock   => kbd_clk,
-         kio8       => kb_io0_o,
-         kio9       => kb_io1_o,
-         kio10      => kb_io2_i,
-         up_out     => kbd_up_out,     -- Active low
-         left_out   => kbd_left_out,   -- Active low
-         return_out => kbd_return_out, -- Active low
-         flopled    => kbd_error,
-         powerled   => kbd_active
-      ); -- keyboard_inst
-
-
-   cdc_start_inst : component xpm_cdc_array_single
+   sys_key_ready <= '1';
+   keyboard_wrapper_inst : entity work.keyboard_wrapper
       generic map (
-         WIDTH => 3
+         G_CTRL_HZ => 100_000_000
       )
       port map (
-         src_clk     => kbd_clk,
-         src_in(0)   => not kbd_up_out,
-         src_in(1)   => not kbd_left_out,
-         src_in(2)   => not kbd_return_out,
-         dest_clk    => sys_clk_i,
-         dest_out(0) => sys_up_o,
-         dest_out(1) => sys_left_o,
-         dest_out(2) => sys_kbd_start
-      ); -- cdc_start_inst
+         ctrl_clk_i        => sys_clk_i,
+         ctrl_rst_i        => sys_rst_i,
+         ctrl_key_valid_o  => sys_key_valid,
+         ctrl_key_ready_i  => sys_key_ready,
+         ctrl_key_data_o   => sys_key_data,
+         ctrl_led_active_i => sys_active_i,
+         ctrl_led_error_i  => sys_error_i,
+         kb_io0_o          => kb_io0_o,
+         kb_io1_o          => kb_io1_o,
+         kb_io2_i          => kb_io2_i
+      ); -- keyboard_wrapper_inst
 
-   cdc_keyboard_inst : component xpm_cdc_array_single
-      generic map (
-         WIDTH => 2
-      )
-      port map (
-         src_clk     => sys_clk_i,
-         src_in(0)   => sys_active_i,
-         src_in(1)   => sys_error_i,
-         dest_clk    => kbd_clk,
-         dest_out(0) => kbd_active,
-         dest_out(1) => kbd_error
-      ); -- cdc_keyboard_inst
+   sys_kbd_start <= sys_key_valid when sys_key_data = X"0D" else '0';
 
 
    --------------------------------------------------------------------------
