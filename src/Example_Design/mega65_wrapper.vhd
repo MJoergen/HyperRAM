@@ -6,7 +6,7 @@
 
 library ieee;
    use ieee.std_logic_1164.all;
-   use ieee.numeric_std.all;
+   use ieee.numeric_std_unsigned.all;
 
 library work;
    use work.video_modes_pkg.all;
@@ -106,6 +106,8 @@ architecture synthesis of mega65_wrapper is
    signal   video_digits : std_logic_vector(G_DIGITS_SIZE - 1 downto 0);
    signal   video_data   : slv_9_0_t(0 to 2);              -- parallel HDMI symbol stream x 3 channels
 
+   signal   video_stat_total : std_logic_vector(31 downto 0);
+
    pure function str2slv (
       str : string
    ) return std_logic_vector is
@@ -113,7 +115,7 @@ architecture synthesis of mega65_wrapper is
    begin
       --
       for i in 0 to str'length-1 loop
-         res_v(8 * i + 7 downto 8 * i) := std_logic_vector(to_unsigned(character'pos(str(str'length - i)), 8));
+         res_v(8 * i + 7 downto 8 * i) := to_stdlogicvector(character'pos(str(str'length - i)), 8);
       end loop;
 
       return res_v;
@@ -293,26 +295,30 @@ begin
          dest_out => video_digits
       ); -- cdc_video_inst
 
+   video_stat_total <= video_digits(127 downto 96) + video_digits(159 downto 128);
 
    video_wrapper_inst : entity work.video_wrapper
       generic map (
-         G_DIGITS_SIZE => G_DIGITS_SIZE,
          G_FONT_PATH   => G_FONT_PATH
       )
       port map (
-         video_clk_i    => video_clk,
-         video_rst_i    => video_rst,
-         video_digits_i => video_digits,   -- From HyperRAM trafic generator
-         vga_red_o      => video_red,
-         vga_green_o    => video_green,
-         vga_blue_o     => video_blue,
-         vga_hs_o       => video_hs,
-         vga_vs_o       => video_vs,
-         vga_de_o       => video_de,
-         vdac_clk_o     => vdac_clk_o,
-         vdac_blank_n_o => vdac_blank_n_o,
-         vdac_psave_n_o => vdac_psave_n_o,
-         vdac_sync_n_o  => vdac_sync_n_o
+         video_clk_i           => video_clk,
+         video_rst_i           => video_rst,
+         video_stat_total_i    => video_stat_total,
+         video_stat_error_i    => video_digits(191 downto 160),
+         video_stat_err_addr_i => video_digits(63 downto 32),
+         video_stat_err_exp_i  => X"00000000" & video_digits(95 downto 64),
+         video_stat_err_read_i => X"00000000" & video_digits(31 downto 0),
+         vga_red_o             => video_red,
+         vga_green_o           => video_green,
+         vga_blue_o            => video_blue,
+         vga_hs_o              => video_hs,
+         vga_vs_o              => video_vs,
+         vga_de_o              => video_de,
+         vdac_clk_o            => vdac_clk_o,
+         vdac_blank_n_o        => vdac_blank_n_o,
+         vdac_psave_n_o        => vdac_psave_n_o,
+         vdac_sync_n_o         => vdac_sync_n_o
       ); -- video_wrapper_inst
 
    vga_red_o   <= video_red;
@@ -326,14 +332,14 @@ begin
       port map (
          select_44100 => '0',
          dvi          => '0',
-         vic          => std_logic_vector(to_unsigned(4,8)), -- CEA/CTA VIC 4=720p @ 60 Hz
-         aspect       => "10",                               -- 01=4:3, 10=16:9
-         pix_rep      => '0',                                -- no pixel repetition
-         vs_pol       => C_VIDEO_MODE.V_POL,                 -- horizontal polarity: positive
-         hs_pol       => C_VIDEO_MODE.H_POL,                 -- vertaical polarity: positive
+         vic          => to_stdlogicvector(4,8), -- CEA/CTA VIC 4=720p @ 60 Hz
+         aspect       => "10",                   -- 01=4:3, 10=16:9
+         pix_rep      => '0',                    -- no pixel repetition
+         vs_pol       => C_VIDEO_MODE.V_POL,     -- horizontal polarity: positive
+         hs_pol       => C_VIDEO_MODE.H_POL,     -- vertaical polarity: positive
 
-         vga_rst      => video_rst,                          -- active high reset
-         vga_clk      => video_clk,                          -- video pixel clock
+         vga_rst      => video_rst,              -- active high reset
+         vga_clk      => video_clk,              -- video pixel clock
          vga_vs       => video_vs,
          vga_hs       => video_hs,
          vga_de       => video_de,
