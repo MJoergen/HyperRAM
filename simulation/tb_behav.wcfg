@@ -13,17 +13,18 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="782.383564 us"></ZoomEndTime>
+      <ZoomEndTime time="301.000001 us"></ZoomEndTime>
       <Cursor1Time time="301.000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="253"></NameColumnWidth>
-      <ValueColumnWidth column_width="92"></ValueColumnWidth>
+      <ValueColumnWidth column_width="82"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="2" />
    <wvobject type="group" fp_name="group127">
       <obj_property name="label">tb</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject type="logic" fp_name="/tb/sys_clk">
          <obj_property name="ElementShortName">sys_clk</obj_property>
          <obj_property name="ObjectShortName">sys_clk</obj_property>
@@ -43,14 +44,6 @@
       <wvobject type="logic" fp_name="/tb/tb_start">
          <obj_property name="ElementShortName">tb_start</obj_property>
          <obj_property name="ObjectShortName">tb_start</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/count_long">
-         <obj_property name="ElementShortName">count_long[31:0]</obj_property>
-         <obj_property name="ObjectShortName">count_long[31:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/count_short">
-         <obj_property name="ElementShortName">count_short[31:0]</obj_property>
-         <obj_property name="ObjectShortName">count_short[31:0]</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb/sys_resetn">
          <obj_property name="ElementShortName">sys_resetn</obj_property>

@@ -26,10 +26,6 @@ architecture simulation of tb is
 
    signal tb_start          : std_logic;
 
-   -- Statistics
-   signal count_long        : unsigned(31 downto 0);
-   signal count_short       : unsigned(31 downto 0);
-
    signal sys_resetn        : std_logic;
    signal sys_csn           : std_logic;
    signal sys_ck            : std_logic;
@@ -80,11 +76,11 @@ begin
    clk_controller_inst : entity work.clk_controller
       port map (
          sys_clk_i      => sys_clk,
-         sys_rstn_i     => sys_rstn,
+         sys_rst_i      => not sys_rstn,
          clk_o          => clk,
+         rst_o          => rst,
          clk_del_o      => clk_del,
-         delay_refclk_o => delay_refclk,
-         rst_o          => rst
+         delay_refclk_o => delay_refclk
       ); -- clk_controller_inst
 
 
@@ -115,22 +111,26 @@ begin
          G_DATA_SIZE         => 64
       )
       port map (
-         clk_i          => clk,
-         clk_del_i      => clk_del,
-         delay_refclk_i => delay_refclk,
-         rst_i          => rst,
-         start_i        => tb_start,
-         count_long_o   => count_long,
-         count_short_o  => count_short,
-         hr_resetn_o    => sys_resetn,
-         hr_csn_o       => sys_csn,
-         hr_ck_o        => sys_ck,
-         hr_rwds_in_i   => sys_rwds_in,
-         hr_rwds_out_o  => sys_rwds_out,
-         hr_rwds_oe_n_o => sys_rwds_oe_n,
-         hr_dq_in_i     => sys_dq_in,
-         hr_dq_out_o    => sys_dq_out,
-         hr_dq_oe_n_o   => sys_dq_oe_n
+         clk_i           => clk,
+         rst_i           => rst,
+         clk_del_i       => clk_del,
+         delay_refclk_i  => delay_refclk,
+         start_i         => tb_start,
+         active_o        => open,
+         stat_total_o    => open,
+         stat_error_o    => open,
+         stat_err_addr_o => open,
+         stat_err_exp_o  => open,
+         stat_err_read_o => open,
+         hr_resetn_o     => sys_resetn,
+         hr_csn_o        => sys_csn,
+         hr_ck_o         => sys_ck,
+         hr_rwds_in_i    => sys_rwds_in,
+         hr_rwds_out_o   => sys_rwds_out,
+         hr_rwds_oe_n_o  => sys_rwds_oe_n,
+         hr_dq_in_i      => sys_dq_in,
+         hr_dq_out_o     => sys_dq_out,
+         hr_dq_oe_n_o    => sys_dq_oe_n
       ); -- i_core_wrapper
 
    ----------------------------------

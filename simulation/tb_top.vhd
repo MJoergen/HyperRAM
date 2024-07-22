@@ -15,8 +15,8 @@ architecture simulation of tb_top is
 
    constant C_DELAY : time := 1 ns;
 
-   signal sys_clk   : std_logic := '1';
-   signal sys_reset : std_logic := '1';
+   signal sys_clk : std_logic := '1';
+   signal sys_rst : std_logic := '1';
 
    signal sys_resetn   : std_logic;
    signal sys_csn      : std_logic;
@@ -62,31 +62,42 @@ begin
    -- Generate clock and reset
    ---------------------------------------------------------
 
-   sys_clk   <= not sys_clk after 5 ns;
-   sys_reset <= '1', '0' after 1000 ns;
+   sys_clk <= not sys_clk after 5 ns;
+   sys_rst <= '1', '0' after 1000 ns;
 
 
    --------------------------------------------------------
    -- Instantiate DUT
    --------------------------------------------------------
 
-   top_inst : entity work.top
+   hyperram_mega65r6_inst : entity work.hyperram_mega65r6
       port map (
-         clk         => sys_clk,
-         reset       => sys_reset,
-         hr_resetn   => sys_resetn,
-         hr_csn      => sys_csn,
-         hr_ck       => sys_ck,
-         hr_rwds     => sys_rwds,
-         hr_dq       => sys_dq,
-         kb_io0      => open,
-         kb_io1      => open,
-         kb_io2      => '0',
-         hdmi_data_p => open,
-         hdmi_data_n => open,
-         hdmi_clk_p  => open,
-         hdmi_clk_n  => open
-      ); -- top_inst
+         sys_clk_i      => sys_clk,
+         sys_rst_i      => sys_rst,
+         hr_resetn_o    => sys_resetn,
+         hr_csn_o       => sys_csn,
+         hr_ck_o        => sys_ck,
+         hr_rwds_io     => sys_rwds,
+         hr_dq_io       => sys_dq,
+         kb_io0_o       => open,
+         kb_io1_o       => open,
+         kb_io2_i       => '0',
+         uart_rx_i      => '1',
+         uart_tx_o      => open,
+         vga_red_o      => open,
+         vga_green_o    => open,
+         vga_blue_o     => open,
+         vga_hs_o       => open,
+         vga_vs_o       => open,
+         vdac_clk_o     => open,
+         vdac_blank_n_o => open,
+         vdac_psave_n_o => open,
+         vdac_sync_n_o  => open,
+         hdmi_data_p_o  => open,
+         hdmi_data_n_o  => open,
+         hdmi_clk_p_o   => open,
+         hdmi_clk_n_o   => open
+      ); -- hyperram_mega65r6_inst
 
 
    ---------------------------------------------------------
