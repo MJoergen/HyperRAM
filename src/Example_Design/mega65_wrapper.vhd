@@ -62,12 +62,14 @@ architecture synthesis of mega65_wrapper is
    constant C_FONT_FILE  : string           := "font8x8.txt";
 
    -- MEGA65 clocks
+   signal   ctrl_clk  : std_logic;
    signal   video_clk : std_logic;
    signal   hdmi_clk  : std_logic;
 
    -- resets
    signal   sys_rst   : std_logic;
    signal   sys_rst_d : std_logic;
+   signal   ctrl_rst  : std_logic;
    signal   video_rst : std_logic;
 
    signal   sys_active_d   : std_logic;
@@ -166,11 +168,13 @@ begin
 
    clk_inst : entity work.clk
       port map (
-         sys_clk_i    => sys_clk_i,
-         sys_rstn_i   => not sys_rst_i,
-         pixel_clk_o  => video_clk,
-         pixel_rst_o  => video_rst,
-         pixel_clk5_o => hdmi_clk
+         sys_clk_i   => sys_clk_i,
+         sys_rst_i   => sys_rst_i,
+         ctrl_clk_o  => ctrl_clk,
+         ctrl_rst_o  => ctrl_rst,
+         video_clk_o => video_clk,
+         video_rst_o => video_rst,
+         hdmi_clk_o  => hdmi_clk
       ); -- clk_inst
 
    xpm_cdc_sync_rst_inst : component xpm_cdc_sync_rst
