@@ -13,33 +13,30 @@ entity core_wrapper is
       G_DATA_SIZE        : integer
    );
    port (
-      clk_i          : in    std_logic; -- Main clock
-      clk_del_i      : in    std_logic; -- Main clock, phase shifted
-      delay_refclk_i : in    std_logic; -- 200 MHz
-      rst_i          : in    std_logic; -- Synchronous reset
+      clk_i           : in    std_logic; -- Main clock
+      clk_del_i       : in    std_logic; -- Main clock, phase shifted
+      delay_refclk_i  : in    std_logic; -- 200 MHz
+      rst_i           : in    std_logic; -- Synchronous reset
 
       -- Control and Status for trafic generator
-      start_i        : in    std_logic;
-      active_o       : out   std_logic;
-      address_o      : out   std_logic_vector(31 downto 0);
-      data_exp_o     : out   std_logic_vector(63 downto 0);
-      data_read_o    : out   std_logic_vector(63 downto 0);
-
-      -- Statistics
-      count_long_o   : out   unsigned(31 downto 0);
-      count_short_o  : out   unsigned(31 downto 0);
-      count_error_o  : out   std_logic_vector(31 downto 0);
+      start_i         : in    std_logic;
+      active_o        : out   std_logic;
+      stat_total_o    : out   std_logic_vector(31 downto 0);
+      stat_error_o    : out   std_logic_vector(31 downto 0);
+      stat_err_addr_o : out   std_logic_vector(31 downto 0);
+      stat_err_exp_o  : out   std_logic_vector(63 downto 0);
+      stat_err_read_o : out   std_logic_vector(63 downto 0);
 
       -- HyperRAM device interface
-      hr_resetn_o    : out   std_logic;
-      hr_csn_o       : out   std_logic;
-      hr_ck_o        : out   std_logic;
-      hr_rwds_in_i   : in    std_logic;
-      hr_rwds_out_o  : out   std_logic;
-      hr_rwds_oe_n_o : out   std_logic;
-      hr_dq_in_i     : in    std_logic_vector(7 downto 0);
-      hr_dq_out_o    : out   std_logic_vector(7 downto 0);
-      hr_dq_oe_n_o   : out   std_logic_vector(7 downto 0)
+      hr_resetn_o     : out   std_logic;
+      hr_csn_o        : out   std_logic;
+      hr_ck_o         : out   std_logic;
+      hr_rwds_in_i    : in    std_logic;
+      hr_rwds_out_o   : out   std_logic;
+      hr_rwds_oe_n_o  : out   std_logic;
+      hr_dq_in_i      : in    std_logic_vector(7 downto 0);
+      hr_dq_out_o     : out   std_logic_vector(7 downto 0);
+      hr_dq_oe_n_o    : out   std_logic_vector(7 downto 0)
    );
 end entity core_wrapper;
 
@@ -74,8 +71,8 @@ architecture synthesis of core_wrapper is
 
 begin
 
-   count_long_o  <= count_long  - start_long;
-   count_short_o <= count_short - start_short;
+   stat_total_o <= std_logic_vector(count_long - start_long +
+                                    count_short - start_short);
 
    start_proc : process (clk_i)
    begin
@@ -104,10 +101,10 @@ begin
          rst_i               => rst_i,
          start_i             => start_i,
          wait_o              => active_o,
-         address_o           => address_o(G_SYS_ADDRESS_SIZE - 1 downto 0),
-         data_exp_o          => data_exp_o(G_DATA_SIZE - 1 downto 0),
-         data_read_o         => data_read_o(G_DATA_SIZE - 1 downto 0),
-         count_error_o       => count_error_o,
+         address_o           => stat_err_addr_o(G_SYS_ADDRESS_SIZE - 1 downto 0),
+         data_exp_o          => stat_err_exp_o(G_DATA_SIZE - 1 downto 0),
+         data_read_o         => stat_err_read_o(G_DATA_SIZE - 1 downto 0),
+         count_error_o       => stat_error_o,
          avm_waitrequest_i   => avm_waitrequest,
          avm_write_o         => avm_write,
          avm_read_o          => avm_read,

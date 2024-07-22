@@ -29,7 +29,6 @@ entity video_wrapper is
       vga_blue_o     : out   std_logic_vector(7 downto 0);
       vga_hs_o       : out   std_logic;
       vga_vs_o       : out   std_logic;
-      vga_de_o       : out   std_logic;
       vdac_clk_o     : out   std_logic;
       vdac_blank_n_o : out   std_logic;
       vdac_psave_n_o : out   std_logic;
@@ -46,6 +45,8 @@ architecture synthesis of video_wrapper is
    -- video mode selection: 720p @ 60 Hz
    constant C_VIDEO_MODE : video_modes_type := C_VIDEO_MODE_1280_720_60;
    constant C_FONT_FILE  : string           := G_FONT_PATH & "font8x8.txt";
+
+   signal   vga_de     : std_logic;
 
    signal   video_hcount : std_logic_vector(10 downto 0);
    signal   video_vcount : std_logic_vector(10 downto 0);
@@ -64,7 +65,7 @@ begin
          rst_i     => video_rst_i,
          vs_o      => vga_vs_o,
          hs_o      => vga_hs_o,
-         de_o      => vga_de_o,
+         de_o      => vga_de,
          pixel_x_o => video_hcount,
          pixel_y_o => video_vcount
       ); -- video_sync_inst
@@ -78,7 +79,7 @@ begin
          video_clk_i    => video_clk_i,
          video_hcount_i => video_hcount,
          video_vcount_i => video_vcount,
-         video_blank_i  => not vga_de_o,
+         video_blank_i  => not vga_de,
          video_rgb_o    => video_rgb,
          video_x_o      => video_pos_x_o,
          video_y_o      => video_pos_y_o,
@@ -109,7 +110,7 @@ begin
          vga_clk      => video_clk_i,            -- video pixel clock
          vga_vs       => vga_vs_o,
          vga_hs       => vga_hs_o,
-         vga_de       => vga_de_o,
+         vga_de       => vga_de,
          vga_r        => vga_red_o,
          vga_g        => vga_green_o,
          vga_b        => vga_blue_o,
