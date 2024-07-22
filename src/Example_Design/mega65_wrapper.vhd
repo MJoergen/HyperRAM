@@ -10,7 +10,6 @@ library ieee;
 
 library work;
    use work.video_modes_pkg.all;
-   use work.types_pkg.all;
 
 library xpm;
    use xpm.vcomponents.all;
@@ -103,7 +102,6 @@ architecture synthesis of mega65_wrapper is
    signal   video_green  : std_logic_vector(7 downto 0);
    signal   video_blue   : std_logic_vector(7 downto 0);
    signal   video_digits : std_logic_vector(G_DIGITS_SIZE - 1 downto 0);
-   signal   video_data   : slv_9_0_t(0 to 2);              -- parallel HDMI symbol stream x 3 channels
 
    signal   video_stat_total    : std_logic_vector(31 downto 0);
    signal   video_stat_error    : std_logic_vector(31 downto 0);
@@ -312,7 +310,7 @@ begin
 
 
    --------------------------------------------------------------------------
-   -- video
+   -- Video
    --------------------------------------------------------------------------
 
    cdc_video_inst : component xpm_cdc_array_single
@@ -371,6 +369,7 @@ begin
          video_pos_y_o  => video_pos_y,
          video_char_i   => video_char,
          video_colors_i => video_colors,
+         hdmi_clk_i     => hdmi_clk,
          vga_red_o      => video_red,
          vga_green_o    => video_green,
          vga_blue_o     => video_blue,
@@ -380,7 +379,11 @@ begin
          vdac_clk_o     => vdac_clk_o,
          vdac_blank_n_o => vdac_blank_n_o,
          vdac_psave_n_o => vdac_psave_n_o,
-         vdac_sync_n_o  => vdac_sync_n_o
+         vdac_sync_n_o  => vdac_sync_n_o,
+         hdmi_data_p_o  => hdmi_data_p_o,
+         hdmi_data_n_o  => hdmi_data_n_o,
+         hdmi_clk_p_o   => hdmi_clk_p_o,
+         hdmi_clk_n_o   => hdmi_clk_n_o
       ); -- video_wrapper_inst
 
    vga_red_o   <= video_red;
@@ -388,72 +391,6 @@ begin
    vga_blue_o  <= video_blue;
    vga_hs_o    <= video_hs;
    vga_vs_o    <= video_vs;
-
-
-   audio_video_to_hdmi_inst : entity work.audio_video_to_hdmi
-      port map (
-         select_44100 => '0',
-         dvi          => '0',
-         vic          => to_stdlogicvector(4,8), -- CEA/CTA VIC 4=720p @ 60 Hz
-         aspect       => "10",                   -- 01=4:3, 10=16:9
-         pix_rep      => '0',                    -- no pixel repetition
-         vs_pol       => C_VIDEO_MODE.V_POL,     -- horizontal polarity: positive
-         hs_pol       => C_VIDEO_MODE.H_POL,     -- vertaical polarity: positive
-
-         vga_rst      => video_rst,              -- active high reset
-         vga_clk      => video_clk,              -- video pixel clock
-         vga_vs       => video_vs,
-         vga_hs       => video_hs,
-         vga_de       => video_de,
-         vga_r        => video_red,
-         vga_g        => video_green,
-         vga_b        => video_blue,
-
-         -- PCM audio
-         pcm_rst      => '0',
-         pcm_clk      => '0',
-         pcm_clken    => '0',
-
-         -- PCM audio is signed
-         pcm_l        => X"0000",
-         pcm_r        => X"0000",
-
-         pcm_acr      => '0',
-         pcm_n        => X"00000",
-         pcm_cts      => X"00000",
-
-         -- TMDS output (parallel)
-         tmds         => video_data
-      ); -- audio_video_to_hdmi_inst
-
-
-   -- serialiser: in this design we use HDMI SelectIO outputs
-
-   hdmi_data_gen : for i in 0 to 2 generate
-   begin
-
-      serialiser_10to1_selectio_data_inst : entity work.serialiser_10to1_selectio
-         port map (
-            rst_i    => video_rst,
-            clk_i    => video_clk,
-            d_i      => video_data(i),
-            clk_x5_i => hdmi_clk,
-            out_p_o  => hdmi_data_p_o(i),
-            out_n_o  => hdmi_data_n_o(i)
-         ); -- serialiser_10to1_selectio_data_inst
-
-   end generate hdmi_data_gen;
-
-
-   serialiser_10to1_selectio_clk_inst : entity work.serialiser_10to1_selectio
-      port map (
-         rst_i    => video_rst,
-         clk_i    => video_clk,
-         clk_x5_i => hdmi_clk,
-         d_i      => "0000011111",
-         out_p_o  => hdmi_clk_p_o,
-         out_n_o  => hdmi_clk_n_o
-      ); -- serialiser_10to1_selectio_clk_inst
 
 end architecture synthesis;
 
