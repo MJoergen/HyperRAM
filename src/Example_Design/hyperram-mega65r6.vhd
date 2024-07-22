@@ -118,12 +118,12 @@ begin
          hdmi_clk_p_o   => hdmi_clk_p_o,
          hdmi_clk_n_o   => hdmi_clk_n_o,
          -- Connection to core
-         sys_up_o       => open,
-         sys_left_o     => open,
-         sys_start_o    => ctrl_start,
-         sys_active_i   => ctrl_active,
-         sys_error_i    => ctrl_error,
-         sys_digits_i   => ctrl_digits
+         ctrl_clk_o     => ctrl_clk,
+         ctrl_rst_o     => ctrl_rst,
+         ctrl_start_o   => ctrl_start,
+         ctrl_active_i  => ctrl_active,
+         ctrl_error_i   => ctrl_error,
+         ctrl_digits_i  => ctrl_digits
       ); -- mega65_wrapper_inst
 
 
@@ -133,10 +133,10 @@ begin
 
    clk_controller_inst : entity work.clk_controller
       port map (
-         sys_clk_i      => sys_clk_i,
-         sys_rst_i      => sys_rst_i,
-         clk_o          => ctrl_clk,
-         rst_o          => ctrl_rst,
+         sys_clk_i      => ctrl_clk,
+         sys_rst_i      => ctrl_rst,
+         clk_o          => open,
+         rst_o          => open,
          clk_del_o      => ctrl_clk_del,
          delay_refclk_o => delay_refclk
       ); -- clk_controller_inst
@@ -196,8 +196,8 @@ begin
    -- Tri-state buffers for HyperRAM
    ----------------------------------
 
-   hr_rwds_io                 <= hr_rwds_out when hr_rwds_oe_n = '0' else
-                                 'Z';
+   hr_rwds_io                  <= hr_rwds_out when hr_rwds_oe_n = '0' else
+                                  'Z';
 
    hr_dq_gen : for i in 0 to 7 generate
       hr_dq_io(i) <= hr_dq_out(i) when hr_dq_oe_n(i) = '0' else
