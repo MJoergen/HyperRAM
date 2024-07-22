@@ -1,3 +1,12 @@
+-- This module is a RAM test.
+--
+-- It generates a random sequence of WRITE and READ operations.
+-- Burstcount is always 1, but byteenable varies randomly as well.
+-- The module keeps a shadow copy of the memory, and uses that
+-- to verify the values received during READ operations.
+--
+-- Created by Michael Jørgensen in 2023
+
 library ieee;
    use ieee.std_logic_1164.all;
    use ieee.numeric_std_unsigned.all;
@@ -20,11 +29,12 @@ entity avm_verifier is
       avm_readdata_i      : in    std_logic_vector(G_DATA_SIZE - 1 downto 0);
       avm_readdatavalid_i : in    std_logic;
       avm_waitrequest_i   : in    std_logic;
-      -- Debug output
-      count_error_o       : out   std_logic_vector(31 downto 0);
-      address_o           : out   std_logic_vector(G_ADDRESS_SIZE - 1 downto 0);
-      data_exp_o          : out   std_logic_vector(G_DATA_SIZE - 1 downto 0);
-      data_read_o         : out   std_logic_vector(G_DATA_SIZE - 1 downto 0)
+      -- Statistics output
+      stat_total_o        : out   std_logic_vector(31 downto 0);
+      stat_error_o        : out   std_logic_vector(31 downto 0);
+      stat_err_addr_o     : out   std_logic_vector(G_ADDRESS_SIZE - 1 downto 0);
+      stat_err_exp_o      : out   std_logic_vector(G_DATA_SIZE - 1 downto 0);
+      stat_err_read_o     : out   std_logic_vector(G_DATA_SIZE - 1 downto 0)
    );
 end entity avm_verifier;
 
@@ -104,25 +114,32 @@ begin
    verifier_proc : process (clk_i)
    begin
       if rising_edge(clk_i) then
+         if avm_waitrequest_i = '0' and (avm_write_i = '1' or avm_read_i = '1') then
+            stat_total_o <= stat_total_o + 1;
+         end if;
          if avm_readdatavalid_i = '1' then
             assert afs_m_valid = '1' -- Check FIFO not empty
                report "Spurious readdatavalid";
             if avm_readdata_i /= afs_m_data then
-               if count_error_o = 0 then
-                  address_o   <= avm_address_i;
-                  data_exp_o  <= afs_m_data;
-                  data_read_o <= avm_readdata_i;
+               if stat_error_o = 0 then
+                  stat_err_addr_o <= avm_address_i;
+                  stat_err_exp_o  <= afs_m_data;
+                  stat_err_read_o <= avm_readdata_i;
                end if;
+               stat_error_o <= stat_error_o + 1;
                assert false
                   report "ERROR at Address " & to_hstring(avm_address_i) &
                          ". Expected " & to_hstring(afs_m_data) &
                          ", read " & to_hstring(avm_readdata_i)
                   severity failure;
-               count_error_o <= count_error_o + 1;
             end if;
          end if;
          if rst_i = '1' then
-            count_error_o <= (others => '0');
+            stat_total_o    <= (others => '0');
+            stat_error_o    <= (others => '0');
+            stat_err_addr_o <= (others => '0');
+            stat_err_exp_o  <= (others => '0');
+            stat_err_read_o <= (others => '0');
          end if;
       end if;
    end process verifier_proc;

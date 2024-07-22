@@ -1,4 +1,4 @@
--- This is the core test
+-- This is the wrapper for the test generator and HyperRAM controller.
 --
 -- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
 
@@ -13,14 +13,16 @@ entity core_wrapper is
       G_DATA_SIZE        : integer
    );
    port (
-      clk_i           : in    std_logic; -- Main clock
+      clk_i           : in    std_logic; -- Main controller clock
+      rst_i           : in    std_logic; -- Synchronous reset, active high
       clk_del_i       : in    std_logic; -- Main clock, phase shifted
       delay_refclk_i  : in    std_logic; -- 200 MHz
-      rst_i           : in    std_logic; -- Synchronous reset
 
       -- Control and Status for trafic generator
       start_i         : in    std_logic;
       active_o        : out   std_logic;
+
+      -- Statistics output from verifier
       stat_total_o    : out   std_logic_vector(31 downto 0);
       stat_error_o    : out   std_logic_vector(31 downto 0);
       stat_err_addr_o : out   std_logic_vector(31 downto 0);
@@ -63,29 +65,7 @@ architecture synthesis of core_wrapper is
    signal dec_readdata      : std_logic_vector(15 downto 0);
    signal dec_readdatavalid : std_logic;
 
-   signal active_d    : std_logic;
-   signal start_long  : unsigned(31 downto 0);
-   signal start_short : unsigned(31 downto 0);
-   signal count_long  : unsigned(31 downto 0);
-   signal count_short : unsigned(31 downto 0);
-
 begin
-
-   stat_total_o <= std_logic_vector(count_long - start_long +
-                                    count_short - start_short);
-
-   start_proc : process (clk_i)
-   begin
-      if rising_edge(clk_i) then
-         active_d <= active_o;
-
-         if active_d = '0' and active_o = '1' then
-            start_long  <= count_long;
-            start_short <= count_short;
-         end if;
-      end if;
-   end process start_proc;
-
 
    --------------------------------------------------------
    -- Instantiate trafic generator
@@ -101,10 +81,11 @@ begin
          rst_i               => rst_i,
          start_i             => start_i,
          wait_o              => active_o,
-         address_o           => stat_err_addr_o(G_SYS_ADDRESS_SIZE - 1 downto 0),
-         data_exp_o          => stat_err_exp_o(G_DATA_SIZE - 1 downto 0),
-         data_read_o         => stat_err_read_o(G_DATA_SIZE - 1 downto 0),
-         count_error_o       => stat_error_o,
+         stat_total_o        => stat_total_o,
+         stat_error_o        => stat_error_o,
+         stat_err_addr_o     => stat_err_addr_o(G_SYS_ADDRESS_SIZE - 1 downto 0),
+         stat_err_exp_o      => stat_err_exp_o(G_DATA_SIZE - 1 downto 0),
+         stat_err_read_o     => stat_err_read_o(G_DATA_SIZE - 1 downto 0),
          avm_waitrequest_i   => avm_waitrequest,
          avm_write_o         => avm_write,
          avm_read_o          => avm_read,
@@ -115,6 +96,11 @@ begin
          avm_readdata_i      => avm_readdata,
          avm_readdatavalid_i => avm_readdatavalid
       ); -- traffic_gen_inst
+
+   stat_err_addr_o(31 downto G_SYS_ADDRESS_SIZE) <= (others => '0');
+   stat_err_exp_o(63 downto G_DATA_SIZE)         <= (others => '0');
+   stat_err_read_o(63 downto G_DATA_SIZE)        <= (others => '0');
+
 
    decrease_gen : if G_DATA_SIZE > 16 generate
 
@@ -183,8 +169,8 @@ begin
          avm_burstcount_i    => dec_burstcount,
          avm_readdata_o      => dec_readdata,
          avm_readdatavalid_o => dec_readdatavalid,
-         count_long_o        => count_long,
-         count_short_o       => count_short,
+         count_long_o        => open,
+         count_short_o       => open,
          hr_resetn_o         => hr_resetn_o,
          hr_csn_o            => hr_csn_o,
          hr_ck_o             => hr_ck_o,

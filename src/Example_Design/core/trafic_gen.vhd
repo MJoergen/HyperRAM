@@ -1,7 +1,7 @@
 -- This module is a simple kind of RAM test.
--- It fills the HyperRAM with pseudo-random data,
+-- It fills the memory with pseudo-random data,
 -- and verifies the data can be read back again.
--- It exercises the HyperRAM using various burst modes.
+-- It exercises the memory using various burst modes.
 --
 -- Created by Michael Jørgensen in 2022 (mjoergen.github.io/HyperRAM).
 
@@ -20,7 +20,7 @@ entity trafic_gen is
       start_i             : in    std_logic;
       wait_o              : out   std_logic;
 
-      -- Connect to HyperRAM controller
+      -- Connect to memory controller
       avm_write_o         : out   std_logic;
       avm_read_o          : out   std_logic;
       avm_address_o       : out   std_logic_vector(G_ADDRESS_SIZE - 1 downto 0);
@@ -31,11 +31,12 @@ entity trafic_gen is
       avm_readdatavalid_i : in    std_logic;
       avm_waitrequest_i   : in    std_logic;
 
-      -- Debug output
-      address_o           : out   std_logic_vector(G_ADDRESS_SIZE - 1 downto 0);
-      data_exp_o          : out   std_logic_vector(G_DATA_SIZE - 1 downto 0);
-      data_read_o         : out   std_logic_vector(G_DATA_SIZE - 1 downto 0);
-      count_error_o       : out   std_logic_vector(31 downto 0)
+      -- Statistics output
+      stat_total_o        : out   std_logic_vector(31 downto 0);
+      stat_error_o        : out   std_logic_vector(31 downto 0);
+      stat_err_addr_o     : out   std_logic_vector(G_ADDRESS_SIZE - 1 downto 0);
+      stat_err_exp_o      : out   std_logic_vector(G_DATA_SIZE - 1 downto 0);
+      stat_err_read_o     : out   std_logic_vector(G_DATA_SIZE - 1 downto 0)
    );
 end entity trafic_gen;
 
@@ -87,7 +88,7 @@ begin
       )
       port map (
          clk_i               => clk_i,
-         rst_i               => rst_i,
+         rst_i               => rst_i or start_i,
          avm_write_i         => avm_write,
          avm_read_i          => avm_read,
          avm_address_i       => avm_address,
@@ -97,10 +98,11 @@ begin
          avm_readdata_i      => avm_readdata,
          avm_readdatavalid_i => avm_readdatavalid,
          avm_waitrequest_i   => avm_waitrequest,
-         count_error_o       => count_error_o,
-         address_o           => address_o,
-         data_exp_o          => data_exp_o,
-         data_read_o         => data_read_o
+         stat_total_o        => stat_total_o,
+         stat_error_o        => stat_error_o,
+         stat_err_addr_o     => stat_err_addr_o,
+         stat_err_exp_o      => stat_err_exp_o,
+         stat_err_read_o     => stat_err_read_o
       ); -- avm_verifier_inst
 
 
