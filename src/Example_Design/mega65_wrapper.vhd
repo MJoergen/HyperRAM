@@ -106,7 +106,23 @@ architecture synthesis of mega65_wrapper is
    signal   video_digits : std_logic_vector(G_DIGITS_SIZE - 1 downto 0);
    signal   video_data   : slv_9_0_t(0 to 2);              -- parallel HDMI symbol stream x 3 channels
 
-   signal   video_stat_total : std_logic_vector(31 downto 0);
+   signal   video_stat_total    : std_logic_vector(31 downto 0);
+   signal   video_stat_error    : std_logic_vector(31 downto 0);
+   signal   video_stat_err_addr : std_logic_vector(31 downto 0);
+   signal   video_stat_err_exp  : std_logic_vector(63 downto 0);
+   signal   video_stat_err_read : std_logic_vector(63 downto 0);
+
+   signal   video_pos_x  : std_logic_vector(7 downto 0);
+   signal   video_pos_y  : std_logic_vector(7 downto 0);
+   signal   video_char   : std_logic_vector(7 downto 0);
+   signal   video_colors : std_logic_vector(15 downto 0);
+
+   constant C_POS_X : natural               := 10;
+   constant C_POS_Y : natural               := 10;
+
+   signal   video_result_data : std_logic_vector(1023 downto 0);
+
+   -- Convert ASCII string to std_logic_vector
 
    pure function str2slv (
       str : string
@@ -120,6 +136,27 @@ architecture synthesis of mega65_wrapper is
 
       return res_v;
    end function str2slv;
+
+   -- Convert std_logic_vector to ASCII
+
+   pure function hexify (
+      arg : std_logic_vector
+   ) return std_logic_vector is
+      variable val_v : integer range 0 to 15;
+      variable res_v : std_logic_vector(arg'length * 2 - 1 downto 0);
+   begin
+      --
+      for i in arg'length / 4 - 1 downto 0 loop
+         val_v := to_integer(arg(arg'right + 4 * i + 3 downto arg'right + 4 * i));
+         if val_v < 10 then
+            res_v(8 * i + 7 downto 8 * i) := to_stdlogicvector(val_v + character'pos('0'), 8);
+         else
+            res_v(8 * i + 7 downto 8 * i) := to_stdlogicvector(val_v + character'pos('A') - 10, 8);
+         end if;
+      end loop;
+
+      return res_v;
+   end function hexify;
 
 begin
 
@@ -295,30 +332,61 @@ begin
          dest_out => video_digits
       ); -- cdc_video_inst
 
-   video_stat_total <= video_digits(127 downto 96) + video_digits(159 downto 128);
+   video_stat_total    <= video_digits(127 downto  96) +
+                          video_digits(159 downto 128);
+   video_stat_error    <= video_digits(191 downto 160);
+   video_stat_err_addr <= video_digits( 63 downto  32);
+   video_stat_err_exp  <= X"00000000" & video_digits( 95 downto  64);
+   video_stat_err_read <= X"00000000" & video_digits( 31 downto   0);
+
+   video_result_data   <= str2slv("TOTAL:  ") & hexify(video_stat_total) & X"0D0A" &
+                          str2slv("ERRORS: ") & hexify(video_stat_error) & X"0D0A" &
+                          str2slv("ADDR:   ") & hexify(video_stat_err_addr) & X"0D0A" &
+                          str2slv("EXP_HI: ") & hexify(video_stat_err_exp(63 downto 32)) & X"0D0A" &
+                          str2slv("EXP_LO: ") & hexify(video_stat_err_exp(31 downto 0)) & X"0D0A" &
+                          str2slv("READ_HI:") & hexify(video_stat_err_read(63 downto 32)) & X"0D0A" &
+                          str2slv("READ_LO:") & hexify(video_stat_err_read(31 downto 0)) & X"0D0A" &
+                          X"0D0A";
+
+   video_proc : process (video_clk)
+      variable col_v   : natural range 0 to 15;
+      variable row_v   : natural range 0 to 6;
+      variable index_v : natural range 0 to video_result_data'length / 8 - 1;
+   begin
+      if rising_edge(video_clk) then
+         video_char   <= X"20";
+         video_colors <= X"55BB";
+         if video_pos_x >= C_POS_X and video_pos_x < C_POS_X + 16 and
+            video_pos_y >= C_POS_Y and video_pos_y < C_POS_Y + 7 then
+            col_v      := 15 - to_integer(video_pos_x - C_POS_X);
+            row_v      := 6 - to_integer(video_pos_y - C_POS_Y);
+            index_v    := row_v * 18 + col_v + 4;
+            video_char <= video_result_data(index_v * 8 + 7 downto index_v * 8);
+         end if;
+      end if;
+   end process video_proc;
 
    video_wrapper_inst : entity work.video_wrapper
       generic map (
-         G_FONT_PATH   => G_FONT_PATH
+         G_FONT_PATH => G_FONT_PATH
       )
       port map (
-         video_clk_i           => video_clk,
-         video_rst_i           => video_rst,
-         video_stat_total_i    => video_stat_total,
-         video_stat_error_i    => video_digits(191 downto 160),
-         video_stat_err_addr_i => video_digits(63 downto 32),
-         video_stat_err_exp_i  => X"00000000" & video_digits(95 downto 64),
-         video_stat_err_read_i => X"00000000" & video_digits(31 downto 0),
-         vga_red_o             => video_red,
-         vga_green_o           => video_green,
-         vga_blue_o            => video_blue,
-         vga_hs_o              => video_hs,
-         vga_vs_o              => video_vs,
-         vga_de_o              => video_de,
-         vdac_clk_o            => vdac_clk_o,
-         vdac_blank_n_o        => vdac_blank_n_o,
-         vdac_psave_n_o        => vdac_psave_n_o,
-         vdac_sync_n_o         => vdac_sync_n_o
+         video_clk_i    => video_clk,
+         video_rst_i    => video_rst,
+         video_pos_x_o  => video_pos_x,
+         video_pos_y_o  => video_pos_y,
+         video_char_i   => video_char,
+         video_colors_i => video_colors,
+         vga_red_o      => video_red,
+         vga_green_o    => video_green,
+         vga_blue_o     => video_blue,
+         vga_hs_o       => video_hs,
+         vga_vs_o       => video_vs,
+         vga_de_o       => video_de,
+         vdac_clk_o     => vdac_clk_o,
+         vdac_blank_n_o => vdac_blank_n_o,
+         vdac_psave_n_o => vdac_psave_n_o,
+         vdac_sync_n_o  => vdac_sync_n_o
       ); -- video_wrapper_inst
 
    vga_red_o   <= video_red;
