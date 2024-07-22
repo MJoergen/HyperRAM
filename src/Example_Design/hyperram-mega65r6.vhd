@@ -56,29 +56,25 @@ architecture synthesis of hyperram_mega65r6 is
    constant C_DATA_SIZE        : integer := 64;
 
    -- HyperRAM clocks and reset
-   signal   hr_clk       : std_logic; -- HyperRAM clock
-   signal   hr_clk_del   : std_logic; -- HyperRAM clock, phase shifted 90 degrees
+   signal   ctrl_clk     : std_logic; -- HyperRAM clock
+   signal   ctrl_rst     : std_logic;
+   signal   ctrl_clk_del : std_logic; -- HyperRAM clock, phase shifted 90 degrees
    signal   delay_refclk : std_logic; -- 200 MHz, for IDELAYCTRL
-   signal   hr_rst       : std_logic;
 
    -- Control and Status for trafic generator
-   signal   sys_up          : std_logic;
-   signal   sys_left        : std_logic;
-   signal   sys_up_d        : std_logic;
-   signal   sys_left_d      : std_logic;
-   signal   sys_start       : std_logic;
-   signal   sys_valid       : std_logic;
-   signal   sys_active      : std_logic;
-   signal   sys_error       : std_logic;
-   signal   sys_address     : std_logic_vector(31 downto 0);
-   signal   sys_data_exp    : std_logic_vector(63 downto 0);
-   signal   sys_data_read   : std_logic_vector(63 downto 0);
-   signal   sys_count_long  : unsigned(31 downto 0);
-   signal   sys_count_short : unsigned(31 downto 0);
-   signal   sys_count_error : std_logic_vector(31 downto 0);
+   signal   ctrl_start       : std_logic;
+   signal   ctrl_valid       : std_logic;
+   signal   ctrl_active      : std_logic;
+   signal   ctrl_error       : std_logic;
+   signal   ctrl_address     : std_logic_vector(31 downto 0);
+   signal   ctrl_data_exp    : std_logic_vector(63 downto 0);
+   signal   ctrl_data_read   : std_logic_vector(63 downto 0);
+   signal   ctrl_count_long  : unsigned(31 downto 0);
+   signal   ctrl_count_short : unsigned(31 downto 0);
+   signal   ctrl_count_error : std_logic_vector(31 downto 0);
 
    -- Interface to MEGA65 video
-   signal   sys_digits : std_logic_vector(191 downto 0);
+   signal   ctrl_digits : std_logic_vector(191 downto 0);
 
    -- HyperRAM tri-state control signals
    signal   hr_rwds_in   : std_logic;
@@ -96,7 +92,7 @@ begin
 
    mega65_wrapper_inst : entity work.mega65_wrapper
       generic map (
-         G_DIGITS_SIZE => sys_digits'length,
+         G_DIGITS_SIZE => ctrl_digits'length,
          G_FONT_PATH   => G_FONT_PATH
       )
       port map (
@@ -122,12 +118,12 @@ begin
          hdmi_clk_p_o   => hdmi_clk_p_o,
          hdmi_clk_n_o   => hdmi_clk_n_o,
          -- Connection to core
-         sys_up_o       => sys_up,
-         sys_left_o     => sys_left,
-         sys_start_o    => sys_start,
-         sys_active_i   => sys_active,
-         sys_error_i    => sys_error,
-         sys_digits_i   => sys_digits
+         sys_up_o       => open,
+         sys_left_o     => open,
+         sys_start_o    => ctrl_start,
+         sys_active_i   => ctrl_active,
+         sys_error_i    => ctrl_error,
+         sys_digits_i   => ctrl_digits
       ); -- mega65_wrapper_inst
 
 
@@ -138,11 +134,11 @@ begin
    clk_controller_inst : entity work.clk_controller
       port map (
          sys_clk_i      => sys_clk_i,
-         sys_rstn_i     => not sys_rst_i,
-         clk_o          => hr_clk,
-         clk_del_o      => hr_clk_del,
-         delay_refclk_o => delay_refclk,
-         rst_o          => hr_rst
+         sys_rst_i      => sys_rst_i,
+         clk_o          => ctrl_clk,
+         rst_o          => ctrl_rst,
+         clk_del_o      => ctrl_clk_del,
+         delay_refclk_o => delay_refclk
       ); -- clk_controller_inst
 
 
@@ -157,18 +153,18 @@ begin
          G_DATA_SIZE        => C_DATA_SIZE
       )
       port map (
-         clk_i          => hr_clk,
-         clk_del_i      => hr_clk_del,
+         clk_i          => ctrl_clk,
+         clk_del_i      => ctrl_clk_del,
          delay_refclk_i => delay_refclk,
-         rst_i          => hr_rst,
-         start_i        => sys_start,
-         active_o       => sys_active,
-         address_o      => sys_address,
-         data_exp_o     => sys_data_exp,
-         data_read_o    => sys_data_read,
-         count_long_o   => sys_count_long,
-         count_short_o  => sys_count_short,
-         count_error_o  => sys_count_error,
+         rst_i          => ctrl_rst,
+         start_i        => ctrl_start,
+         active_o       => ctrl_active,
+         address_o      => ctrl_address,
+         data_exp_o     => ctrl_data_exp,
+         data_read_o    => ctrl_data_read,
+         count_long_o   => ctrl_count_long,
+         count_short_o  => ctrl_count_short,
+         count_error_o  => ctrl_count_error,
          hr_resetn_o    => hr_resetn_o,
          hr_csn_o       => hr_csn_o,
          hr_ck_o        => hr_ck_o,
@@ -185,15 +181,15 @@ begin
    -- Generate debug output for video
    ----------------------------------
 
-   sys_digits( 31 downto   0) <= sys_data_read(31 downto 0);
-   sys_digits( 47 downto  32) <= sys_address(15 downto 0);
-   sys_digits( 63 downto  48) <= X"00" & "000" & sys_address(20 downto 16);
-   sys_digits( 95 downto  64) <= sys_data_exp(31 downto 0);
-   sys_digits(127 downto  96) <= std_logic_vector(sys_count_long);
-   sys_digits(159 downto 128) <= std_logic_vector(sys_count_short);
-   sys_digits(191 downto 160) <= sys_count_error;
+   ctrl_digits( 31 downto   0) <= ctrl_data_read(31 downto 0);
+   ctrl_digits( 47 downto  32) <= ctrl_address(15 downto 0);
+   ctrl_digits( 63 downto  48) <= X"00" & "000" & ctrl_address(20 downto 16);
+   ctrl_digits( 95 downto  64) <= ctrl_data_exp(31 downto 0);
+   ctrl_digits(127 downto  96) <= std_logic_vector(ctrl_count_long);
+   ctrl_digits(159 downto 128) <= std_logic_vector(ctrl_count_short);
+   ctrl_digits(191 downto 160) <= ctrl_count_error;
 
-   sys_error                  <= or(sys_count_error);
+   ctrl_error                  <= or(ctrl_count_error);
 
 
    ----------------------------------
