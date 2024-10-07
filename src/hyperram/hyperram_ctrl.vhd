@@ -13,7 +13,8 @@ library ieee;
 
 entity hyperram_ctrl is
    generic (
-      G_LATENCY : integer
+      G_LATENCY : integer;
+      G_LATENCY_FIXED : boolean
    );
    port (
       clk_i               : in    std_logic;
@@ -148,7 +149,7 @@ begin
                state <= SAMPLE_RWDS_ST;
 
             when SAMPLE_RWDS_ST =>
-               if hb_rwds_in_i = '1' then
+               if (hb_rwds_in_i = '1') or G_LATENCY_FIXED then
                   latency_count <= 2 * G_LATENCY - 4;
                   count_long    <= count_long + 1;
                else

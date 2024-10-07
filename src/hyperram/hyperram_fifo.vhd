@@ -9,6 +9,7 @@ library ieee;
 
 entity hyperram_fifo is
    generic (
+      G_INVERT_SRC_CLK : boolean;
       G_DATA_SIZE : natural
    );
    port (
@@ -28,6 +29,8 @@ architecture synthesis of hyperram_fifo is
 
    -- Number of words in FIFO
    constant C_FIFO_SIZE : natural                                         := 2 ** (C_GRAY_SIZE - 1);
+
+   signal src_clk : std_logic;
 
    -- Dual-port LUTRAM memory to contain the FIFO data
    -- We use LUTRAM instead of registers to save space in the FPGA.
@@ -89,17 +92,24 @@ architecture synthesis of hyperram_fifo is
 
 begin
 
+   invert_src_clk_gen : if G_INVERT_SRC_CLK generate
+      src_clk <= not src_clk_i;
+   else generate
+      src_clk <= src_clk_i;
+   end generate invert_src_clk_gen;
+
+
    -- Dual port memory: One write port, and one read port.
    -- The memory is implemented with LUTRAM. There is no
    -- need for a complete CDC circuit on the output of the LUTRAM, a simple
    -- flip-flop is sufficient. This is because the contents being read from the LUTRAM is
    -- not changing at the time it is sampled. This is due to the CDC causing a (usually) two-cycle
    -- delay between writing to and reading from a given memory location.
-   dpram_proc : process (src_clk_i, dst_clk_i)
+   dpram_proc : process (src_clk, dst_clk_i)
       variable index_v : natural range 0 to C_FIFO_SIZE - 1;
    begin
       -- Write to memory
-      if rising_edge(src_clk_i) then
+      if rising_edge(src_clk) then
          if src_valid_i = '1' then
             index_v        := to_integer(gray2bin(src_gray_wr)) mod C_FIFO_SIZE;
             dpram(index_v) <= src_data_i;
@@ -116,10 +126,10 @@ begin
    end process dpram_proc;
 
    -- Update write pointer
-   src_proc : process (src_clk_i)
+   src_proc : process (src_clk)
       variable index_v : natural range 0 to C_FIFO_SIZE - 1;
    begin
-      if rising_edge(src_clk_i) then
+      if rising_edge(src_clk) then
          if src_valid_i = '1' then
             src_gray_wr <= bin2gray(gray2bin(src_gray_wr) + 1);
          end if;

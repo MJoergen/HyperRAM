@@ -11,7 +11,8 @@ library ieee;
 
 entity hyperram_config is
    generic (
-      G_LATENCY : integer
+      G_LATENCY       : integer;
+      G_LATENCY_FIXED : boolean
    );
    port (
       clk_i                 : in    std_logic;
@@ -110,6 +111,9 @@ begin
                cfg_writedata(R_C0_RESERVED) <= "1111";
                cfg_writedata(R_C0_LATENCY)  <= std_logic_vector(to_unsigned(G_LATENCY, 4) - 5);
                cfg_writedata(C_C0_FIXED)    <= '0';                                             -- variable
+               if G_LATENCY_FIXED then
+                  cfg_writedata(C_C0_FIXED) <= '1';
+               end if;
                cfg_writedata(C_C0_HYBRID)   <= '1';                                             -- legacy (default)
                cfg_writedata(R_C0_BURST)    <= "11";                                            -- 32 bytes (default)
                cfg_byteenable               <= "11";

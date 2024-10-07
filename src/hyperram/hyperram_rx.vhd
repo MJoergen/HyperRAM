@@ -120,10 +120,11 @@ begin
    -- synchronize it to the main clock clk_i.
    hyperram_fifo_inst : entity work.hyperram_fifo
       generic map (
+         G_INVERT_SRC_CLK => true,
          G_DATA_SIZE => 16
       )
       port map (
-         src_clk_i   => not rwds_in_delay,
+         src_clk_i   => rwds_in_delay,
          src_valid_i => ctrl_read_i,
          src_data_i  => rwds_dq_in,
          dst_clk_i   => clk_i,

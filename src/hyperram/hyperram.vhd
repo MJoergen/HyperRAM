@@ -21,6 +21,8 @@ library ieee;
 
 entity hyperram is
    generic (
+      G_LATENCY           : integer := 4;
+      G_LATENCY_FIXED     : boolean := false;
       G_ERRATA_ISSI_D_FIX : boolean := true
    );
    port (
@@ -59,39 +61,37 @@ end entity hyperram;
 
 architecture synthesis of hyperram is
 
-   constant C_LATENCY : integer := 4;
+   signal errata_write         : std_logic;
+   signal errata_read          : std_logic;
+   signal errata_address       : std_logic_vector(31 downto 0);
+   signal errata_writedata     : std_logic_vector(15 downto 0);
+   signal errata_byteenable    : std_logic_vector( 1 downto 0);
+   signal errata_burstcount    : std_logic_vector( 7 downto 0);
+   signal errata_readdata      : std_logic_vector(15 downto 0);
+   signal errata_readdatavalid : std_logic;
+   signal errata_waitrequest   : std_logic;
 
-   signal   errata_write         : std_logic;
-   signal   errata_read          : std_logic;
-   signal   errata_address       : std_logic_vector(31 downto 0);
-   signal   errata_writedata     : std_logic_vector(15 downto 0);
-   signal   errata_byteenable    : std_logic_vector( 1 downto 0);
-   signal   errata_burstcount    : std_logic_vector( 7 downto 0);
-   signal   errata_readdata      : std_logic_vector(15 downto 0);
-   signal   errata_readdatavalid : std_logic;
-   signal   errata_waitrequest   : std_logic;
+   signal cfg_write         : std_logic;
+   signal cfg_read          : std_logic;
+   signal cfg_address       : std_logic_vector(31 downto 0);
+   signal cfg_writedata     : std_logic_vector(15 downto 0);
+   signal cfg_byteenable    : std_logic_vector( 1 downto 0);
+   signal cfg_burstcount    : std_logic_vector( 7 downto 0);
+   signal cfg_readdata      : std_logic_vector(15 downto 0);
+   signal cfg_readdatavalid : std_logic;
+   signal cfg_waitrequest   : std_logic;
 
-   signal   cfg_write         : std_logic;
-   signal   cfg_read          : std_logic;
-   signal   cfg_address       : std_logic_vector(31 downto 0);
-   signal   cfg_writedata     : std_logic_vector(15 downto 0);
-   signal   cfg_byteenable    : std_logic_vector( 1 downto 0);
-   signal   cfg_burstcount    : std_logic_vector( 7 downto 0);
-   signal   cfg_readdata      : std_logic_vector(15 downto 0);
-   signal   cfg_readdatavalid : std_logic;
-   signal   cfg_waitrequest   : std_logic;
-
-   signal   ctrl_rstn         : std_logic;
-   signal   ctrl_csn          : std_logic;
-   signal   ctrl_ck_ddr       : std_logic_vector( 1 downto 0);
-   signal   ctrl_dq_ddr_in    : std_logic_vector(15 downto 0);
-   signal   ctrl_dq_ddr_out   : std_logic_vector(15 downto 0);
-   signal   ctrl_dq_oe        : std_logic;
-   signal   ctrl_dq_ie        : std_logic;
-   signal   ctrl_rwds_ddr_out : std_logic_vector( 1 downto 0);
-   signal   ctrl_rwds_oe      : std_logic;
-   signal   ctrl_rwds_in      : std_logic;
-   signal   ctrl_read         : std_logic;
+   signal ctrl_rstn         : std_logic;
+   signal ctrl_csn          : std_logic;
+   signal ctrl_ck_ddr       : std_logic_vector( 1 downto 0);
+   signal ctrl_dq_ddr_in    : std_logic_vector(15 downto 0);
+   signal ctrl_dq_ddr_out   : std_logic_vector(15 downto 0);
+   signal ctrl_dq_oe        : std_logic;
+   signal ctrl_dq_ie        : std_logic;
+   signal ctrl_rwds_ddr_out : std_logic_vector( 1 downto 0);
+   signal ctrl_rwds_oe      : std_logic;
+   signal ctrl_rwds_in      : std_logic;
+   signal ctrl_read         : std_logic;
 
 begin
 
@@ -150,7 +150,8 @@ begin
 
    hyperram_config_inst : entity work.hyperram_config
       generic map (
-         G_LATENCY => C_LATENCY
+         G_LATENCY       => G_LATENCY,
+         G_LATENCY_FIXED => G_LATENCY_FIXED
       )
       port map (
          clk_i                 => clk_i,
@@ -182,7 +183,8 @@ begin
 
    hyperram_ctrl_inst : entity work.hyperram_ctrl
       generic map (
-         G_LATENCY => C_LATENCY
+         G_LATENCY       => G_LATENCY,
+         G_LATENCY_FIXED => G_LATENCY_FIXED
       )
       port map (
          clk_i               => clk_i,
