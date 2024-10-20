@@ -135,8 +135,7 @@ begin
    -- Determine start of test
    --------------------------------------------------------------------------
 
-   ctrl_rx_ready    <= '1' when ctrl_state = IDLE_ST else
-                       '0';
+   ctrl_rx_ready    <= '1';
 
    uart_rx_proc : process (ctrl_clk_i)
    begin
@@ -200,7 +199,8 @@ begin
             ctrl_result_valid <= '0';
          end if;
          -- Trigger on falling edge
-         if ctrl_active_d = '1' and ctrl_active_i = '0' then
+         if (ctrl_active_d = '1' and ctrl_active_i = '0') or
+            (ctrl_state = BUSY_ST and ctrl_rx_valid = '1') then
             ctrl_result_valid <= '1';
          end if;
          if ctrl_rst_i = '1' then

@@ -13,18 +13,17 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="301.000001 us"></ZoomEndTime>
-      <Cursor1Time time="301.000000 us"></Cursor1Time>
+      <ZoomEndTime time="963.519837 us"></ZoomEndTime>
+      <Cursor1Time time="1.000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="253"></NameColumnWidth>
-      <ValueColumnWidth column_width="82"></ValueColumnWidth>
+      <NameColumnWidth column_width="268"></NameColumnWidth>
+      <ValueColumnWidth column_width="125"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="2" />
+   <WVObjectSize size="5" />
    <wvobject type="group" fp_name="group127">
       <obj_property name="label">tb</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject type="logic" fp_name="/tb/sys_clk">
          <obj_property name="ElementShortName">sys_clk</obj_property>
          <obj_property name="ObjectShortName">sys_clk</obj_property>
@@ -44,6 +43,14 @@
       <wvobject type="logic" fp_name="/tb/tb_start">
          <obj_property name="ElementShortName">tb_start</obj_property>
          <obj_property name="ObjectShortName">tb_start</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/tb_read_error">
+         <obj_property name="ElementShortName">tb_read_error</obj_property>
+         <obj_property name="ObjectShortName">tb_read_error</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/tb_write_error">
+         <obj_property name="ElementShortName">tb_write_error</obj_property>
+         <obj_property name="ObjectShortName">tb_write_error</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb/sys_resetn">
          <obj_property name="ElementShortName">sys_resetn</obj_property>
@@ -81,6 +88,14 @@
          <obj_property name="ElementShortName">sys_dq_out[7:0]</obj_property>
          <obj_property name="ObjectShortName">sys_dq_out[7:0]</obj_property>
       </wvobject>
+      <wvobject type="other" fp_name="/tb/C_DELAY">
+         <obj_property name="ElementShortName">C_DELAY</obj_property>
+         <obj_property name="ObjectShortName">C_DELAY</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/C_CLK_PERIOD">
+         <obj_property name="ElementShortName">C_CLK_PERIOD</obj_property>
+         <obj_property name="ObjectShortName">C_CLK_PERIOD</obj_property>
+      </wvobject>
       <wvobject type="logic" fp_name="/tb/hr_resetn">
          <obj_property name="ElementShortName">hr_resetn</obj_property>
          <obj_property name="ObjectShortName">hr_resetn</obj_property>
@@ -101,361 +116,1270 @@
          <obj_property name="ElementShortName">hr_dq[7:0]</obj_property>
          <obj_property name="ObjectShortName">hr_dq[7:0]</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/C_DELAY">
-         <obj_property name="ElementShortName">C_DELAY</obj_property>
-         <obj_property name="ObjectShortName">C_DELAY</obj_property>
-      </wvobject>
-      <wvobject type="other" fp_name="/tb/C_CLK_PERIOD">
-         <obj_property name="ElementShortName">C_CLK_PERIOD</obj_property>
-         <obj_property name="ObjectShortName">C_CLK_PERIOD</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/clk_i">
+   </wvobject>
+   <wvobject type="group" fp_name="group752">
+      <obj_property name="label">core_wrapper</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/clk_i">
          <obj_property name="ElementShortName">clk_i</obj_property>
          <obj_property name="ObjectShortName">clk_i</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/rst_i">
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/rst_i">
          <obj_property name="ElementShortName">rst_i</obj_property>
          <obj_property name="ObjectShortName">rst_i</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_waitrequest_o">
-         <obj_property name="ElementShortName">avm_waitrequest_o</obj_property>
-         <obj_property name="ObjectShortName">avm_waitrequest_o</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/clk_del_i">
+         <obj_property name="ElementShortName">clk_del_i</obj_property>
+         <obj_property name="ObjectShortName">clk_del_i</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_write_i">
-         <obj_property name="ElementShortName">avm_write_i</obj_property>
-         <obj_property name="ObjectShortName">avm_write_i</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/delay_refclk_i">
+         <obj_property name="ElementShortName">delay_refclk_i</obj_property>
+         <obj_property name="ObjectShortName">delay_refclk_i</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_read_i">
-         <obj_property name="ElementShortName">avm_read_i</obj_property>
-         <obj_property name="ObjectShortName">avm_read_i</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/start_i">
+         <obj_property name="ElementShortName">start_i</obj_property>
+         <obj_property name="ObjectShortName">start_i</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_address_i">
-         <obj_property name="ElementShortName">avm_address_i[31:0]</obj_property>
-         <obj_property name="ObjectShortName">avm_address_i[31:0]</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/active_o">
+         <obj_property name="ElementShortName">active_o</obj_property>
+         <obj_property name="ObjectShortName">active_o</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_writedata_i">
-         <obj_property name="ElementShortName">avm_writedata_i[15:0]</obj_property>
-         <obj_property name="ObjectShortName">avm_writedata_i[15:0]</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/tb_read_error_i">
+         <obj_property name="ElementShortName">tb_read_error_i</obj_property>
+         <obj_property name="ObjectShortName">tb_read_error_i</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_byteenable_i">
-         <obj_property name="ElementShortName">avm_byteenable_i[1:0]</obj_property>
-         <obj_property name="ObjectShortName">avm_byteenable_i[1:0]</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/tb_write_error_i">
+         <obj_property name="ElementShortName">tb_write_error_i</obj_property>
+         <obj_property name="ObjectShortName">tb_write_error_i</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_burstcount_i">
-         <obj_property name="ElementShortName">avm_burstcount_i[7:0]</obj_property>
-         <obj_property name="ObjectShortName">avm_burstcount_i[7:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/stat_total_o">
+         <obj_property name="ElementShortName">stat_total_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">stat_total_o[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_readdata_o">
-         <obj_property name="ElementShortName">avm_readdata_o[15:0]</obj_property>
-         <obj_property name="ObjectShortName">avm_readdata_o[15:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/stat_error_o">
+         <obj_property name="ElementShortName">stat_error_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">stat_error_o[31:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_readdatavalid_o">
-         <obj_property name="ElementShortName">avm_readdatavalid_o</obj_property>
-         <obj_property name="ObjectShortName">avm_readdatavalid_o</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/stat_err_addr_o">
+         <obj_property name="ElementShortName">stat_err_addr_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">stat_err_addr_o[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/count_long_o">
-         <obj_property name="ElementShortName">count_long_o[31:0]</obj_property>
-         <obj_property name="ObjectShortName">count_long_o[31:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/stat_err_exp_o">
+         <obj_property name="ElementShortName">stat_err_exp_o[63:0]</obj_property>
+         <obj_property name="ObjectShortName">stat_err_exp_o[63:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/count_short_o">
-         <obj_property name="ElementShortName">count_short_o[31:0]</obj_property>
-         <obj_property name="ObjectShortName">count_short_o[31:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/stat_err_read_o">
+         <obj_property name="ElementShortName">stat_err_read_o[63:0]</obj_property>
+         <obj_property name="ObjectShortName">stat_err_read_o[63:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_rstn_o">
-         <obj_property name="ElementShortName">hb_rstn_o</obj_property>
-         <obj_property name="ObjectShortName">hb_rstn_o</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hr_resetn_o">
+         <obj_property name="ElementShortName">hr_resetn_o</obj_property>
+         <obj_property name="ObjectShortName">hr_resetn_o</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_csn_o">
-         <obj_property name="ElementShortName">hb_csn_o</obj_property>
-         <obj_property name="ObjectShortName">hb_csn_o</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hr_csn_o">
+         <obj_property name="ElementShortName">hr_csn_o</obj_property>
+         <obj_property name="ObjectShortName">hr_csn_o</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_ck_ddr_o">
-         <obj_property name="ElementShortName">hb_ck_ddr_o[1:0]</obj_property>
-         <obj_property name="ObjectShortName">hb_ck_ddr_o[1:0]</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hr_ck_o">
+         <obj_property name="ElementShortName">hr_ck_o</obj_property>
+         <obj_property name="ObjectShortName">hr_ck_o</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_dq_ddr_in_i">
-         <obj_property name="ElementShortName">hb_dq_ddr_in_i[15:0]</obj_property>
-         <obj_property name="ObjectShortName">hb_dq_ddr_in_i[15:0]</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hr_rwds_in_i">
+         <obj_property name="ElementShortName">hr_rwds_in_i</obj_property>
+         <obj_property name="ObjectShortName">hr_rwds_in_i</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_dq_ddr_out_o">
-         <obj_property name="ElementShortName">hb_dq_ddr_out_o[15:0]</obj_property>
-         <obj_property name="ObjectShortName">hb_dq_ddr_out_o[15:0]</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hr_rwds_out_o">
+         <obj_property name="ElementShortName">hr_rwds_out_o</obj_property>
+         <obj_property name="ObjectShortName">hr_rwds_out_o</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_dq_oe_o">
-         <obj_property name="ElementShortName">hb_dq_oe_o</obj_property>
-         <obj_property name="ObjectShortName">hb_dq_oe_o</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hr_rwds_oe_n_o">
+         <obj_property name="ElementShortName">hr_rwds_oe_n_o</obj_property>
+         <obj_property name="ObjectShortName">hr_rwds_oe_n_o</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_dq_ie_i">
-         <obj_property name="ElementShortName">hb_dq_ie_i</obj_property>
-         <obj_property name="ObjectShortName">hb_dq_ie_i</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hr_dq_in_i">
+         <obj_property name="ElementShortName">hr_dq_in_i[7:0]</obj_property>
+         <obj_property name="ObjectShortName">hr_dq_in_i[7:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_rwds_ddr_out_o">
-         <obj_property name="ElementShortName">hb_rwds_ddr_out_o[1:0]</obj_property>
-         <obj_property name="ObjectShortName">hb_rwds_ddr_out_o[1:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hr_dq_out_o">
+         <obj_property name="ElementShortName">hr_dq_out_o[7:0]</obj_property>
+         <obj_property name="ObjectShortName">hr_dq_out_o[7:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_rwds_oe_o">
-         <obj_property name="ElementShortName">hb_rwds_oe_o</obj_property>
-         <obj_property name="ObjectShortName">hb_rwds_oe_o</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hr_dq_oe_n_o">
+         <obj_property name="ElementShortName">hr_dq_oe_n_o[7:0]</obj_property>
+         <obj_property name="ObjectShortName">hr_dq_oe_n_o[7:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_rwds_in_i">
-         <obj_property name="ElementShortName">hb_rwds_in_i</obj_property>
-         <obj_property name="ObjectShortName">hb_rwds_in_i</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/avm_waitrequest">
+         <obj_property name="ElementShortName">avm_waitrequest</obj_property>
+         <obj_property name="ObjectShortName">avm_waitrequest</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_read_o">
-         <obj_property name="ElementShortName">hb_read_o</obj_property>
-         <obj_property name="ObjectShortName">hb_read_o</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/avm_write">
+         <obj_property name="ElementShortName">avm_write</obj_property>
+         <obj_property name="ObjectShortName">avm_write</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/state">
-         <obj_property name="ElementShortName">state</obj_property>
-         <obj_property name="ObjectShortName">state</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/avm_read">
+         <obj_property name="ElementShortName">avm_read</obj_property>
+         <obj_property name="ObjectShortName">avm_read</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/writedata">
-         <obj_property name="ElementShortName">writedata[15:0]</obj_property>
-         <obj_property name="ObjectShortName">writedata[15:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/avm_address">
+         <obj_property name="ElementShortName">avm_address[31:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_address[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/byteenable">
-         <obj_property name="ElementShortName">byteenable[1:0]</obj_property>
-         <obj_property name="ObjectShortName">byteenable[1:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/avm_writedata">
+         <obj_property name="ElementShortName">avm_writedata[15:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_writedata[15:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/read">
-         <obj_property name="ElementShortName">read</obj_property>
-         <obj_property name="ObjectShortName">read</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/avm_byteenable">
+         <obj_property name="ElementShortName">avm_byteenable[1:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_byteenable[1:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/config">
-         <obj_property name="ElementShortName">config</obj_property>
-         <obj_property name="ObjectShortName">config</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/avm_burstcount">
+         <obj_property name="ElementShortName">avm_burstcount[7:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_burstcount[7:0]</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/burst_count">
-         <obj_property name="ElementShortName">burst_count</obj_property>
-         <obj_property name="ObjectShortName">burst_count</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/avm_readdata">
+         <obj_property name="ElementShortName">avm_readdata[15:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_readdata[15:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/command_address">
-         <obj_property name="ElementShortName">command_address[47:0]</obj_property>
-         <obj_property name="ObjectShortName">command_address[47:0]</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/avm_readdatavalid">
+         <obj_property name="ElementShortName">avm_readdatavalid</obj_property>
+         <obj_property name="ObjectShortName">avm_readdatavalid</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/ca_count">
-         <obj_property name="ElementShortName">ca_count</obj_property>
-         <obj_property name="ObjectShortName">ca_count</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/dec_waitrequest">
+         <obj_property name="ElementShortName">dec_waitrequest</obj_property>
+         <obj_property name="ObjectShortName">dec_waitrequest</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/latency_count">
-         <obj_property name="ElementShortName">latency_count</obj_property>
-         <obj_property name="ObjectShortName">latency_count</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/dec_write">
+         <obj_property name="ElementShortName">dec_write</obj_property>
+         <obj_property name="ObjectShortName">dec_write</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/read_clk_count">
-         <obj_property name="ElementShortName">read_clk_count</obj_property>
-         <obj_property name="ObjectShortName">read_clk_count</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/dec_read">
+         <obj_property name="ElementShortName">dec_read</obj_property>
+         <obj_property name="ObjectShortName">dec_read</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/read_return_count">
-         <obj_property name="ElementShortName">read_return_count</obj_property>
-         <obj_property name="ObjectShortName">read_return_count</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/dec_address">
+         <obj_property name="ElementShortName">dec_address[31:0]</obj_property>
+         <obj_property name="ObjectShortName">dec_address[31:0]</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/write_clk_count">
-         <obj_property name="ElementShortName">write_clk_count</obj_property>
-         <obj_property name="ObjectShortName">write_clk_count</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/dec_writedata">
+         <obj_property name="ElementShortName">dec_writedata[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dec_writedata[15:0]</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/recovery_count">
-         <obj_property name="ElementShortName">recovery_count</obj_property>
-         <obj_property name="ObjectShortName">recovery_count</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/dec_byteenable">
+         <obj_property name="ElementShortName">dec_byteenable[1:0]</obj_property>
+         <obj_property name="ObjectShortName">dec_byteenable[1:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/count_long">
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/dec_burstcount">
+         <obj_property name="ElementShortName">dec_burstcount[7:0]</obj_property>
+         <obj_property name="ObjectShortName">dec_burstcount[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/dec_readdata">
+         <obj_property name="ElementShortName">dec_readdata[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dec_readdata[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/dec_readdatavalid">
+         <obj_property name="ElementShortName">dec_readdatavalid</obj_property>
+         <obj_property name="ObjectShortName">dec_readdatavalid</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/avm_write_error">
+         <obj_property name="ElementShortName">avm_write_error[15:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_write_error[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/avm_read_error">
+         <obj_property name="ElementShortName">avm_read_error[15:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_read_error[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/count_long">
          <obj_property name="ElementShortName">count_long[31:0]</obj_property>
          <obj_property name="ObjectShortName">count_long[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/count_short">
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/count_short">
          <obj_property name="ElementShortName">count_short[31:0]</obj_property>
          <obj_property name="ObjectShortName">count_short[31:0]</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/G_LATENCY">
-         <obj_property name="ElementShortName">G_LATENCY</obj_property>
-         <obj_property name="ObjectShortName">G_LATENCY</obj_property>
-      </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/C_CA_RW">
-         <obj_property name="ElementShortName">C_CA_RW</obj_property>
-         <obj_property name="ObjectShortName">C_CA_RW</obj_property>
-      </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/C_CA_AS">
-         <obj_property name="ElementShortName">C_CA_AS</obj_property>
-         <obj_property name="ObjectShortName">C_CA_AS</obj_property>
-      </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/C_CA_BURST">
-         <obj_property name="ElementShortName">C_CA_BURST</obj_property>
-         <obj_property name="ObjectShortName">C_CA_BURST</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/refresh_time">
+         <obj_property name="ElementShortName">refresh_time[31:0]</obj_property>
+         <obj_property name="ObjectShortName">refresh_time[31:0]</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject type="group" fp_name="group351">
-      <obj_property name="label">hyperram_ctrl</obj_property>
+   <wvobject type="group" fp_name="group165">
+      <obj_property name="label">traffic_gen</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/clk_i">
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/clk_i">
          <obj_property name="ElementShortName">clk_i</obj_property>
          <obj_property name="ObjectShortName">clk_i</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/rst_i">
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/rst_i">
          <obj_property name="ElementShortName">rst_i</obj_property>
          <obj_property name="ObjectShortName">rst_i</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_waitrequest_o">
-         <obj_property name="ElementShortName">avm_waitrequest_o</obj_property>
-         <obj_property name="ObjectShortName">avm_waitrequest_o</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/start_i">
+         <obj_property name="ElementShortName">start_i</obj_property>
+         <obj_property name="ObjectShortName">start_i</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_write_i">
-         <obj_property name="ElementShortName">avm_write_i</obj_property>
-         <obj_property name="ObjectShortName">avm_write_i</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/wait_o">
+         <obj_property name="ElementShortName">wait_o</obj_property>
+         <obj_property name="ObjectShortName">wait_o</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_read_i">
-         <obj_property name="ElementShortName">avm_read_i</obj_property>
-         <obj_property name="ObjectShortName">avm_read_i</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/stat_total_o">
+         <obj_property name="ElementShortName">stat_total_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">stat_total_o[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_address_i">
-         <obj_property name="ElementShortName">avm_address_i[31:0]</obj_property>
-         <obj_property name="ObjectShortName">avm_address_i[31:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/stat_error_o">
+         <obj_property name="ElementShortName">stat_error_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">stat_error_o[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_writedata_i">
-         <obj_property name="ElementShortName">avm_writedata_i[15:0]</obj_property>
-         <obj_property name="ObjectShortName">avm_writedata_i[15:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/stat_err_addr_o">
+         <obj_property name="ElementShortName">stat_err_addr_o[7:0]</obj_property>
+         <obj_property name="ObjectShortName">stat_err_addr_o[7:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_byteenable_i">
-         <obj_property name="ElementShortName">avm_byteenable_i[1:0]</obj_property>
-         <obj_property name="ObjectShortName">avm_byteenable_i[1:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/stat_err_exp_o">
+         <obj_property name="ElementShortName">stat_err_exp_o[15:0]</obj_property>
+         <obj_property name="ObjectShortName">stat_err_exp_o[15:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_burstcount_i">
-         <obj_property name="ElementShortName">avm_burstcount_i[7:0]</obj_property>
-         <obj_property name="ObjectShortName">avm_burstcount_i[7:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/stat_err_read_o">
+         <obj_property name="ElementShortName">stat_err_read_o[15:0]</obj_property>
+         <obj_property name="ObjectShortName">stat_err_read_o[15:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_readdata_o">
-         <obj_property name="ElementShortName">avm_readdata_o[15:0]</obj_property>
-         <obj_property name="ObjectShortName">avm_readdata_o[15:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/stat_err_read_2nd_o">
+         <obj_property name="ElementShortName">stat_err_read_2nd_o[15:0]</obj_property>
+         <obj_property name="ObjectShortName">stat_err_read_2nd_o[15:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/avm_readdatavalid_o">
-         <obj_property name="ElementShortName">avm_readdatavalid_o</obj_property>
-         <obj_property name="ObjectShortName">avm_readdatavalid_o</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/avm_waitrequest_i">
+         <obj_property name="ElementShortName">avm_waitrequest_i</obj_property>
+         <obj_property name="ObjectShortName">avm_waitrequest_i</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/count_long_o">
-         <obj_property name="ElementShortName">count_long_o[31:0]</obj_property>
-         <obj_property name="ObjectShortName">count_long_o[31:0]</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/avm_write_o">
+         <obj_property name="ElementShortName">avm_write_o</obj_property>
+         <obj_property name="ObjectShortName">avm_write_o</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/count_short_o">
-         <obj_property name="ElementShortName">count_short_o[31:0]</obj_property>
-         <obj_property name="ObjectShortName">count_short_o[31:0]</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/avm_read_o">
+         <obj_property name="ElementShortName">avm_read_o</obj_property>
+         <obj_property name="ObjectShortName">avm_read_o</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_rstn_o">
-         <obj_property name="ElementShortName">hb_rstn_o</obj_property>
-         <obj_property name="ObjectShortName">hb_rstn_o</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/avm_address_o">
+         <obj_property name="ElementShortName">avm_address_o[7:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_address_o[7:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_csn_o">
-         <obj_property name="ElementShortName">hb_csn_o</obj_property>
-         <obj_property name="ObjectShortName">hb_csn_o</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/avm_writedata_o">
+         <obj_property name="ElementShortName">avm_writedata_o[15:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_writedata_o[15:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_ck_ddr_o">
-         <obj_property name="ElementShortName">hb_ck_ddr_o[1:0]</obj_property>
-         <obj_property name="ObjectShortName">hb_ck_ddr_o[1:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/avm_byteenable_o">
+         <obj_property name="ElementShortName">avm_byteenable_o[1:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_byteenable_o[1:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_dq_ddr_in_i">
-         <obj_property name="ElementShortName">hb_dq_ddr_in_i[15:0]</obj_property>
-         <obj_property name="ObjectShortName">hb_dq_ddr_in_i[15:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/avm_burstcount_o">
+         <obj_property name="ElementShortName">avm_burstcount_o[7:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_burstcount_o[7:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_dq_ddr_out_o">
-         <obj_property name="ElementShortName">hb_dq_ddr_out_o[15:0]</obj_property>
-         <obj_property name="ObjectShortName">hb_dq_ddr_out_o[15:0]</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/avm_readdata_i">
+         <obj_property name="ElementShortName">avm_readdata_i[15:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_readdata_i[15:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_dq_oe_o">
-         <obj_property name="ElementShortName">hb_dq_oe_o</obj_property>
-         <obj_property name="ObjectShortName">hb_dq_oe_o</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/avm_readdatavalid_i">
+         <obj_property name="ElementShortName">avm_readdatavalid_i</obj_property>
+         <obj_property name="ObjectShortName">avm_readdatavalid_i</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_dq_ie_i">
-         <obj_property name="ElementShortName">hb_dq_ie_i</obj_property>
-         <obj_property name="ObjectShortName">hb_dq_ie_i</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_rwds_ddr_out_o">
-         <obj_property name="ElementShortName">hb_rwds_ddr_out_o[1:0]</obj_property>
-         <obj_property name="ObjectShortName">hb_rwds_ddr_out_o[1:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_rwds_oe_o">
-         <obj_property name="ElementShortName">hb_rwds_oe_o</obj_property>
-         <obj_property name="ObjectShortName">hb_rwds_oe_o</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_rwds_in_i">
-         <obj_property name="ElementShortName">hb_rwds_in_i</obj_property>
-         <obj_property name="ObjectShortName">hb_rwds_in_i</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/hb_read_o">
-         <obj_property name="ElementShortName">hb_read_o</obj_property>
-         <obj_property name="ObjectShortName">hb_read_o</obj_property>
-      </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/state">
+      <wvobject type="other" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/state">
          <obj_property name="ElementShortName">state</obj_property>
          <obj_property name="ObjectShortName">state</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/writedata">
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/seed">
+         <obj_property name="ElementShortName">seed[31:0]</obj_property>
+         <obj_property name="ObjectShortName">seed[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/iteration">
+         <obj_property name="ElementShortName">iteration[31:0]</obj_property>
+         <obj_property name="ObjectShortName">iteration[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/counter">
+         <obj_property name="ElementShortName">counter[47:0]</obj_property>
+         <obj_property name="ObjectShortName">counter[47:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/exp_addr">
+         <obj_property name="ElementShortName">exp_addr[7:0]</obj_property>
+         <obj_property name="ObjectShortName">exp_addr[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/traffic_gen_inst/exp_data">
+         <obj_property name="ElementShortName">exp_data[15:0]</obj_property>
+         <obj_property name="ObjectShortName">exp_data[15:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group211">
+      <obj_property name="label">hyperram_ctrl</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/clk_i">
+         <obj_property name="ElementShortName">clk_i</obj_property>
+         <obj_property name="ObjectShortName">clk_i</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/rst_i">
+         <obj_property name="ElementShortName">rst_i</obj_property>
+         <obj_property name="ObjectShortName">rst_i</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/avm_waitrequest_o">
+         <obj_property name="ElementShortName">avm_waitrequest_o</obj_property>
+         <obj_property name="ObjectShortName">avm_waitrequest_o</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/avm_write_i">
+         <obj_property name="ElementShortName">avm_write_i</obj_property>
+         <obj_property name="ObjectShortName">avm_write_i</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/avm_read_i">
+         <obj_property name="ElementShortName">avm_read_i</obj_property>
+         <obj_property name="ObjectShortName">avm_read_i</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/avm_address_i">
+         <obj_property name="ElementShortName">avm_address_i[31:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_address_i[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/avm_writedata_i">
+         <obj_property name="ElementShortName">avm_writedata_i[15:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_writedata_i[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/avm_byteenable_i">
+         <obj_property name="ElementShortName">avm_byteenable_i[1:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_byteenable_i[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/avm_burstcount_i">
+         <obj_property name="ElementShortName">avm_burstcount_i[7:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_burstcount_i[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/avm_readdata_o">
+         <obj_property name="ElementShortName">avm_readdata_o[15:0]</obj_property>
+         <obj_property name="ObjectShortName">avm_readdata_o[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/avm_readdatavalid_o">
+         <obj_property name="ElementShortName">avm_readdatavalid_o</obj_property>
+         <obj_property name="ObjectShortName">avm_readdatavalid_o</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/count_long_o">
+         <obj_property name="ElementShortName">count_long_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">count_long_o[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/count_short_o">
+         <obj_property name="ElementShortName">count_short_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">count_short_o[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/refresh_time_o">
+         <obj_property name="ElementShortName">refresh_time_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">refresh_time_o[31:0]</obj_property>
+         <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+         <obj_property name="CellHeight">100</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/hb_rstn_o">
+         <obj_property name="ElementShortName">hb_rstn_o</obj_property>
+         <obj_property name="ObjectShortName">hb_rstn_o</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/hb_csn_o">
+         <obj_property name="ElementShortName">hb_csn_o</obj_property>
+         <obj_property name="ObjectShortName">hb_csn_o</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/hb_ck_ddr_o">
+         <obj_property name="ElementShortName">hb_ck_ddr_o[1:0]</obj_property>
+         <obj_property name="ObjectShortName">hb_ck_ddr_o[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/hb_dq_ddr_in_i">
+         <obj_property name="ElementShortName">hb_dq_ddr_in_i[15:0]</obj_property>
+         <obj_property name="ObjectShortName">hb_dq_ddr_in_i[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/hb_dq_ddr_out_o">
+         <obj_property name="ElementShortName">hb_dq_ddr_out_o[15:0]</obj_property>
+         <obj_property name="ObjectShortName">hb_dq_ddr_out_o[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/hb_dq_oe_o">
+         <obj_property name="ElementShortName">hb_dq_oe_o</obj_property>
+         <obj_property name="ObjectShortName">hb_dq_oe_o</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/hb_dq_ie_i">
+         <obj_property name="ElementShortName">hb_dq_ie_i</obj_property>
+         <obj_property name="ObjectShortName">hb_dq_ie_i</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/hb_rwds_ddr_out_o">
+         <obj_property name="ElementShortName">hb_rwds_ddr_out_o[1:0]</obj_property>
+         <obj_property name="ObjectShortName">hb_rwds_ddr_out_o[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/hb_rwds_oe_o">
+         <obj_property name="ElementShortName">hb_rwds_oe_o</obj_property>
+         <obj_property name="ObjectShortName">hb_rwds_oe_o</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/hb_rwds_in_i">
+         <obj_property name="ElementShortName">hb_rwds_in_i</obj_property>
+         <obj_property name="ObjectShortName">hb_rwds_in_i</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/hb_read_o">
+         <obj_property name="ElementShortName">hb_read_o</obj_property>
+         <obj_property name="ObjectShortName">hb_read_o</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/state">
+         <obj_property name="ElementShortName">state</obj_property>
+         <obj_property name="ObjectShortName">state</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/writedata">
          <obj_property name="ElementShortName">writedata[15:0]</obj_property>
          <obj_property name="ObjectShortName">writedata[15:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/byteenable">
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/byteenable">
          <obj_property name="ElementShortName">byteenable[1:0]</obj_property>
          <obj_property name="ObjectShortName">byteenable[1:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/read">
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/read">
          <obj_property name="ElementShortName">read</obj_property>
          <obj_property name="ObjectShortName">read</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/config">
+      <wvobject type="logic" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/config">
          <obj_property name="ElementShortName">config</obj_property>
          <obj_property name="ObjectShortName">config</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/burst_count">
+      <wvobject type="other" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/burst_count">
          <obj_property name="ElementShortName">burst_count</obj_property>
          <obj_property name="ObjectShortName">burst_count</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/command_address">
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/command_address">
          <obj_property name="ElementShortName">command_address[47:0]</obj_property>
          <obj_property name="ObjectShortName">command_address[47:0]</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/ca_count">
+      <wvobject type="other" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/ca_count">
          <obj_property name="ElementShortName">ca_count</obj_property>
          <obj_property name="ObjectShortName">ca_count</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/latency_count">
+      <wvobject type="other" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/latency_count">
          <obj_property name="ElementShortName">latency_count</obj_property>
          <obj_property name="ObjectShortName">latency_count</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/read_clk_count">
+      <wvobject type="other" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/read_clk_count">
          <obj_property name="ElementShortName">read_clk_count</obj_property>
          <obj_property name="ObjectShortName">read_clk_count</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/read_return_count">
+      <wvobject type="other" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/read_return_count">
          <obj_property name="ElementShortName">read_return_count</obj_property>
          <obj_property name="ObjectShortName">read_return_count</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/write_clk_count">
+      <wvobject type="other" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/write_clk_count">
          <obj_property name="ElementShortName">write_clk_count</obj_property>
          <obj_property name="ObjectShortName">write_clk_count</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/recovery_count">
+      <wvobject type="other" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/recovery_count">
          <obj_property name="ElementShortName">recovery_count</obj_property>
          <obj_property name="ObjectShortName">recovery_count</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/count_long">
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/count_long">
          <obj_property name="ElementShortName">count_long[31:0]</obj_property>
          <obj_property name="ObjectShortName">count_long[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/count_short">
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/count_short">
          <obj_property name="ElementShortName">count_short[31:0]</obj_property>
          <obj_property name="ObjectShortName">count_short[31:0]</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/G_LATENCY">
-         <obj_property name="ElementShortName">G_LATENCY</obj_property>
-         <obj_property name="ObjectShortName">G_LATENCY</obj_property>
+      <wvobject type="array" fp_name="/tb/core_wrapper_inst/hyperram_inst/hyperram_ctrl_inst/refresh_time">
+         <obj_property name="ElementShortName">refresh_time[31:0]</obj_property>
+         <obj_property name="ObjectShortName">refresh_time[31:0]</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/C_CA_RW">
-         <obj_property name="ElementShortName">C_CA_RW</obj_property>
-         <obj_property name="ObjectShortName">C_CA_RW</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group412">
+      <obj_property name="label">HyperRAM</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ7">
+         <obj_property name="ElementShortName">DQ7</obj_property>
+         <obj_property name="ObjectShortName">DQ7</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/C_CA_AS">
-         <obj_property name="ElementShortName">C_CA_AS</obj_property>
-         <obj_property name="ObjectShortName">C_CA_AS</obj_property>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ6">
+         <obj_property name="ElementShortName">DQ6</obj_property>
+         <obj_property name="ObjectShortName">DQ6</obj_property>
       </wvobject>
-      <wvobject type="other" fp_name="/tb/i_core_wrapper/hyperram_inst/hyperram_ctrl_inst/C_CA_BURST">
-         <obj_property name="ElementShortName">C_CA_BURST</obj_property>
-         <obj_property name="ObjectShortName">C_CA_BURST</obj_property>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ5">
+         <obj_property name="ElementShortName">DQ5</obj_property>
+         <obj_property name="ObjectShortName">DQ5</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ4">
+         <obj_property name="ElementShortName">DQ4</obj_property>
+         <obj_property name="ObjectShortName">DQ4</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ3">
+         <obj_property name="ElementShortName">DQ3</obj_property>
+         <obj_property name="ObjectShortName">DQ3</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ2">
+         <obj_property name="ElementShortName">DQ2</obj_property>
+         <obj_property name="ObjectShortName">DQ2</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ1">
+         <obj_property name="ElementShortName">DQ1</obj_property>
+         <obj_property name="ObjectShortName">DQ1</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ0">
+         <obj_property name="ElementShortName">DQ0</obj_property>
+         <obj_property name="ObjectShortName">DQ0</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RWDS">
+         <obj_property name="ElementShortName">RWDS</obj_property>
+         <obj_property name="ObjectShortName">RWDS</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/CSNeg">
+         <obj_property name="ElementShortName">CSNeg</obj_property>
+         <obj_property name="ObjectShortName">CSNeg</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/CK">
+         <obj_property name="ElementShortName">CK</obj_property>
+         <obj_property name="ObjectShortName">CK</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/CKn">
+         <obj_property name="ElementShortName">CKn</obj_property>
+         <obj_property name="ObjectShortName">CKn</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RESETNeg">
+         <obj_property name="ElementShortName">RESETNeg</obj_property>
+         <obj_property name="ObjectShortName">RESETNeg</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/CSNeg_ipd">
+         <obj_property name="ElementShortName">CSNeg_ipd</obj_property>
+         <obj_property name="ObjectShortName">CSNeg_ipd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/CK_ipd">
+         <obj_property name="ElementShortName">CK_ipd</obj_property>
+         <obj_property name="ObjectShortName">CK_ipd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RESETNeg_ipd">
+         <obj_property name="ElementShortName">RESETNeg_ipd</obj_property>
+         <obj_property name="ObjectShortName">RESETNeg_ipd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ7_ipd">
+         <obj_property name="ElementShortName">DQ7_ipd</obj_property>
+         <obj_property name="ObjectShortName">DQ7_ipd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ6_ipd">
+         <obj_property name="ElementShortName">DQ6_ipd</obj_property>
+         <obj_property name="ObjectShortName">DQ6_ipd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ5_ipd">
+         <obj_property name="ElementShortName">DQ5_ipd</obj_property>
+         <obj_property name="ObjectShortName">DQ5_ipd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ4_ipd">
+         <obj_property name="ElementShortName">DQ4_ipd</obj_property>
+         <obj_property name="ObjectShortName">DQ4_ipd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ3_ipd">
+         <obj_property name="ElementShortName">DQ3_ipd</obj_property>
+         <obj_property name="ObjectShortName">DQ3_ipd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ2_ipd">
+         <obj_property name="ElementShortName">DQ2_ipd</obj_property>
+         <obj_property name="ObjectShortName">DQ2_ipd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ1_ipd">
+         <obj_property name="ElementShortName">DQ1_ipd</obj_property>
+         <obj_property name="ObjectShortName">DQ1_ipd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ0_ipd">
+         <obj_property name="ElementShortName">DQ0_ipd</obj_property>
+         <obj_property name="ObjectShortName">DQ0_ipd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RWDS_ipd">
+         <obj_property name="ElementShortName">RWDS_ipd</obj_property>
+         <obj_property name="ObjectShortName">RWDS_ipd</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/Din">
+         <obj_property name="ElementShortName">Din[7:0]</obj_property>
+         <obj_property name="ObjectShortName">Din[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/Dout">
+         <obj_property name="ElementShortName">Dout[7:0]</obj_property>
+         <obj_property name="ObjectShortName">Dout[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RWDSin">
+         <obj_property name="ElementShortName">RWDSin</obj_property>
+         <obj_property name="ObjectShortName">RWDSin</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/HS_in">
+         <obj_property name="ElementShortName">HS_in</obj_property>
+         <obj_property name="ObjectShortName">HS_in</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/HS_out">
+         <obj_property name="ElementShortName">HS_out</obj_property>
+         <obj_property name="ObjectShortName">HS_out</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DPD_in">
+         <obj_property name="ElementShortName">DPD_in</obj_property>
+         <obj_property name="ObjectShortName">DPD_in</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DPD_out">
+         <obj_property name="ElementShortName">DPD_out</obj_property>
+         <obj_property name="ObjectShortName">DPD_out</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RPH_in">
+         <obj_property name="ElementShortName">RPH_in</obj_property>
+         <obj_property name="ObjectShortName">RPH_in</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RPH_out">
+         <obj_property name="ElementShortName">RPH_out</obj_property>
+         <obj_property name="ObjectShortName">RPH_out</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/REF_in">
+         <obj_property name="ElementShortName">REF_in</obj_property>
+         <obj_property name="ObjectShortName">REF_in</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/REF_out">
+         <obj_property name="ElementShortName">REF_out</obj_property>
+         <obj_property name="ObjectShortName">REF_out</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/PO_in">
+         <obj_property name="ElementShortName">PO_in</obj_property>
+         <obj_property name="ObjectShortName">PO_in</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/PO_out">
+         <obj_property name="ElementShortName">PO_out</obj_property>
+         <obj_property name="ObjectShortName">PO_out</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DPDExt_in">
+         <obj_property name="ElementShortName">DPDExt_in</obj_property>
+         <obj_property name="ObjectShortName">DPDExt_in</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DPDExt_out">
+         <obj_property name="ElementShortName">DPDExt_out</obj_property>
+         <obj_property name="ObjectShortName">DPDExt_out</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DPDExt">
+         <obj_property name="ElementShortName">DPDExt</obj_property>
+         <obj_property name="ObjectShortName">DPDExt</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/rising_edge_PoweredUp">
+         <obj_property name="ElementShortName">rising_edge_PoweredUp</obj_property>
+         <obj_property name="ObjectShortName">rising_edge_PoweredUp</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/rising_edge_CKDiff">
+         <obj_property name="ElementShortName">rising_edge_CKDiff</obj_property>
+         <obj_property name="ObjectShortName">rising_edge_CKDiff</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/falling_edge_CKDiff">
+         <obj_property name="ElementShortName">falling_edge_CKDiff</obj_property>
+         <obj_property name="ObjectShortName">falling_edge_CKDiff</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/rising_edge_CSNeg">
+         <obj_property name="ElementShortName">rising_edge_CSNeg</obj_property>
+         <obj_property name="ObjectShortName">rising_edge_CSNeg</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/falling_edge_CSNeg">
+         <obj_property name="ElementShortName">falling_edge_CSNeg</obj_property>
+         <obj_property name="ObjectShortName">falling_edge_CSNeg</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/rising_edge_REF_out">
+         <obj_property name="ElementShortName">rising_edge_REF_out</obj_property>
+         <obj_property name="ObjectShortName">rising_edge_REF_out</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/rising_edge_PO_out">
+         <obj_property name="ElementShortName">rising_edge_PO_out</obj_property>
+         <obj_property name="ObjectShortName">rising_edge_PO_out</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/rising_edge_RPH_out">
+         <obj_property name="ElementShortName">rising_edge_RPH_out</obj_property>
+         <obj_property name="ObjectShortName">rising_edge_RPH_out</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/rising_edge_DPD_in">
+         <obj_property name="ElementShortName">rising_edge_DPD_in</obj_property>
+         <obj_property name="ObjectShortName">rising_edge_DPD_in</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/rising_edge_DPD_out">
+         <obj_property name="ElementShortName">rising_edge_DPD_out</obj_property>
+         <obj_property name="ObjectShortName">rising_edge_DPD_out</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/rising_edge_HS_in">
+         <obj_property name="ElementShortName">rising_edge_HS_in</obj_property>
+         <obj_property name="ObjectShortName">rising_edge_HS_in</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/rising_edge_HS_out">
+         <obj_property name="ElementShortName">rising_edge_HS_out</obj_property>
+         <obj_property name="ObjectShortName">rising_edge_HS_out</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/rising_edge_RESETNeg">
+         <obj_property name="ElementShortName">rising_edge_RESETNeg</obj_property>
+         <obj_property name="ObjectShortName">rising_edge_RESETNeg</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/falling_edge_RESETNeg">
+         <obj_property name="ElementShortName">falling_edge_RESETNeg</obj_property>
+         <obj_property name="ObjectShortName">falling_edge_RESETNeg</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/rising_edge_glitch_rwds">
+         <obj_property name="ElementShortName">rising_edge_glitch_rwds</obj_property>
+         <obj_property name="ObjectShortName">rising_edge_glitch_rwds</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tACC_delay">
+         <obj_property name="ElementShortName">tACC_delay[31:0]</obj_property>
+         <obj_property name="ObjectShortName">tACC_delay[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/DQt_01">
+         <obj_property name="ElementShortName">DQt_01[31:0]</obj_property>
+         <obj_property name="ObjectShortName">DQt_01[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/RWDSt_01">
+         <obj_property name="ElementShortName">RWDSt_01[31:0]</obj_property>
+         <obj_property name="ObjectShortName">RWDSt_01[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/RWDSRt_01">
+         <obj_property name="ElementShortName">RWDSRt_01[31:0]</obj_property>
+         <obj_property name="ObjectShortName">RWDSRt_01[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/CK_cycle">
+         <obj_property name="ElementShortName">CK_cycle[63:0]</obj_property>
+         <obj_property name="ObjectShortName">CK_cycle[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/prev_CK">
+         <obj_property name="ElementShortName">prev_CK[63:0]</obj_property>
+         <obj_property name="ObjectShortName">prev_CK[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/tacc_start">
+         <obj_property name="ElementShortName">tacc_start</obj_property>
+         <obj_property name="ObjectShortName">tacc_start</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/glitch_dq">
+         <obj_property name="ElementShortName">glitch_dq</obj_property>
+         <obj_property name="ObjectShortName">glitch_dq</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/glitch_rwds">
+         <obj_property name="ElementShortName">glitch_rwds</obj_property>
+         <obj_property name="ObjectShortName">glitch_rwds</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/glitch_rwdsR">
+         <obj_property name="ElementShortName">glitch_rwdsR</obj_property>
+         <obj_property name="ObjectShortName">glitch_rwdsR</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/Viol">
+         <obj_property name="ElementShortName">Viol</obj_property>
+         <obj_property name="ObjectShortName">Viol</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/Dout_zd">
+         <obj_property name="ElementShortName">Dout_zd[7:0]</obj_property>
+         <obj_property name="ObjectShortName">Dout_zd[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/Dout_zdp">
+         <obj_property name="ElementShortName">Dout_zdp[7:0]</obj_property>
+         <obj_property name="ObjectShortName">Dout_zdp[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/Dout_zdn">
+         <obj_property name="ElementShortName">Dout_zdn[7:0]</obj_property>
+         <obj_property name="ObjectShortName">Dout_zdn[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RWDSout_zd">
+         <obj_property name="ElementShortName">RWDSout_zd</obj_property>
+         <obj_property name="ObjectShortName">RWDSout_zd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RWDS_zdp">
+         <obj_property name="ElementShortName">RWDS_zdp</obj_property>
+         <obj_property name="ObjectShortName">RWDS_zdp</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RWDS_zdn">
+         <obj_property name="ElementShortName">RWDS_zdn</obj_property>
+         <obj_property name="ObjectShortName">RWDS_zdn</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQp_latch">
+         <obj_property name="ElementShortName">DQp_latch</obj_property>
+         <obj_property name="ObjectShortName">DQp_latch</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQn_latch">
+         <obj_property name="ElementShortName">DQn_latch</obj_property>
+         <obj_property name="ObjectShortName">DQn_latch</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ7_zd">
+         <obj_property name="ElementShortName">DQ7_zd</obj_property>
+         <obj_property name="ObjectShortName">DQ7_zd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ6_zd">
+         <obj_property name="ElementShortName">DQ6_zd</obj_property>
+         <obj_property name="ObjectShortName">DQ6_zd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ5_zd">
+         <obj_property name="ElementShortName">DQ5_zd</obj_property>
+         <obj_property name="ObjectShortName">DQ5_zd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ4_zd">
+         <obj_property name="ElementShortName">DQ4_zd</obj_property>
+         <obj_property name="ObjectShortName">DQ4_zd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ3_zd">
+         <obj_property name="ElementShortName">DQ3_zd</obj_property>
+         <obj_property name="ObjectShortName">DQ3_zd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ2_zd">
+         <obj_property name="ElementShortName">DQ2_zd</obj_property>
+         <obj_property name="ObjectShortName">DQ2_zd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ1_zd">
+         <obj_property name="ElementShortName">DQ1_zd</obj_property>
+         <obj_property name="ObjectShortName">DQ1_zd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQ0_zd">
+         <obj_property name="ElementShortName">DQ0_zd</obj_property>
+         <obj_property name="ObjectShortName">DQ0_zd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RWDS_zd">
+         <obj_property name="ElementShortName">RWDS_zd</obj_property>
+         <obj_property name="ObjectShortName">RWDS_zd</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/Dout_zd_tmp">
+         <obj_property name="ElementShortName">Dout_zd_tmp[7:0]</obj_property>
+         <obj_property name="ObjectShortName">Dout_zd_tmp[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RWDSout_zd_tmp">
+         <obj_property name="ElementShortName">RWDSout_zd_tmp</obj_property>
+         <obj_property name="ObjectShortName">RWDSout_zd_tmp</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/Dout_zd_latchH">
+         <obj_property name="ElementShortName">Dout_zd_latchH[7:0]</obj_property>
+         <obj_property name="ObjectShortName">Dout_zd_latchH[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/Dout_zd_latchL">
+         <obj_property name="ElementShortName">Dout_zd_latchL[7:0]</obj_property>
+         <obj_property name="ObjectShortName">Dout_zd_latchL[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RWDS_zd_latchH">
+         <obj_property name="ElementShortName">RWDS_zd_latchH</obj_property>
+         <obj_property name="ObjectShortName">RWDS_zd_latchH</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RWDS_zd_latchL">
+         <obj_property name="ElementShortName">RWDS_zd_latchL</obj_property>
+         <obj_property name="ObjectShortName">RWDS_zd_latchL</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RESETNeg_pullup">
+         <obj_property name="ElementShortName">RESETNeg_pullup</obj_property>
+         <obj_property name="ObjectShortName">RESETNeg_pullup</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/CKDiff">
+         <obj_property name="ElementShortName">CKDiff</obj_property>
+         <obj_property name="ObjectShortName">CKDiff</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RW">
+         <obj_property name="ElementShortName">RW</obj_property>
+         <obj_property name="ObjectShortName">RW</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/REFCOLL">
+         <obj_property name="ElementShortName">REFCOLL</obj_property>
+         <obj_property name="ObjectShortName">REFCOLL</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/REFCOLL_ACTIV">
+         <obj_property name="ElementShortName">REFCOLL_ACTIV</obj_property>
+         <obj_property name="ObjectShortName">REFCOLL_ACTIV</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/t_RWR_CHK">
+         <obj_property name="ElementShortName">t_RWR_CHK</obj_property>
+         <obj_property name="ObjectShortName">t_RWR_CHK</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/PartialRefresh_Array">
+         <obj_property name="ElementShortName">PartialRefresh_Array[0:7][1:0][31:0]</obj_property>
+         <obj_property name="ObjectShortName">PartialRefresh_Array[0:7][1:0][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/temp">
+         <obj_property name="ElementShortName">temp</obj_property>
+         <obj_property name="ObjectShortName">temp</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/Dout_Z">
+         <obj_property name="ElementShortName">Dout_Z</obj_property>
+         <obj_property name="ObjectShortName">Dout_Z</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RWDSout_Z">
+         <obj_property name="ElementShortName">RWDSout_Z</obj_property>
+         <obj_property name="ObjectShortName">RWDSout_Z</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/tRWR_CHK">
+         <obj_property name="ElementShortName">tRWR_CHK</obj_property>
+         <obj_property name="ObjectShortName">tRWR_CHK</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/s27kl0642_inst/REFinterval">
+         <obj_property name="ElementShortName">REFinterval</obj_property>
+         <obj_property name="ObjectShortName">REFinterval</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/current_state">
+         <obj_property name="ElementShortName">current_state[2:0]</obj_property>
+         <obj_property name="ObjectShortName">current_state[2:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/next_state">
+         <obj_property name="ElementShortName">next_state[2:0]</obj_property>
+         <obj_property name="ObjectShortName">next_state[2:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/bus_cycle_state">
+         <obj_property name="ElementShortName">bus_cycle_state[1:0]</obj_property>
+         <obj_property name="ObjectShortName">bus_cycle_state[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/RD_MODE">
+         <obj_property name="ElementShortName">RD_MODE[1:0]</obj_property>
+         <obj_property name="ObjectShortName">RD_MODE[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/PoweredUp">
+         <obj_property name="ElementShortName">PoweredUp</obj_property>
+         <obj_property name="ObjectShortName">PoweredUp</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DPD_ACT">
+         <obj_property name="ElementShortName">DPD_ACT</obj_property>
+         <obj_property name="ObjectShortName">DPD_ACT</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/HS_ACT">
+         <obj_property name="ElementShortName">HS_ACT</obj_property>
+         <obj_property name="ObjectShortName">HS_ACT</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/Address">
+         <obj_property name="ElementShortName">Address[31:0]</obj_property>
+         <obj_property name="ObjectShortName">Address[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/Config_reg0">
+         <obj_property name="ElementShortName">Config_reg0[15:0]</obj_property>
+         <obj_property name="ObjectShortName">Config_reg0[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/Config_reg1">
+         <obj_property name="ElementShortName">Config_reg1[15:0]</obj_property>
+         <obj_property name="ObjectShortName">Config_reg1[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/Identification_reg0">
+         <obj_property name="ElementShortName">Identification_reg0[15:0]</obj_property>
+         <obj_property name="ObjectShortName">Identification_reg0[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/Identification_reg1">
+         <obj_property name="ElementShortName">Identification_reg1[15:0]</obj_property>
+         <obj_property name="ObjectShortName">Identification_reg1[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/UByteMask">
+         <obj_property name="ElementShortName">UByteMask</obj_property>
+         <obj_property name="ObjectShortName">UByteMask</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/LByteMask">
+         <obj_property name="ElementShortName">LByteMask</obj_property>
+         <obj_property name="ObjectShortName">LByteMask</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/Target">
+         <obj_property name="ElementShortName">Target</obj_property>
+         <obj_property name="ObjectShortName">Target</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/BurstDelay">
+         <obj_property name="ElementShortName">BurstDelay[31:0]</obj_property>
+         <obj_property name="ObjectShortName">BurstDelay[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/RefreshDelay">
+         <obj_property name="ElementShortName">RefreshDelay[31:0]</obj_property>
+         <obj_property name="ObjectShortName">RefreshDelay[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/BurstLength">
+         <obj_property name="ElementShortName">BurstLength[31:0]</obj_property>
+         <obj_property name="ObjectShortName">BurstLength[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tmp_timing">
+         <obj_property name="ElementShortName">tmp_timing[191:0]</obj_property>
+         <obj_property name="ObjectShortName">tmp_timing[191:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tmp_char1">
+         <obj_property name="ElementShortName">tmp_char1[7:0]</obj_property>
+         <obj_property name="ObjectShortName">tmp_char1[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tmp_char2">
+         <obj_property name="ElementShortName">tmp_char2[7:0]</obj_property>
+         <obj_property name="ObjectShortName">tmp_char2[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/found">
+         <obj_property name="ElementShortName">found[31:0]</obj_property>
+         <obj_property name="ObjectShortName">found[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/SPEED100">
+         <obj_property name="ElementShortName">SPEED100</obj_property>
+         <obj_property name="ObjectShortName">SPEED100</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/refresh_pulse">
+         <obj_property name="ElementShortName">refresh_pulse</obj_property>
+         <obj_property name="ObjectShortName">refresh_pulse</obj_property>
+         <obj_property name="CustomSignalColor">#FF00FF</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/HSExit_in">
+         <obj_property name="ElementShortName">HSExit_in</obj_property>
+         <obj_property name="ObjectShortName">HSExit_in</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/HSExt_out">
+         <obj_property name="ElementShortName">HSExt_out</obj_property>
+         <obj_property name="ObjectShortName">HSExt_out</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/HSExt">
+         <obj_property name="ElementShortName">HSExt</obj_property>
+         <obj_property name="ObjectShortName">HSExt</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DPDExit_in">
+         <obj_property name="ElementShortName">DPDExit_in</obj_property>
+         <obj_property name="ObjectShortName">DPDExit_in</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tACC_start_time">
+         <obj_property name="ElementShortName">tACC_start_time[31:0]</obj_property>
+         <obj_property name="ObjectShortName">tACC_start_time[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/data_cycle">
+         <obj_property name="ElementShortName">data_cycle[31:0]</obj_property>
+         <obj_property name="ObjectShortName">data_cycle[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/ca_cnt">
+         <obj_property name="ElementShortName">ca_cnt[31:0]</obj_property>
+         <obj_property name="ObjectShortName">ca_cnt[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/ca_in">
+         <obj_property name="ElementShortName">ca_in[47:0]</obj_property>
+         <obj_property name="ObjectShortName">ca_in[47:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/Data_in">
+         <obj_property name="ElementShortName">Data_in[15:0]</obj_property>
+         <obj_property name="ObjectShortName">Data_in[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RD_WRAP">
+         <obj_property name="ElementShortName">RD_WRAP</obj_property>
+         <obj_property name="ObjectShortName">RD_WRAP</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/Start_BurstAddr">
+         <obj_property name="ElementShortName">Start_BurstAddr[31:0]</obj_property>
+         <obj_property name="ObjectShortName">Start_BurstAddr[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/RdWrStart">
+         <obj_property name="ElementShortName">RdWrStart</obj_property>
+         <obj_property name="ObjectShortName">RdWrStart</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/ALTERNATE_64">
+         <obj_property name="ElementShortName">ALTERNATE_64</obj_property>
+         <obj_property name="ObjectShortName">ALTERNATE_64</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/HYBRID">
+         <obj_property name="ElementShortName">HYBRID</obj_property>
+         <obj_property name="ObjectShortName">HYBRID</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/po_out_flag">
+         <obj_property name="ElementShortName">po_out_flag</obj_property>
+         <obj_property name="ObjectShortName">po_out_flag</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/flag">
+         <obj_property name="ElementShortName">flag</obj_property>
+         <obj_property name="ObjectShortName">flag</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/BuffInDQ">
+         <obj_property name="ElementShortName">BuffInDQ</obj_property>
+         <obj_property name="ObjectShortName">BuffInDQ</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/BuffOutDQ">
+         <obj_property name="ElementShortName">BuffOutDQ</obj_property>
+         <obj_property name="ObjectShortName">BuffOutDQ</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/BuffInRWDS">
+         <obj_property name="ElementShortName">BuffInRWDS</obj_property>
+         <obj_property name="ObjectShortName">BuffInRWDS</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/BuffOutRWDS">
+         <obj_property name="ElementShortName">BuffOutRWDS</obj_property>
+         <obj_property name="ObjectShortName">BuffOutRWDS</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/BuffInRWDSR">
+         <obj_property name="ElementShortName">BuffInRWDSR</obj_property>
+         <obj_property name="ObjectShortName">BuffInRWDSR</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/BuffOutRWDSR">
+         <obj_property name="ElementShortName">BuffOutRWDSR</obj_property>
+         <obj_property name="ObjectShortName">BuffOutRWDSR</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/rwds_enable">
+         <obj_property name="ElementShortName">rwds_enable</obj_property>
+         <obj_property name="ObjectShortName">rwds_enable</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQp_z">
+         <obj_property name="ElementShortName">DQp_z</obj_property>
+         <obj_property name="ObjectShortName">DQp_z</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/DQn_z">
+         <obj_property name="ElementShortName">DQn_z</obj_property>
+         <obj_property name="ObjectShortName">DQn_z</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb/s27kl0642_inst/HSExt_in">
+         <obj_property name="ElementShortName">HSExt_in</obj_property>
+         <obj_property name="ObjectShortName">HSExt_in</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/UserPreload">
+         <obj_property name="ElementShortName">UserPreload[31:0]</obj_property>
+         <obj_property name="ObjectShortName">UserPreload[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/mem_file_name">
+         <obj_property name="ElementShortName">mem_file_name[31:0]</obj_property>
+         <obj_property name="ObjectShortName">mem_file_name[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/TimingModel">
+         <obj_property name="ElementShortName">TimingModel[135:0]</obj_property>
+         <obj_property name="ObjectShortName">TimingModel[135:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/PartID">
+         <obj_property name="ElementShortName">PartID[71:0]</obj_property>
+         <obj_property name="ObjectShortName">PartID[71:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/MaxData">
+         <obj_property name="ElementShortName">MaxData[15:0]</obj_property>
+         <obj_property name="ObjectShortName">MaxData[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/MemSize">
+         <obj_property name="ElementShortName">MemSize[24:0]</obj_property>
+         <obj_property name="ObjectShortName">MemSize[24:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/no_of_rows">
+         <obj_property name="ElementShortName">no_of_rows[31:0]</obj_property>
+         <obj_property name="ObjectShortName">no_of_rows[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/HiAddrBit">
+         <obj_property name="ElementShortName">HiAddrBit[31:0]</obj_property>
+         <obj_property name="ObjectShortName">HiAddrBit[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/AddrRANGE">
+         <obj_property name="ElementShortName">AddrRANGE[24:0]</obj_property>
+         <obj_property name="ObjectShortName">AddrRANGE[24:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/POWER_ON">
+         <obj_property name="ElementShortName">POWER_ON[2:0]</obj_property>
+         <obj_property name="ObjectShortName">POWER_ON[2:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/ACT">
+         <obj_property name="ElementShortName">ACT[2:0]</obj_property>
+         <obj_property name="ObjectShortName">ACT[2:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/RESET_STATE">
+         <obj_property name="ElementShortName">RESET_STATE[2:0]</obj_property>
+         <obj_property name="ObjectShortName">RESET_STATE[2:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/DPD_STATE">
+         <obj_property name="ElementShortName">DPD_STATE[2:0]</obj_property>
+         <obj_property name="ObjectShortName">DPD_STATE[2:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/HSLEEP_STATE">
+         <obj_property name="ElementShortName">HSLEEP_STATE[2:0]</obj_property>
+         <obj_property name="ObjectShortName">HSLEEP_STATE[2:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/STAND_BY">
+         <obj_property name="ElementShortName">STAND_BY[1:0]</obj_property>
+         <obj_property name="ObjectShortName">STAND_BY[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/CA_BITS">
+         <obj_property name="ElementShortName">CA_BITS[1:0]</obj_property>
+         <obj_property name="ObjectShortName">CA_BITS[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/DATA_BITS">
+         <obj_property name="ElementShortName">DATA_BITS[1:0]</obj_property>
+         <obj_property name="ObjectShortName">DATA_BITS[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/LINEAR">
+         <obj_property name="ElementShortName">LINEAR[3:0]</obj_property>
+         <obj_property name="ObjectShortName">LINEAR[3:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/CONTINUOUS">
+         <obj_property name="ElementShortName">CONTINUOUS[3:0]</obj_property>
+         <obj_property name="ObjectShortName">CONTINUOUS[3:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tpd_CSNeg_RWDSn">
+         <obj_property name="ElementShortName">tpd_CSNeg_RWDSn[31:0]</obj_property>
+         <obj_property name="ObjectShortName">tpd_CSNeg_RWDSn[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tpd_CSNeg_RWDSp">
+         <obj_property name="ElementShortName">tpd_CSNeg_RWDSp[31:0]</obj_property>
+         <obj_property name="ObjectShortName">tpd_CSNeg_RWDSp[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tpd_CK_RWDS">
+         <obj_property name="ElementShortName">tpd_CK_RWDS[31:0]</obj_property>
+         <obj_property name="ObjectShortName">tpd_CK_RWDS[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tpd_CSNeg_DQ0">
+         <obj_property name="ElementShortName">tpd_CSNeg_DQ0[31:0]</obj_property>
+         <obj_property name="ObjectShortName">tpd_CSNeg_DQ0[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tpd_CK_DQ0">
+         <obj_property name="ElementShortName">tpd_CK_DQ0[31:0]</obj_property>
+         <obj_property name="ObjectShortName">tpd_CK_DQ0[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tsetup_CSNeg_CK">
+         <obj_property name="ElementShortName">tsetup_CSNeg_CK[31:0]</obj_property>
+         <obj_property name="ObjectShortName">tsetup_CSNeg_CK[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tsetup_DQ0_CK">
+         <obj_property name="ElementShortName">tsetup_DQ0_CK[31:0]</obj_property>
+         <obj_property name="ObjectShortName">tsetup_DQ0_CK[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/thold_CSNeg_CK">
+         <obj_property name="ElementShortName">thold_CSNeg_CK[31:0]</obj_property>
+         <obj_property name="ObjectShortName">thold_CSNeg_CK[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/thold_DQ0_CK">
+         <obj_property name="ElementShortName">thold_DQ0_CK[31:0]</obj_property>
+         <obj_property name="ObjectShortName">thold_DQ0_CK[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/thold_CSNeg_RESETNeg">
+         <obj_property name="ElementShortName">thold_CSNeg_RESETNeg[31:0]</obj_property>
+         <obj_property name="ObjectShortName">thold_CSNeg_RESETNeg[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/trecovery_CSNeg_CK">
+         <obj_property name="ElementShortName">trecovery_CSNeg_CK[31:0]</obj_property>
+         <obj_property name="ObjectShortName">trecovery_CSNeg_CK[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/s27kl0642_inst/tskew_CSNeg_CSNeg">
+         <obj_property name="ElementShortName">tskew_CSNeg_CSNeg</obj_property>
+         <obj_property name="ObjectShortName">tskew_CSNeg_CSNeg</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tpw_CK_negedge">
+         <obj_property name="ElementShortName">tpw_CK_negedge[31:0]</obj_property>
+         <obj_property name="ObjectShortName">tpw_CK_negedge[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tpw_CK_posedge">
+         <obj_property name="ElementShortName">tpw_CK_posedge[31:0]</obj_property>
+         <obj_property name="ObjectShortName">tpw_CK_posedge[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/s27kl0642_inst/tpw_CSNeg_posedge">
+         <obj_property name="ElementShortName">tpw_CSNeg_posedge</obj_property>
+         <obj_property name="ObjectShortName">tpw_CSNeg_posedge</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/s27kl0642_inst/tpw_RESETNeg_negedge">
+         <obj_property name="ElementShortName">tpw_RESETNeg_negedge</obj_property>
+         <obj_property name="ObjectShortName">tpw_RESETNeg_negedge</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/s27kl0642_inst/tACC_device">
+         <obj_property name="ElementShortName">tACC_device</obj_property>
+         <obj_property name="ObjectShortName">tACC_device</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tperiod_CK">
+         <obj_property name="ElementShortName">tperiod_CK[31:0]</obj_property>
+         <obj_property name="ObjectShortName">tperiod_CK[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/s27kl0642_inst/tdevice_VCS">
+         <obj_property name="ElementShortName">tdevice_VCS</obj_property>
+         <obj_property name="ObjectShortName">tdevice_VCS</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/s27kl0642_inst/tdevice_DPD">
+         <obj_property name="ElementShortName">tdevice_DPD</obj_property>
+         <obj_property name="ObjectShortName">tdevice_DPD</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/s27kl0642_inst/tdevice_DPDCSL">
+         <obj_property name="ElementShortName">tdevice_DPDCSL</obj_property>
+         <obj_property name="ObjectShortName">tdevice_DPDCSL</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/s27kl0642_inst/tdevice_HSCSL">
+         <obj_property name="ElementShortName">tdevice_HSCSL</obj_property>
+         <obj_property name="ObjectShortName">tdevice_HSCSL</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/s27kl0642_inst/tdevice_RPH">
+         <obj_property name="ElementShortName">tdevice_RPH</obj_property>
+         <obj_property name="ObjectShortName">tdevice_RPH</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/s27kl0642_inst/tdevice_REF100">
+         <obj_property name="ElementShortName">tdevice_REF100</obj_property>
+         <obj_property name="ObjectShortName">tdevice_REF100</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/s27kl0642_inst/tdevice_PO100">
+         <obj_property name="ElementShortName">tdevice_PO100[31:0]</obj_property>
+         <obj_property name="ObjectShortName">tdevice_PO100[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/s27kl0642_inst/tHSIN">
+         <obj_property name="ElementShortName">tHSIN</obj_property>
+         <obj_property name="ObjectShortName">tHSIN</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/s27kl0642_inst/tDPDIN">
+         <obj_property name="ElementShortName">tDPDIN</obj_property>
+         <obj_property name="ObjectShortName">tDPDIN</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/s27kl0642_inst/tCSHS">
+         <obj_property name="ElementShortName">tCSHS</obj_property>
+         <obj_property name="ObjectShortName">tCSHS</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/tb/s27kl0642_inst/tCSDPD">
+         <obj_property name="ElementShortName">tCSDPD</obj_property>
+         <obj_property name="ObjectShortName">tCSDPD</obj_property>
       </wvobject>
    </wvobject>
 </wave_config>

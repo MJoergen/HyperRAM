@@ -41,6 +41,9 @@ architecture synthesis of hyperram_rx is
    signal ctrl_dq_ie_d  : std_logic;
    signal ctrl_dq_ie_d2 : std_logic;
 
+   attribute mark_debug : string;
+   attribute mark_debug of rwds_in_delay : signal is "true";
+
 begin
 
    -- This is needed in order to make use of the IDELAYE2 primitive.
@@ -59,7 +62,7 @@ begin
       generic map (
          IDELAY_TYPE           => "FIXED",
          DELAY_SRC             => "IDATAIN",
-         IDELAY_VALUE          => 20,
+         IDELAY_VALUE          => 12,
          HIGH_PERFORMANCE_MODE => "TRUE",
          SIGNAL_PATTERN        => "CLOCK",
          REFCLK_FREQUENCY      => 200.0, -- Each tap on average 5/32 ns.
@@ -121,7 +124,7 @@ begin
    hyperram_fifo_inst : entity work.hyperram_fifo
       generic map (
          G_INVERT_SRC_CLK => true,
-         G_DATA_SIZE => 16
+         G_DATA_SIZE      => 16
       )
       port map (
          src_clk_i   => rwds_in_delay,

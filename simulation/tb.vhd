@@ -13,11 +13,11 @@ end entity tb;
 
 architecture simulation of tb is
 
-   constant C_DELAY      : time  := 1 ns;
-   constant C_CLK_PERIOD : time  := 10 ns; -- 100 MHz
+   constant C_DELAY      : time        := 1 ns;
+   constant C_CLK_PERIOD : time        := 10 ns; -- 100 MHz
 
-   signal   sys_clk  : std_logic := '1';
-   signal   sys_rstn : std_logic := '0';
+   signal   sys_clk  : std_logic       := '1';
+   signal   sys_rstn : std_logic       := '0';
 
    signal   clk          : std_logic;
    signal   clk_del      : std_logic;
@@ -25,6 +25,9 @@ architecture simulation of tb is
    signal   rst          : std_logic;
 
    signal   tb_start : std_logic;
+
+   signal   tb_read_error  : std_logic := '0';
+   signal   tb_write_error : std_logic := '0';
 
    signal   sys_resetn    : std_logic;
    signal   sys_csn       : std_logic;
@@ -99,6 +102,38 @@ begin
       wait;
    end process tb_start_proc;
 
+   tb_write_error_proc : process
+   begin
+      tb_write_error <= '0';
+      wait for 200 us;
+      wait until clk = '1';
+      wait until clk = '1';
+      tb_write_error <= '1';
+
+      for i in 1 to 28 loop
+         wait until clk = '1';
+      end loop;
+
+      tb_write_error <= '0';
+      wait;
+   end process tb_write_error_proc;
+
+   tb_read_error_proc : process
+   begin
+      tb_read_error <= '0';
+      wait for 300 us;
+      wait until clk = '1';
+      wait until clk = '1';
+      tb_read_error <= '1';
+
+      for i in 1 to 16 loop
+         wait until clk = '1';
+      end loop;
+
+      tb_read_error <= '0';
+      wait;
+   end process tb_read_error_proc;
+
 
    --------------------------------------------------------
    -- Instantiate core test generator
@@ -106,31 +141,33 @@ begin
 
    core_wrapper_inst : entity work.core_wrapper
       generic map (
-         G_SYS_ADDRESS_SIZE => 6,
-         G_ADDRESS_SIZE     => 20,
-         G_DATA_SIZE        => 64
+         G_SYS_ADDRESS_SIZE => 8,
+         G_ADDRESS_SIZE     => 22,
+         G_DATA_SIZE        => 16
       )
       port map (
-         clk_i           => clk,
-         rst_i           => rst,
-         clk_del_i       => clk_del,
-         delay_refclk_i  => delay_refclk,
-         start_i         => tb_start,
-         active_o        => open,
-         stat_total_o    => open,
-         stat_error_o    => open,
-         stat_err_addr_o => open,
-         stat_err_exp_o  => open,
-         stat_err_read_o => open,
-         hr_resetn_o     => sys_resetn,
-         hr_csn_o        => sys_csn,
-         hr_ck_o         => sys_ck,
-         hr_rwds_in_i    => sys_rwds_in,
-         hr_rwds_out_o   => sys_rwds_out,
-         hr_rwds_oe_n_o  => sys_rwds_oe_n,
-         hr_dq_in_i      => sys_dq_in,
-         hr_dq_out_o     => sys_dq_out,
-         hr_dq_oe_n_o    => sys_dq_oe_n
+         clk_i            => clk,
+         rst_i            => rst,
+         clk_del_i        => clk_del,
+         delay_refclk_i   => delay_refclk,
+         start_i          => tb_start,
+         active_o         => open,
+         tb_read_error_i  => tb_read_error,
+         tb_write_error_i => tb_write_error,
+         stat_total_o     => open,
+         stat_error_o     => open,
+         stat_err_addr_o  => open,
+         stat_err_exp_o   => open,
+         stat_err_read_o  => open,
+         hr_resetn_o      => sys_resetn,
+         hr_csn_o         => sys_csn,
+         hr_ck_o          => sys_ck,
+         hr_rwds_in_i     => sys_rwds_in,
+         hr_rwds_out_o    => sys_rwds_out,
+         hr_rwds_oe_n_o   => sys_rwds_oe_n,
+         hr_dq_in_i       => sys_dq_in,
+         hr_dq_out_o      => sys_dq_out,
+         hr_dq_oe_n_o     => sys_dq_oe_n
       ); -- core_wrapper_inst
 
    ----------------------------------

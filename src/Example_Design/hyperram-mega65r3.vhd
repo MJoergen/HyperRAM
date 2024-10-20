@@ -51,9 +51,9 @@ end entity hyperram_mega65r3;
 
 architecture synthesis of hyperram_mega65r3 is
 
-   constant C_SYS_ADDRESS_SIZE : integer := 17;
-   constant C_ADDRESS_SIZE     : integer := 20;
-   constant C_DATA_SIZE        : integer := 64;
+   constant C_SYS_ADDRESS_SIZE : integer := 22;
+   constant C_ADDRESS_SIZE     : integer := 22;
+   constant C_DATA_SIZE        : integer := 16;
 
    -- HyperRAM clocks and reset
    signal   ctrl_clk     : std_logic; -- HyperRAM clock
@@ -211,26 +211,28 @@ begin
          G_DATA_SIZE        => C_DATA_SIZE
       )
       port map (
-         clk_i           => ctrl_clk,
-         clk_del_i       => ctrl_clk_del,
-         delay_refclk_i  => delay_refclk,
-         rst_i           => ctrl_rst,
-         start_i         => ctrl_start,
-         active_o        => ctrl_active,
-         stat_total_o    => ctrl_stat_total,
-         stat_error_o    => ctrl_stat_error,
-         stat_err_addr_o => ctrl_stat_err_addr,
-         stat_err_exp_o  => ctrl_stat_err_exp,
-         stat_err_read_o => ctrl_stat_err_read,
-         hr_resetn_o     => hr_resetn_o,
-         hr_csn_o        => hr_csn_o,
-         hr_ck_o         => hr_ck_o,
-         hr_rwds_in_i    => hr_rwds_in,
-         hr_rwds_out_o   => hr_rwds_out,
-         hr_rwds_oe_n_o  => hr_rwds_oe_n,
-         hr_dq_in_i      => hr_dq_in,
-         hr_dq_out_o     => hr_dq_out,
-         hr_dq_oe_n_o    => hr_dq_oe_n
+         clk_i            => ctrl_clk,
+         clk_del_i        => ctrl_clk_del,
+         delay_refclk_i   => delay_refclk,
+         rst_i            => ctrl_rst,
+         start_i          => ctrl_start,
+         active_o         => ctrl_active,
+         tb_read_error_i  => '0',
+         tb_write_error_i => '0',
+         stat_total_o     => ctrl_stat_total,
+         stat_error_o     => ctrl_stat_error,
+         stat_err_addr_o  => ctrl_stat_err_addr,
+         stat_err_exp_o   => ctrl_stat_err_exp,
+         stat_err_read_o  => ctrl_stat_err_read,
+         hr_resetn_o      => hr_resetn_o,
+         hr_csn_o         => hr_csn_o,
+         hr_ck_o          => hr_ck_o,
+         hr_rwds_in_i     => hr_rwds_in,
+         hr_rwds_out_o    => hr_rwds_out,
+         hr_rwds_oe_n_o   => hr_rwds_oe_n,
+         hr_dq_in_i       => hr_dq_in,
+         hr_dq_out_o      => hr_dq_out,
+         hr_dq_oe_n_o     => hr_dq_oe_n
       ); -- core_wrapper_inst
 
 

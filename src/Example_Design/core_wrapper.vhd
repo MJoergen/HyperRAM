@@ -13,32 +13,34 @@ entity core_wrapper is
       G_DATA_SIZE        : integer
    );
    port (
-      clk_i           : in    std_logic; -- Main controller clock
-      rst_i           : in    std_logic; -- Synchronous reset, active high
-      clk_del_i       : in    std_logic; -- Main clock, phase shifted
-      delay_refclk_i  : in    std_logic; -- 200 MHz
+      clk_i            : in    std_logic; -- Main controller clock
+      rst_i            : in    std_logic; -- Synchronous reset, active high
+      clk_del_i        : in    std_logic; -- Main clock, phase shifted
+      delay_refclk_i   : in    std_logic; -- 200 MHz
 
       -- Control and Status for trafic generator
-      start_i         : in    std_logic;
-      active_o        : out   std_logic;
+      start_i          : in    std_logic;
+      active_o         : out   std_logic;
+      tb_read_error_i  : in    std_logic;
+      tb_write_error_i : in    std_logic;
 
       -- Statistics output from verifier
-      stat_total_o    : out   std_logic_vector(31 downto 0);
-      stat_error_o    : out   std_logic_vector(31 downto 0);
-      stat_err_addr_o : out   std_logic_vector(31 downto 0);
-      stat_err_exp_o  : out   std_logic_vector(63 downto 0);
-      stat_err_read_o : out   std_logic_vector(63 downto 0);
+      stat_total_o     : out   std_logic_vector(31 downto 0);
+      stat_error_o     : out   std_logic_vector(31 downto 0);
+      stat_err_addr_o  : out   std_logic_vector(31 downto 0);
+      stat_err_exp_o   : out   std_logic_vector(63 downto 0);
+      stat_err_read_o  : out   std_logic_vector(63 downto 0);
 
       -- HyperRAM device interface
-      hr_resetn_o     : out   std_logic;
-      hr_csn_o        : out   std_logic;
-      hr_ck_o         : out   std_logic;
-      hr_rwds_in_i    : in    std_logic;
-      hr_rwds_out_o   : out   std_logic;
-      hr_rwds_oe_n_o  : out   std_logic;
-      hr_dq_in_i      : in    std_logic_vector(7 downto 0);
-      hr_dq_out_o     : out   std_logic_vector(7 downto 0);
-      hr_dq_oe_n_o    : out   std_logic_vector(7 downto 0)
+      hr_resetn_o      : out   std_logic;
+      hr_csn_o         : out   std_logic;
+      hr_ck_o          : out   std_logic;
+      hr_rwds_in_i     : in    std_logic;
+      hr_rwds_out_o    : out   std_logic;
+      hr_rwds_oe_n_o   : out   std_logic;
+      hr_dq_in_i       : in    std_logic_vector(7 downto 0);
+      hr_dq_out_o      : out   std_logic_vector(7 downto 0);
+      hr_dq_oe_n_o     : out   std_logic_vector(7 downto 0)
    );
 end entity core_wrapper;
 
@@ -65,6 +67,14 @@ architecture synthesis of core_wrapper is
    signal dec_readdata      : std_logic_vector(15 downto 0);
    signal dec_readdatavalid : std_logic;
 
+   signal avm_write_error : std_logic_vector(G_DATA_SIZE - 1 downto 0);
+   signal avm_read_error  : std_logic_vector(G_DATA_SIZE - 1 downto 0);
+
+   signal stat_error_d : std_logic_vector(31 downto 0);
+   signal count_long   : unsigned(31 downto 0);
+   signal count_short  : unsigned(31 downto 0);
+   signal refresh_time : unsigned(31 downto 0);
+
 begin
 
    --------------------------------------------------------
@@ -86,6 +96,7 @@ begin
          stat_err_addr_o     => stat_err_addr_o(G_SYS_ADDRESS_SIZE - 1 downto 0),
          stat_err_exp_o      => stat_err_exp_o(G_DATA_SIZE - 1 downto 0),
          stat_err_read_o     => stat_err_read_o(G_DATA_SIZE - 1 downto 0),
+         stat_err_read_2nd_o => stat_err_read_o(2 * G_DATA_SIZE - 1 downto G_DATA_SIZE),
          avm_waitrequest_i   => avm_waitrequest,
          avm_write_o         => avm_write,
          avm_read_o          => avm_read,
@@ -93,13 +104,28 @@ begin
          avm_writedata_o     => avm_writedata,
          avm_byteenable_o    => avm_byteenable,
          avm_burstcount_o    => avm_burstcount,
-         avm_readdata_i      => avm_readdata,
+         avm_readdata_i      => avm_readdata xor avm_read_error,
          avm_readdatavalid_i => avm_readdatavalid
       ); -- traffic_gen_inst
 
+   avm_write_error                               <= (others => tb_write_error_i) when avm_write = '1' and avm_waitrequest = '0' else
+                                                    (others => '0');
+   avm_read_error                                <= (others => tb_read_error_i) when avm_readdatavalid = '1' else
+                                                    (others => '0');
+
    stat_err_addr_o(31 downto G_SYS_ADDRESS_SIZE) <= (others => '0');
-   stat_err_exp_o(63 downto G_DATA_SIZE)         <= (others => '0');
-   stat_err_read_o(63 downto G_DATA_SIZE)        <= (others => '0');
+   stat_err_exp_o(63 downto 2 * G_DATA_SIZE)     <= (others => '0');
+   stat_err_read_o(63 downto 2 * G_DATA_SIZE)    <= (others => '0');
+
+   refresh_time_proc : process (clk_i)
+   begin
+      if rising_edge(clk_i) then
+         stat_error_d <= stat_error_o;
+         if to_integer(unsigned(stat_error_d)) /= to_integer(unsigned(stat_error_o)) then
+            stat_err_exp_o(2 * G_DATA_SIZE - 1 downto G_DATA_SIZE) <= std_logic_vector(refresh_time(G_DATA_SIZE - 1 downto 0));
+         end if;
+      end if;
+   end process refresh_time_proc;
 
 
    decrease_gen : if G_DATA_SIZE > 16 generate
@@ -118,7 +144,7 @@ begin
             s_avm_write_i         => avm_write,
             s_avm_read_i          => avm_read,
             s_avm_address_i       => avm_address(G_ADDRESS_SIZE - 1 downto 0),
-            s_avm_writedata_i     => avm_writedata,
+            s_avm_writedata_i     => avm_writedata xor avm_write_error,
             s_avm_byteenable_i    => avm_byteenable,
             s_avm_burstcount_i    => avm_burstcount,
             s_avm_readdata_o      => avm_readdata,
@@ -139,7 +165,7 @@ begin
       dec_write         <= avm_write;
       dec_read          <= avm_read;
       dec_address       <= avm_address;
-      dec_writedata     <= avm_writedata;
+      dec_writedata     <= avm_writedata xor avm_write_error;
       dec_byteenable    <= avm_byteenable;
       dec_burstcount    <= avm_burstcount;
       avm_readdata      <= dec_readdata;
@@ -153,7 +179,7 @@ begin
 
    hyperram_inst : entity work.hyperram
       generic map (
-         G_ERRATA_ISSI_D_FIX => true
+         G_ERRATA_ISSI_D_FIX => false
       )
       port map (
          clk_i               => clk_i,
@@ -169,8 +195,9 @@ begin
          avm_burstcount_i    => dec_burstcount,
          avm_readdata_o      => dec_readdata,
          avm_readdatavalid_o => dec_readdatavalid,
-         count_long_o        => open,
-         count_short_o       => open,
+         count_long_o        => count_long,
+         count_short_o       => count_short,
+         refresh_time_o      => refresh_time,
          hr_resetn_o         => hr_resetn_o,
          hr_csn_o            => hr_csn_o,
          hr_ck_o             => hr_ck_o,

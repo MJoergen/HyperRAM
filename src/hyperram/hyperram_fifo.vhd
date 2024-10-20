@@ -10,7 +10,7 @@ library ieee;
 entity hyperram_fifo is
    generic (
       G_INVERT_SRC_CLK : boolean;
-      G_DATA_SIZE : natural
+      G_DATA_SIZE      : natural
    );
    port (
       src_clk_i   : in    std_logic;

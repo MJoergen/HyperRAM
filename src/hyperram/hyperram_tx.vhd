@@ -42,7 +42,7 @@ architecture synthesis of hyperram_tx is
    -- they have identical inputs. This is necessary for the
    -- set_property IOB TRUE constraint to have effect.
    attribute dont_touch : string;
-   attribute dont_touch of hr_dq_oe_n : signal is "true";
+   attribute dont_touch of hr_dq_oe_n   : signal is "true";
    attribute dont_touch of hr_rwds_oe_n : signal is "true";
 
 begin

@@ -45,6 +45,7 @@ entity hyperram is
       -- Statistics
       count_long_o        : out   unsigned(31 downto 0);
       count_short_o       : out   unsigned(31 downto 0);
+      refresh_time_o      : out   unsigned(31 downto 0);
 
       -- HyperRAM device interface
       hr_resetn_o         : out   std_logic;
@@ -200,6 +201,7 @@ begin
          avm_waitrequest_o   => cfg_waitrequest,
          count_long_o        => count_long_o,
          count_short_o       => count_short_o,
+         refresh_time_o      => refresh_time_o,
          hb_rstn_o           => ctrl_rstn,
          hb_csn_o            => ctrl_csn,
          hb_ck_ddr_o         => ctrl_ck_ddr,

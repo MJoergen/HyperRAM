@@ -34,6 +34,7 @@ entity hyperram_ctrl is
       -- Statistics
       count_long_o        : out   unsigned(31 downto 0);
       count_short_o       : out   unsigned(31 downto 0);
+      refresh_time_o      : out   unsigned(31 downto 0);
 
       -- HyperBus control signals
       hb_rstn_o           : out   std_logic;
@@ -88,8 +89,32 @@ architecture synthesis of hyperram_ctrl is
    subtype  R_CA_ADDR_LSB is natural range  2 downto  0;
 
    -- Statistics
-   signal   count_long  : unsigned(31 downto 0);
-   signal   count_short : unsigned(31 downto 0);
+   signal   count_long   : unsigned(31 downto 0);
+   signal   count_short  : unsigned(31 downto 0);
+   signal   refresh_time : unsigned(31 downto 0);
+
+   attribute mark_debug : string;
+   attribute mark_debug of state               : signal is "true";
+   attribute mark_debug of avm_waitrequest_o   : signal is "true";
+   attribute mark_debug of avm_write_i         : signal is "true";
+   attribute mark_debug of avm_read_i          : signal is "true";
+   attribute mark_debug of avm_address_i       : signal is "true";
+   attribute mark_debug of avm_writedata_i     : signal is "true";
+   attribute mark_debug of avm_byteenable_i    : signal is "true";
+   attribute mark_debug of avm_burstcount_i    : signal is "true";
+   attribute mark_debug of avm_readdata_o      : signal is "true";
+   attribute mark_debug of avm_readdatavalid_o : signal is "true";
+   attribute mark_debug of hb_ck_ddr_o         : signal is "true";
+   attribute mark_debug of hb_dq_ddr_out_o     : signal is "true";
+   attribute mark_debug of hb_dq_oe_o          : signal is "true";
+   attribute mark_debug of hb_dq_ie_i          : signal is "true";
+   attribute mark_debug of hb_rwds_ddr_out_o   : signal is "true";
+   attribute mark_debug of hb_rwds_oe_o        : signal is "true";
+   attribute mark_debug of hb_rwds_in_i        : signal is "true";
+   attribute mark_debug of hb_read_o           : signal is "true";
+   attribute mark_debug of count_long          : signal is "true";
+   attribute mark_debug of count_short         : signal is "true";
+   attribute mark_debug of refresh_time        : signal is "true";
 
 begin
 
@@ -100,6 +125,8 @@ begin
          hb_dq_oe_o   <= '0';
          hb_rwds_oe_o <= '0';
          hb_read_o    <= '0';
+
+         refresh_time <= refresh_time + 1;
 
          case state is
 
@@ -122,6 +149,8 @@ begin
                   hb_csn_o                       <= '0';
                   hb_dq_oe_o                     <= '1';
                   ca_count                       <= 2;
+
+                  -- Write to Register Space
                   if avm_address_i(31) = '1' then
                      ca_count <= 3;
                   end if;
@@ -152,6 +181,7 @@ begin
                if (hb_rwds_in_i = '1') or G_LATENCY_FIXED then
                   latency_count <= 2 * G_LATENCY - 4;
                   count_long    <= count_long + 1;
+                  refresh_time  <= (others => '0');
                else
                   latency_count <= G_LATENCY - 4;
                   count_short   <= count_short + 1;
@@ -239,6 +269,7 @@ begin
             hb_rwds_oe_o      <= '0';
             count_long        <= (others => '0');
             count_short       <= (others => '0');
+            refresh_time      <= (others => '0');
          end if;
       end if;
    end process fsm_proc;
@@ -256,6 +287,7 @@ begin
    -- Statistics
    count_long_o        <= count_long;
    count_short_o       <= count_short;
+   refresh_time_o      <= refresh_time;
 
 end architecture synthesis;
 
