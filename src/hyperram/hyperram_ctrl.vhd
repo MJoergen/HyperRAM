@@ -62,6 +62,7 @@ architecture synthesis of hyperram_ctrl is
       READ_ST,
       WRITE_ST,
       WRITE_BURST_ST,
+      PRE_RECOVERY_ST,
       RECOVERY_ST
    );
 
@@ -240,12 +241,16 @@ begin
                         hb_dq_oe_o        <= '0';
                         hb_rwds_oe_o      <= '0';
                         avm_waitrequest_o <= '1';
-                        state             <= RECOVERY_ST;
+                        state             <= PRE_RECOVERY_ST;
                      end if;
                   end if;
                else
                   hb_ck_ddr_o <= "00";
                end if;
+
+            when PRE_RECOVERY_ST =>
+               -- Wait one clock cycle before de-asserting CS
+               state <= RECOVERY_ST;
 
             when RECOVERY_ST =>
                hb_csn_o    <= '1';
