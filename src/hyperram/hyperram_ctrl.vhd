@@ -169,7 +169,7 @@ begin
                else
                   if config = '1' and read = '0' then
                      recovery_count <= 3;
-                     state          <= RECOVERY_ST;
+                     state          <= PRE_RECOVERY_ST;
                   else
                      state <= WAIT_ST;
                   end if;
@@ -250,6 +250,7 @@ begin
 
             when PRE_RECOVERY_ST =>
                -- Wait one clock cycle before de-asserting CS
+               hb_ck_ddr_o <= "00";
                state <= RECOVERY_ST;
 
             when RECOVERY_ST =>
