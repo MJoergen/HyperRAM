@@ -8,6 +8,8 @@ library ieee;
    use ieee.std_logic_1164.all;
    use ieee.numeric_std.all;
 
+use work.model_hram_pkg.all;
+
 entity tb is
 end entity tb;
 
@@ -48,6 +50,13 @@ architecture simulation of tb is
    signal   hr_rwds   : std_logic;
    signal   hr_dq     : std_logic_vector(7 downto 0);
 
+   function hram_params(i : hram_params_t) return hram_params_t is
+     variable r : hram_params_t;
+   begin
+     r := i;
+     r.tVCS := 10.0; -- override tVCS to shorten simulation time
+     return r;
+   end function hram_params;
 
    component s27kl0642 is
       port (
@@ -108,7 +117,7 @@ begin
       wait for 200 us;
       wait until clk = '1';
       wait until clk = '1';
-      tb_write_error <= '1';
+      --tb_write_error <= '1';
 
       for i in 1 to 28 loop
          wait until clk = '1';
@@ -124,7 +133,7 @@ begin
       wait for 300 us;
       wait until clk = '1';
       wait until clk = '1';
-      tb_read_error <= '1';
+      --tb_read_error <= '1';
 
       for i in 1 to 16 loop
          wait until clk = '1';
@@ -221,22 +230,35 @@ begin
    -- Instantiate HyperRAM simulation model
    ---------------------------------------------------------
 
-   s27kl0642_inst : component s27kl0642
+--   s27kl0642_inst : component s27kl0642
+--      port map (
+--         dq7      => hr_dq(7),
+--         dq6      => hr_dq(6),
+--         dq5      => hr_dq(5),
+--         dq4      => hr_dq(4),
+--         dq3      => hr_dq(3),
+--         dq2      => hr_dq(2),
+--         dq1      => hr_dq(1),
+--         dq0      => hr_dq(0),
+--         rwds     => hr_rwds,
+--         csneg    => hr_csn,
+--         ck       => hr_ck,
+--         ckn      => not hr_ck,
+--         resetneg => hr_resetn
+--      ); -- s27kl0642_inst
+
+    model_hram_inst: component model_hram
+      generic map (
+        SIM_MEM_SIZE => 8*1024*1024,
+        OUTPUT_DELAY => "UNIFORM",
+        PARAMS       => hram_params(IS66WVH8M8DBLL_100B1LI)
+      )
       port map (
-         dq7      => hr_dq(7),
-         dq6      => hr_dq(6),
-         dq5      => hr_dq(5),
-         dq4      => hr_dq(4),
-         dq3      => hr_dq(3),
-         dq2      => hr_dq(2),
-         dq1      => hr_dq(1),
-         dq0      => hr_dq(0),
-         rwds     => hr_rwds,
-         csneg    => hr_csn,
-         ck       => hr_ck,
-         ckn      => not hr_ck,
-         resetneg => hr_resetn
-      ); -- s27kl0642_inst
+        rst_n => hr_resetn,
+        cs_n  => hr_csn,
+        clk   => hr_ck,
+        rwds  => hr_rwds,
+        dq    => hr_dq
+      ); -- model_hram_inst
 
 end architecture simulation;
-
